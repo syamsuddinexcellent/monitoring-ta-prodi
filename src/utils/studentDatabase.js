@@ -1,0 +1,166 @@
+/**
+ * Master Student Database Mapping for Prodi Sains Data
+ * Maps student name -> NIM and known WhatsApp numbers
+ */
+
+export const STUDENT_NIM_MAP = {
+  "queena aurora batubara": "120450062",
+  "kholisaturrohmah": "120450019",
+  "alem ardemi": "120450004",
+  "fikri dwi alpian": "120450022",
+  "nadhea allya maharani": "120450007",
+  "cornel silaen": "120450102",
+  "wisnu wasis saputra": "120450030",
+  "gregorius gama abi surya": "120450018",
+  "marhanny zahra nurendra": "120450017",
+  "dede masita": "121450007",
+  "gede moena": "121450014",
+  "marshanda putri prasetya": "121450020",
+  "pramudya wibowo": "121450030",
+  "muhammad rendy saputra": "121450045",
+  "lion abdi marga": "121450047",
+  "muhammad hanif faros": "121450048",
+  "putri maulida chairani": "121450050",
+  "nadia silvani": "121450054",
+  "erwan arief": "121450062",
+  "catherine firdhasari maulina sinaga": "121450072",
+  "dwi sulistiani": "121450079",
+  "yunaena mar`atul kirom": "121450080",
+  "afifah syaharani": "121450097",
+  "helma lia putri": "121450100",
+  "audrey ribka desmonda manihuruk": "121450103",
+  "putri durrotul shopia": "121450116",
+  "kiwit novitasari": "121450126",
+  "adisty syawalda ariyanto": "121450136",
+  "lia alyani": "121450138",
+  "ima alifah izati zalfa": "121450140",
+  "mayada": "121450145",
+  "lulu christin sihombing": "121450152",
+  "jihan putri yani": "121450161",
+  "kartini lovian simbolon": "122450003",
+  "asa doa uyi": "122450005",
+  "siti nur aarifah": "122450006",
+  "muhammad bayu syuhada": "122450007",
+  "dwi ratna anggraeni": "122450008",
+  "khoirul mizan abdullah": "122450010",
+  "meira listyaningrum": "122450011",
+  "jaclin alcavella": "122450015",
+  "kemas veriandra ramadhan": "122450016",
+  "nawwaf abdurrahman": "122450018",
+  "lisa diani amelia": "122450021",
+  "cyntia kristina sidauruk": "122450023",
+  "raid muhammad naufal": "122450027",
+  "ukasyah muntaha": "122450028",
+  "nabiilah putri karnaia": "122450029",
+  "rani puspita sari": "122450030",
+  "allya nurul islami pasha": "122450033",
+  "khaalishah zuhrah alyaa vanefi": "122450034",
+  "najla juwairia": "122450037",
+  "khoirul anam": "122450039",
+  "tessa kania sagala": "122450040",
+  "oktavia nurwinda puspitasari": "122450041",
+  "abit ahmad oktarian": "122450042",
+  "ahmad sahidin akbar": "122450044",
+  "eka fidiya putri": "122450045",
+  "vita anggraini": "122450046",
+  "mutiara dian pitaloka": "122450047",
+  "david boby c. nainggolan": "122450048",
+  "nisrina nur afifah": "122450052",
+  "priska silvia ferantiana": "122450053",
+  "salwa farhanatussaidah": "122450055",
+  "adil aulia rahma nurhidayah": "122450058",
+  "nathanael daniel santoso": "122450059",
+  "annisa komalasari": "122450060",
+  "kharisa harvanny": "122450061",
+  "eli dwi putra berema": "122450064",
+  "berliana enda putri": "122450065",
+  "cintya bella": "122450066",
+  "azizah kusumah putri": "122450068",
+  "hermawan manurung": "122450069",
+  "renta siahaan": "122450070",
+  "safitri": "122450071",
+  "ganiya syazwa": "122450073",
+  "dearni monica br manik": "122450075",
+  "khusnun nisa": "122450078",
+  "renisha putri giani": "122450079",
+  "fadhil fitra wijaya": "122450082",
+  "randa andriana putra": "122450083",
+  "danang hilal kurniawan": "122450085",
+  "kayla amanda sukma": "122450086",
+  "feryadi yulius": "122450087",
+  "reynaldi rahmad": "122450088",
+  "naufal fakhri": "122450089",
+  "tobias david manogari": "122450091",
+  "chevando daffa pramanda": "122450095",
+  "uliano wilyam purba": "122450098",
+  "ibrahim al kahfi": "122450100",
+  "m. deriansyah okutra": "122450101",
+  "daris samudra": "122450102",
+  "rut junita sari siburian": "122450103",
+  "novelia adinda": "122450104",
+  "ferdy kevin naibaho": "122450107",
+  "andre hadiman rotua parhusip": "122450108",
+  "sahid maulana": "122450109",
+  "syalaisha andini putriansyah": "122450111",
+  "rendra eka prayoga": "122450112",
+  "aditya rahman": "122450113",
+  "akmal faiz abdillah": "122450114",
+  "smertniki javid ahmedthian": "122450115",
+  "anwar muslim": "122450117",
+  "mirzan yusuf rabbani": "122450118",
+  "muhammad zaky zaiddan": "122450119",
+  "syalaisha andina putriansyah": "122450121",
+  "amalia melani putri": "122450122",
+  "virdio samuel saragih": "122450124",
+  "nasywa nur afifah": "122450125",
+  "vira putri maharani": "122450129",
+  "bastian heskia silaban": "122450130",
+  "fayyaza aqila syafitri achjar": "122450131",
+  "pardi octaviando": "122450132",
+  "dhafin razaqa luthfi": "122450133",
+  "ahmad rizqi": "122450138",
+  "nabila zakiyah zahra": "122450139",
+  "rafly prabu darmawan": "122450140",
+  "diana syafithri": "122450141",
+  "rafa aqilla jungjunan": "122450142"
+};
+
+export const STUDENT_PHONE_MAP = {
+  "120450062": "6288219758365",
+  "120450022": "6282388137794",
+  "120450004": "6285817743940",
+  "120450019": "6285279852167",
+  "121450136": "6282377198091",
+  "121450161": "6282183021387",
+  "121450062": "6282340189456",
+  "121450126": "6281373938153",
+  "122450003": "6281285256067",
+  "122450006": "6288286496048",
+  "122450023": "6283132034836",
+  "122450027": "628877325774",
+  "122450039": "6289632152848",
+  "122450109": "6289505121002",
+  "122450117": "628978262875",
+  "122450122": "6281267862044",
+  "122450132": "6285173444166"
+};
+
+export function lookupStudentNIM(nama, angkatan = '2022') {
+  if (!nama) return '';
+  const clean = String(nama).trim().toLowerCase();
+  if (STUDENT_NIM_MAP[clean]) {
+    return STUDENT_NIM_MAP[clean];
+  }
+  // Search partial match
+  for (const [key, nim] of Object.entries(STUDENT_NIM_MAP)) {
+    if (key.includes(clean) || clean.includes(key)) {
+      return nim;
+    }
+  }
+  return '';
+}
+
+export function lookupStudentPhone(nim) {
+  if (!nim) return '';
+  return STUDENT_PHONE_MAP[String(nim).trim()] || '';
+}
