@@ -19,18 +19,25 @@ export function loginWithCredentials(identifier, password) {
   // Check registered users by email
   const users = getStoredUsers();
   const found = users.find(u => u.email === identifier.toLowerCase() && u.passwordHash === btoa(password));
-  if (found) return { role: 'user', email: found.email, name: found.name };
+  if (found) return { role: found.role || 'user', email: found.email, name: found.name };
   return null;
 }
 
+const ALLOWED_DOMAINS = ['sd.itera.ac.id', 'student.itera.ac.id'];
+
 export function registerUser(email, password) {
   if (!email.trim() || !password) return { error: 'Semua field wajib diisi.' };
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return { error: 'Format email tidak valid.' };
+  const emailLower = email.trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailLower)) return { error: 'Format email tidak valid.' };
+  const domain = emailLower.split('@')[1];
+  if (!ALLOWED_DOMAINS.includes(domain)) {
+    return { error: 'Hanya email @sd.itera.ac.id (dosen) atau @student.itera.ac.id (mahasiswa) yang diizinkan.' };
+  }
   if (password.length < 6) return { error: 'Password minimal 6 karakter.' };
   const users = getStoredUsers();
-  if (users.some(u => u.email === email.trim().toLowerCase())) return { error: 'Email sudah terdaftar.' };
-  const emailLower = email.trim().toLowerCase();
-  users.push({ email: emailLower, name: emailLower.split('@')[0], passwordHash: btoa(password) });
+  if (users.some(u => u.email === emailLower)) return { error: 'Email sudah terdaftar.' };
+  const role = domain === 'sd.itera.ac.id' ? 'dosen' : 'mahasiswa';
+  users.push({ email: emailLower, name: emailLower.split('@')[0], role, passwordHash: btoa(password) });
   saveStoredUsers(users);
   return { success: true };
 }
@@ -224,11 +231,16 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
                   type="email"
                   value={regEmail}
                   onChange={e => setRegEmail(e.target.value)}
-                  placeholder="contoh@itera.ac.id"
+                  placeholder="nama@sd.itera.ac.id atau @student.itera.ac.id"
                   required
                   className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 placeholder:text-slate-400"
                 />
               </div>
+              <p className="mt-1.5 text-[11px] text-slate-400">
+                Dosen: <span className="font-medium text-slate-500">@sd.itera.ac.id</span>
+                {' · '}
+                Mahasiswa: <span className="font-medium text-slate-500">@student.itera.ac.id</span>
+              </p>
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">Password</label>
