@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   X, Users, Database, ShieldCheck, GraduationCap, User,
   Trash2, RefreshCw, AlertTriangle, CheckCircle2, Inbox,
-  RotateCcw, BookOpen, Calendar, Layers, Clock, Wifi, WifiOff
+  RotateCcw, Calendar, Layers, Clock, Wifi, WifiOff, Search,
+  ChevronUp, ChevronDown, Phone
 } from 'lucide-react';
 import { getStoredUsersList, deleteStoredUser } from './AuthModal';
 
@@ -39,6 +40,11 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, isRefresh
   const [dosenSummary, setDosenSummary] = useState([]);
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [flash, setFlash] = useState('');
+  const [search, setSearch] = useState('');
+  const [filterAngkatan, setFilterAngkatan] = useState('all');
+  const [sortCol, setSortCol] = useState('nim');
+  const [sortAsc, setSortAsc] = useState(true);
+  const [showPeriode, setShowPeriode] = useState(false);
 
   const refresh = () => {
     setUsers(getStoredUsersList());
@@ -78,6 +84,46 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, isRefresh
     showFlash('Token reset password berhasil dihapus.');
   };
 
+  const angkatanList = useMemo(() => {
+    if (!sheetsData?.students) return [];
+    return [...new Set(sheetsData.students.map(s => s.angkatan))].sort();
+  }, [sheetsData]);
+
+  const totalPeriode = sheetsData?.weekColumns?.length ?? 0;
+
+  const filteredStudents = useMemo(() => {
+    if (!sheetsData?.students) return [];
+    let list = sheetsData.students;
+    if (filterAngkatan !== 'all') list = list.filter(s => s.angkatan === filterAngkatan);
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      list = list.filter(s =>
+        s.nama?.toLowerCase().includes(q) ||
+        s.nim?.toLowerCase().includes(q) ||
+        s.pembimbing1?.toLowerCase().includes(q) ||
+        s.pembimbing2?.toLowerCase().includes(q) ||
+        s.penguji1?.toLowerCase().includes(q) ||
+        s.penguji2?.toLowerCase().includes(q)
+      );
+    }
+    return [...list].sort((a, b) => {
+      let av = a[sortCol] ?? '';
+      let bv = b[sortCol] ?? '';
+      if (sortCol === 'laporan') {
+        av = Object.values(a.weeklyUpdates || {}).filter(w => w.reported).length;
+        bv = Object.values(b.weeklyUpdates || {}).filter(w => w.reported).length;
+      }
+      if (av < bv) return sortAsc ? -1 : 1;
+      if (av > bv) return sortAsc ? 1 : -1;
+      return 0;
+    });
+  }, [sheetsData, search, filterAngkatan, sortCol, sortAsc]);
+
+  const handleSort = (col) => {
+    if (sortCol === col) setSortAsc(p => !p);
+    else { setSortCol(col); setSortAsc(true); }
+  };
+
   if (!isOpen) return null;
 
   const dosenUsers = users.filter(u => u.role === 'dosen');
@@ -87,7 +133,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, isRefresh
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={onClose} />
       <div
-        className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col border border-slate-200 overflow-hidden"
+        className="relative bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col border border-slate-200 overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -222,7 +268,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, isRefresh
           {tab === 'data' && (
             <div className="p-5 space-y-4">
 
-              {/* ── Google Sheets ── */}
+              {/* ── Google Sheets header ── */}
               <div className="rounded-xl border border-brand-200 overflow-hidden">
                 <div className="flex items-center justify-between px-4 py-3 bg-brand-50 border-b border-brand-200">
                   <div className="flex items-center gap-2">
@@ -238,22 +284,30 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, isRefresh
                       {sheetsData?.source === 'google_sheets' ? 'Live' : 'Data Cadangan'}
                     </span>
                   </div>
-                  <button
-                    onClick={onRefreshSheets}
-                    disabled={isRefreshing}
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-brand-600 hover:bg-brand-700 text-white disabled:opacity-60 transition-colors"
-                  >
-                    <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin' : ''}`} />
-                    {isRefreshing ? 'Menyinkronkan...' : 'Sinkronkan'}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {sheetsData?.lastUpdated && (
+                      <span className="hidden sm:flex items-center gap-1 text-[10px] text-slate-400">
+                        <Clock className="w-3 h-3" />
+                        {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(sheetsData.lastUpdated)}
+                      </span>
+                    )}
+                    <button
+                      onClick={onRefreshSheets}
+                      disabled={isRefreshing}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-brand-600 hover:bg-brand-700 text-white disabled:opacity-60 transition-colors"
+                    >
+                      <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin' : ''}`} />
+                      {isRefreshing ? 'Menyinkronkan...' : 'Sinkronkan'}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Stat grid */}
                 <div className="grid grid-cols-3 divide-x divide-slate-100 border-b border-slate-100">
                   {[
                     { icon: Users, label: 'Total Mahasiswa', value: sheetsData?.students?.length ?? '-', color: 'text-brand-700' },
-                    { icon: Calendar, label: 'Periode', value: sheetsData?.weekColumns?.length ?? '-', color: 'text-indigo-600' },
-                    { icon: Layers, label: 'Angkatan', value: sheetsData ? [...new Set(sheetsData.students.map(s => s.angkatan))].length : '-', color: 'text-emerald-600' },
+                    { icon: Calendar, label: 'Periode', value: totalPeriode || '-', color: 'text-indigo-600' },
+                    { icon: Layers, label: 'Angkatan', value: angkatanList.length || '-', color: 'text-emerald-600' },
                   ].map(({ icon: Icon, label, value, color }) => (
                     <div key={label} className="flex flex-col items-center py-3 px-2 text-center">
                       <Icon className={`w-4 h-4 ${color} mb-1`} />
@@ -270,15 +324,12 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, isRefresh
                     return acc;
                   }, {});
                   return (
-                    <div className="px-4 py-3 space-y-1.5">
+                    <div className="px-4 py-3 space-y-1.5 border-b border-slate-100">
                       {Object.entries(byAngkatan).sort().map(([ang, count]) => (
                         <div key={ang} className="flex items-center gap-2">
                           <span className="text-[10px] font-semibold text-slate-500 w-16 shrink-0">Angk. {ang}</span>
                           <div className="flex-1 bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                            <div
-                              className="bg-brand-500 h-full rounded-full"
-                              style={{ width: `${(count / sheetsData.students.length) * 100}%` }}
-                            />
+                            <div className="bg-brand-500 h-full rounded-full" style={{ width: `${(count / sheetsData.students.length) * 100}%` }} />
                           </div>
                           <span className="text-[10px] font-bold text-slate-700 w-8 text-right shrink-0">{count}</span>
                         </div>
@@ -287,15 +338,145 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, isRefresh
                   );
                 })()}
 
-                {/* Last updated */}
-                {sheetsData?.lastUpdated && (
-                  <div className="flex items-center gap-1.5 px-4 py-2 border-t border-slate-100 bg-slate-50">
-                    <Clock className="w-3 h-3 text-slate-400" />
-                    <span className="text-[10px] text-slate-400">
-                      Diperbarui: {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(sheetsData.lastUpdated)}
-                    </span>
+                {/* Periode list toggle */}
+                {sheetsData?.weekColumns?.length > 0 && (
+                  <div>
+                    <button
+                      onClick={() => setShowPeriode(p => !p)}
+                      className="w-full flex items-center justify-between px-4 py-2.5 text-[10px] font-semibold text-slate-500 hover:bg-slate-50 transition-colors"
+                    >
+                      <span>Daftar Periode ({sheetsData.weekColumns.length})</span>
+                      {showPeriode ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                    </button>
+                    {showPeriode && (
+                      <div className="px-4 pb-3 flex flex-wrap gap-1.5 border-t border-slate-100 pt-2.5">
+                        {sheetsData.weekColumns.map((w, i) => (
+                          <span key={w} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-semibold">
+                            <span className="text-indigo-400">{i + 1}.</span> {w}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
+              </div>
+
+              {/* ── Daftar Mahasiswa (full table) ── */}
+              <div className="rounded-xl border border-slate-200 overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200 flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <GraduationCap className="w-4 h-4 text-brand-600" />
+                    <span className="text-xs font-bold text-slate-700">Daftar Mahasiswa</span>
+                    <span className="text-[10px] text-slate-400">({filteredStudents.length} ditampilkan)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {/* Angkatan filter */}
+                    <select
+                      value={filterAngkatan}
+                      onChange={e => setFilterAngkatan(e.target.value)}
+                      className="text-[10px] font-semibold border border-slate-200 rounded-lg px-2 py-1 bg-white text-slate-600 outline-none focus:ring-1 focus:ring-brand-400"
+                    >
+                      <option value="all">Semua Angkatan</option>
+                      {angkatanList.map(a => (
+                        <option key={a} value={a}>Angkatan {a}</option>
+                      ))}
+                    </select>
+                    {/* Search */}
+                    <div className="relative">
+                      <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" />
+                      <input
+                        type="text"
+                        placeholder="Cari nama / NIM / dosen…"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        className="pl-6 pr-3 py-1 text-[10px] border border-slate-200 rounded-lg bg-white text-slate-700 placeholder-slate-400 outline-none focus:ring-1 focus:ring-brand-400 w-44"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Table */}
+                <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
+                  <table className="w-full text-[10px] border-collapse">
+                    <thead className="sticky top-0 z-10 bg-slate-100">
+                      <tr>
+                        {[
+                          { col: null, label: 'No', w: 'w-8' },
+                          { col: 'nim', label: 'NIM', w: 'w-24' },
+                          { col: 'nama', label: 'Nama', w: 'w-40' },
+                          { col: 'angkatan', label: 'Angk.', w: 'w-14' },
+                          { col: 'pembimbing1', label: 'P1', w: 'w-32' },
+                          { col: 'pembimbing2', label: 'P2', w: 'w-32' },
+                          { col: 'penguji1', label: 'Pj1', w: 'w-32' },
+                          { col: 'penguji2', label: 'Pj2', w: 'w-32' },
+                          { col: 'phone', label: 'WA', w: 'w-24' },
+                          { col: 'statusTA', label: 'Status', w: 'w-20' },
+                          { col: 'laporan', label: 'Laporan', w: 'w-16' },
+                        ].map(({ col, label, w }) => (
+                          <th
+                            key={label}
+                            onClick={col ? () => handleSort(col) : undefined}
+                            className={`${w} px-2 py-2 text-left font-bold text-slate-600 whitespace-nowrap border-b border-slate-200 ${col ? 'cursor-pointer hover:text-brand-700 select-none' : ''}`}
+                          >
+                            <span className="flex items-center gap-0.5">
+                              {label}
+                              {col && sortCol === col && (
+                                sortAsc ? <ChevronUp className="w-2.5 h-2.5" /> : <ChevronDown className="w-2.5 h-2.5" />
+                              )}
+                            </span>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {filteredStudents.length === 0 ? (
+                        <tr>
+                          <td colSpan={11} className="text-center py-8 text-slate-400 italic">Tidak ada data mahasiswa.</td>
+                        </tr>
+                      ) : filteredStudents.map((s, i) => {
+                        const reported = Object.values(s.weeklyUpdates || {}).filter(w => w.reported).length;
+                        return (
+                          <tr key={s.nim} className={`${i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'} hover:bg-brand-50/40 transition-colors`}>
+                            <td className="px-2 py-1.5 text-slate-400 font-mono">{i + 1}</td>
+                            <td className="px-2 py-1.5 text-slate-700 font-mono font-semibold whitespace-nowrap">{s.nim}</td>
+                            <td className="px-2 py-1.5 text-slate-800 font-medium max-w-[160px]">
+                              <span className="line-clamp-2">{s.nama}</span>
+                            </td>
+                            <td className="px-2 py-1.5 text-center">
+                              <span className="px-1.5 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-200 font-bold">{s.angkatan}</span>
+                            </td>
+                            <td className="px-2 py-1.5 text-slate-600 max-w-[128px]">
+                              <span className="line-clamp-2">{s.pembimbing1 || <span className="text-slate-300">-</span>}</span>
+                            </td>
+                            <td className="px-2 py-1.5 text-slate-600 max-w-[128px]">
+                              <span className="line-clamp-2">{s.pembimbing2 || <span className="text-slate-300">-</span>}</span>
+                            </td>
+                            <td className="px-2 py-1.5 text-slate-600 max-w-[128px]">
+                              <span className="line-clamp-2">{s.penguji1 || <span className="text-slate-300">-</span>}</span>
+                            </td>
+                            <td className="px-2 py-1.5 text-slate-600 max-w-[128px]">
+                              <span className="line-clamp-2">{s.penguji2 || <span className="text-slate-300">-</span>}</span>
+                            </td>
+                            <td className="px-2 py-1.5 whitespace-nowrap">
+                              {s.phone
+                                ? <span className="flex items-center gap-0.5 text-emerald-700"><Phone className="w-2.5 h-2.5" />{s.phone}</span>
+                                : <span className="text-slate-300">-</span>}
+                            </td>
+                            <td className="px-2 py-1.5">
+                              {s.statusTA
+                                ? <span className="px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[9px] font-semibold whitespace-nowrap">{s.statusTA}</span>
+                                : <span className="text-slate-300">-</span>}
+                            </td>
+                            <td className="px-2 py-1.5 text-center whitespace-nowrap">
+                              <span className={`font-bold ${reported > 0 ? 'text-emerald-700' : 'text-rose-400'}`}>{reported}</span>
+                              <span className="text-slate-400">/{totalPeriode}</span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
               {/* ── Laporan Lokal Mahasiswa ── */}
