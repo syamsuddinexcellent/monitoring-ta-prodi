@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, X, Eye, EyeOff, ShieldCheck, AlertCircle, UserPlus, LogIn, User } from 'lucide-react';
+import { Lock, X, Eye, EyeOff, ShieldCheck, AlertCircle, UserPlus, LogIn, Mail } from 'lucide-react';
 
 const ADMIN_USER = 'admin';
 const ADMIN_PASS_B64 = btoa('prodi2026');
@@ -11,25 +11,25 @@ function saveStoredUsers(users) {
   try { localStorage.setItem('app_users', JSON.stringify(users)); } catch {}
 }
 
-export function loginWithCredentials(username, password) {
-  // Check admin
-  if (username === ADMIN_USER && btoa(password) === ADMIN_PASS_B64) {
-    return { role: 'admin', username: 'admin', name: 'Administrator' };
+export function loginWithCredentials(identifier, password) {
+  // Check admin (by username "admin")
+  if (identifier === ADMIN_USER && btoa(password) === ADMIN_PASS_B64) {
+    return { role: 'admin', email: 'admin', name: 'Administrator' };
   }
-  // Check registered users
+  // Check registered users by email
   const users = getStoredUsers();
-  const found = users.find(u => u.username === username && u.passwordHash === btoa(password));
-  if (found) return { role: 'user', username: found.username, name: found.name };
+  const found = users.find(u => u.email === identifier.toLowerCase() && u.passwordHash === btoa(password));
+  if (found) return { role: 'user', email: found.email, name: found.name };
   return null;
 }
 
-export function registerUser(username, name, password) {
-  if (!username.trim() || !name.trim() || !password) return { error: 'Semua field wajib diisi.' };
-  if (username === ADMIN_USER) return { error: 'Username tidak tersedia.' };
+export function registerUser(email, name, password) {
+  if (!email.trim() || !name.trim() || !password) return { error: 'Semua field wajib diisi.' };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return { error: 'Format email tidak valid.' };
   if (password.length < 6) return { error: 'Password minimal 6 karakter.' };
   const users = getStoredUsers();
-  if (users.some(u => u.username === username.trim())) return { error: 'Username sudah digunakan.' };
-  users.push({ username: username.trim(), name: name.trim(), passwordHash: btoa(password) });
+  if (users.some(u => u.email === email.trim().toLowerCase())) return { error: 'Email sudah terdaftar.' };
+  users.push({ email: email.trim().toLowerCase(), name: name.trim(), passwordHash: btoa(password) });
   saveStoredUsers(users);
   return { success: true };
 }
@@ -58,13 +58,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess, availableLecture
   const [tab, setTab] = useState('login');
 
   // Login state
-  const [loginUsername, setLoginUsername] = useState('');
+  const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
 
   // Register state
-  const [regUsername, setRegUsername] = useState('');
+  const [regEmail, setRegEmail] = useState('');
   const [regName, setRegName] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [regConfirm, setRegConfirm] = useState('');
@@ -75,8 +75,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess, availableLecture
   if (!isOpen) return null;
 
   const handleClose = () => {
-    setLoginUsername(''); setLoginPassword(''); setLoginError('');
-    setRegUsername(''); setRegName(''); setRegPassword(''); setRegConfirm('');
+    setLoginEmail(''); setLoginPassword(''); setLoginError('');
+    setRegEmail(''); setRegName(''); setRegPassword(''); setRegConfirm('');
     setRegError(''); setRegSuccess('');
     onClose();
   };
@@ -86,13 +86,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess, availableLecture
     setLoginError('');
     setLoginLoading(true);
     setTimeout(() => {
-      const result = loginWithCredentials(loginUsername.trim(), loginPassword);
+      const result = loginWithCredentials(loginEmail.trim(), loginPassword);
       if (result) {
         try { sessionStorage.setItem('auth_session', JSON.stringify(result)); } catch {}
         onSuccess(result);
         handleClose();
       } else {
-        setLoginError('Username atau password salah.');
+        setLoginError('Email atau password salah.');
       }
       setLoginLoading(false);
     }, 400);
@@ -104,11 +104,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess, availableLecture
     if (regPassword !== regConfirm) { setRegError('Password tidak cocok.'); return; }
     setRegLoading(true);
     setTimeout(() => {
-      const result = registerUser(regUsername, regName, regPassword);
+      const result = registerUser(regEmail, regName, regPassword);
       if (result.error) { setRegError(result.error); }
       else {
         setRegSuccess('Akun berhasil dibuat! Silakan login.');
-        setRegUsername(''); setRegName(''); setRegPassword(''); setRegConfirm('');
+        setRegEmail(''); setRegName(''); setRegPassword(''); setRegConfirm('');
         setTimeout(() => setTab('login'), 1200);
       }
       setRegLoading(false);
@@ -169,10 +169,19 @@ export default function AuthModal({ isOpen, onClose, onSuccess, availableLecture
               </div>
             )}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Username</label>
-              <input type="text" value={loginUsername} onChange={e => setLoginUsername(e.target.value)}
-                placeholder="Masukkan username" autoFocus required
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent bg-slate-50 placeholder:text-slate-400" />
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Email</label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={loginEmail}
+                  onChange={e => setLoginEmail(e.target.value)}
+                  placeholder="Email atau username admin"
+                  autoFocus
+                  required
+                  className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent bg-slate-50 placeholder:text-slate-400"
+                />
+              </div>
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">Password</label>
@@ -222,10 +231,18 @@ export default function AuthModal({ isOpen, onClose, onSuccess, availableLecture
               )}
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Username</label>
-              <input type="text" value={regUsername} onChange={e => setRegUsername(e.target.value)}
-                placeholder="Buat username unik" required
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 placeholder:text-slate-400" />
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Email</label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="email"
+                  value={regEmail}
+                  onChange={e => setRegEmail(e.target.value)}
+                  placeholder="contoh@itera.ac.id"
+                  required
+                  className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 placeholder:text-slate-400"
+                />
+              </div>
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">Password</label>
