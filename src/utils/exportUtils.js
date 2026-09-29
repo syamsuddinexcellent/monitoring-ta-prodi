@@ -261,6 +261,105 @@ export function printRekapPeriode(students, week, weekColumns) {
   win.document.close();
 }
 
+// PDF: all periods summary via print window
+export function printRekapAll(students, weekColumns) {
+  const periodeSections = weekColumns.map((week, idx) => {
+    const sudah = students.filter(s => s.weeklyUpdates?.[week]?.reported).length;
+    const belum = students.length - sudah;
+    const rate = Math.round((sudah / (students.length || 1)) * 100);
+
+    const rows = students.map((s, i) => {
+      const upd = s.weeklyUpdates?.[week] || {};
+      const reported = upd.reported;
+      return `<tr style="${i % 2 === 0 ? '' : 'background:#f8fafc;'}">
+        <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;color:#64748b;font-size:11px;">${i + 1}</td>
+        <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-family:monospace;font-size:10px;">${s.nim}</td>
+        <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-weight:600;font-size:11px;">${s.nama}</td>
+        <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:10px;">${s.angkatan}</td>
+        <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;">
+          <span style="background:${reported ? '#d1fae5' : '#fee2e2'};color:${reported ? '#065f46' : '#991b1b'};padding:2px 7px;border-radius:9999px;font-size:10px;font-weight:700;">
+            ${reported ? 'Sudah' : 'Belum'}
+          </span>
+        </td>
+        <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:10px;">${upd.category || '-'}</td>
+        <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:10px;max-width:160px;">${upd.progress || '-'}</td>
+      </tr>`;
+    }).join('');
+
+    return `
+      <div style="break-inside:avoid;margin-bottom:32px;">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:2px solid #4f46e5;padding-bottom:6px;margin-bottom:10px;">
+          <div>
+            <span style="font-size:14px;font-weight:800;color:#1e293b;">Periode ${idx + 1}</span>
+            <span style="font-size:12px;color:#64748b;margin-left:8px;">${week}</span>
+          </div>
+          <div style="display:flex;gap:12px;font-size:11px;">
+            <span style="color:#059669;font-weight:700;">${sudah} lapor</span>
+            <span style="color:#e11d48;font-weight:700;">${belum} belum</span>
+            <span style="color:#4f46e5;font-weight:700;">${rate}%</span>
+          </div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          <thead><tr style="background:#f1f5f9;">
+            <th style="padding:5px 7px;text-align:left;font-size:10px;color:#64748b;border-bottom:2px solid #e2e8f0;">No</th>
+            <th style="padding:5px 7px;text-align:left;font-size:10px;color:#64748b;border-bottom:2px solid #e2e8f0;">NIM</th>
+            <th style="padding:5px 7px;text-align:left;font-size:10px;color:#64748b;border-bottom:2px solid #e2e8f0;">Nama</th>
+            <th style="padding:5px 7px;text-align:left;font-size:10px;color:#64748b;border-bottom:2px solid #e2e8f0;">Angk.</th>
+            <th style="padding:5px 7px;text-align:left;font-size:10px;color:#64748b;border-bottom:2px solid #e2e8f0;">Status</th>
+            <th style="padding:5px 7px;text-align:left;font-size:10px;color:#64748b;border-bottom:2px solid #e2e8f0;">Kategori</th>
+            <th style="padding:5px 7px;text-align:left;font-size:10px;color:#64748b;border-bottom:2px solid #e2e8f0;">Progres</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }).join('');
+
+  const overallSudah = weekColumns.length > 0
+    ? students.filter(s => weekColumns.some(w => s.weeklyUpdates?.[w]?.reported)).length
+    : 0;
+
+  const html = `<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8"/>
+<title>Rekap Monitoring TA – Semua Periode</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 24px; color: #1e293b; font-size: 12px; }
+  @media print { button { display: none !important; } body { padding: 12px; } }
+  @page { size: A4 landscape; margin: 14mm; }
+</style>
+</head><body>
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:12px;border-bottom:3px solid #4f46e5;">
+  <div>
+    <h1 style="font-size:20px;font-weight:900;margin:0 0 2px;">Rekap Monitoring Tugas Akhir</h1>
+    <div style="color:#64748b;font-size:12px;">Program Studi Sains Data · Semua Periode (${weekColumns.length} periode) · ${students.length} mahasiswa</div>
+  </div>
+  <button onclick="window.print()" style="padding:8px 18px;background:#4f46e5;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">Cetak / Simpan PDF</button>
+</div>
+<div style="display:flex;gap:12px;margin-bottom:20px;">
+  <div style="flex:1;padding:10px 14px;border-radius:8px;border:1px solid #bfdbfe;background:#eff6ff;">
+    <div style="font-size:20px;font-weight:900;color:#1d4ed8;">${weekColumns.length}</div>
+    <div style="font-size:11px;color:#64748b;">Total Periode</div>
+  </div>
+  <div style="flex:1;padding:10px 14px;border-radius:8px;border:1px solid #e2e8f0;">
+    <div style="font-size:20px;font-weight:900;color:#1e293b;">${students.length}</div>
+    <div style="font-size:11px;color:#64748b;">Total Mahasiswa</div>
+  </div>
+  <div style="flex:1;padding:10px 14px;border-radius:8px;border:1px solid #bbf7d0;background:#f0fdf4;">
+    <div style="font-size:20px;font-weight:900;color:#059669;">${overallSudah}</div>
+    <div style="font-size:11px;color:#64748b;">Pernah Melapor</div>
+  </div>
+</div>
+${periodeSections}
+<div style="margin-top:16px;font-size:10px;color:#94a3b8;text-align:right;">
+  Dicetak dari Sistem Monitoring TA Prodi Sains Data · ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+</div>
+</body></html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+}
+
 // ─── Verifikasi helpers ───────────────────────────────────────────────────────
 
 const VERIF_KEY = 'verifikasi_laporan';

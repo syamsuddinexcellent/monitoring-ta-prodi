@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { getStoredUsersList, deleteStoredUser } from './AuthModal';
 import {
-  exportExcelAll, exportExcelPeriode, printRekapPeriode,
+  exportExcelAll, exportExcelPeriode, printRekapPeriode, printRekapAll,
   getLocalPeriods, saveLocalPeriods
 } from '../utils/exportUtils';
 
@@ -568,16 +568,26 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, isRefresh
                   <div className="flex items-center justify-between gap-3 flex-wrap">
                     <div>
                       <p className="text-xs font-semibold text-slate-700">Rekap Semua Periode</p>
-                      <p className="text-[10px] text-slate-400">Excel dengan 1 sheet per periode + sheet ringkasan</p>
+                      <p className="text-[10px] text-slate-400">Semua {allWeekColumns.length} periode dalam satu file</p>
                     </div>
-                    <button
-                      onClick={() => sheetsData?.students && exportExcelAll(sheetsData.students, allWeekColumns)}
-                      disabled={!sheetsData?.students}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-40 transition-colors shrink-0"
-                    >
-                      <FileSpreadsheet className="w-3 h-3" />
-                      Download Excel
-                    </button>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => sheetsData?.students && exportExcelAll(sheetsData.students, allWeekColumns)}
+                        disabled={!sheetsData?.students}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-40 transition-colors"
+                      >
+                        <FileSpreadsheet className="w-3 h-3" />
+                        Excel
+                      </button>
+                      <button
+                        onClick={() => sheetsData?.students && printRekapAll(sheetsData.students, allWeekColumns)}
+                        disabled={!sheetsData?.students}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-slate-700 hover:bg-slate-800 text-white disabled:opacity-40 transition-colors"
+                      >
+                        <Printer className="w-3 h-3" />
+                        PDF
+                      </button>
+                    </div>
                   </div>
 
                   {/* Export per periode */}
