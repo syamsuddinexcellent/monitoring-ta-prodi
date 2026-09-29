@@ -10,7 +10,7 @@ import MatrixView from './components/MatrixView';
 import StudentDetailModal from './components/StudentDetailModal';
 import WhatsAppModal from './components/WhatsAppModal';
 import WhatsAppConnectModal from './components/WhatsAppConnectModal';
-import AuthModal from './components/AuthModal';
+import AuthModal, { validateResetToken } from './components/AuthModal';
 import {
   loadMonitoringData,
   getWeeklyMetrics,
@@ -48,6 +48,7 @@ export default function App() {
   });
   const isAdmin = loggedInUser?.role === 'admin';
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [resetToken, setResetToken] = useState(null);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -67,6 +68,17 @@ export default function App() {
   // Initial Data Fetch
   useEffect(() => {
     fetchData();
+  }, []);
+
+  // Detect reset_token in URL (from password reset email link)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('reset_token');
+    if (token && validateResetToken(token)) {
+      setResetToken(token);
+      setIsLoginModalOpen(true);
+      window.history.replaceState({}, '', window.location.pathname);
+    }
   }, []);
 
   // Restore lecturer filter when dosen session is active on load
@@ -509,14 +521,14 @@ export default function App() {
       {/* Auth Modal (Login + Register) */}
       <AuthModal
         isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
+        onClose={() => { setIsLoginModalOpen(false); setResetToken(null); }}
         onSuccess={(user) => {
           setLoggedInUser(user);
           if (user.role === 'dosen' && user.lecturerName) {
             setLecturerFilter(user.lecturerName);
           }
         }}
-        availableLecturers={availableLecturers}
+        resetToken={resetToken}
       />
     </div>
   );

@@ -94,6 +94,29 @@ export function resetPassword(email, newPassword) {
   return { success: true, name: users[idx].name };
 }
 
+// Reset token helpers (stored in localStorage so link works across sessions)
+function getResetTokens() {
+  try { return JSON.parse(localStorage.getItem('reset_tokens') || '[]'); } catch { return []; }
+}
+function storeResetToken(email, token) {
+  const expiry = Date.now() + 60 * 60 * 1000; // 1 jam
+  const active = getResetTokens().filter(t => t.email !== email && t.expiry > Date.now());
+  active.push({ token, email, expiry });
+  localStorage.setItem('reset_tokens', JSON.stringify(active));
+}
+export function validateResetToken(token) {
+  return getResetTokens().find(t => t.token === token && t.expiry > Date.now()) || null;
+}
+export function consumeResetToken(token) {
+  localStorage.setItem('reset_tokens', JSON.stringify(
+    getResetTokens().filter(t => t.token !== token)
+  ));
+}
+function generateToken() {
+  return Array.from(crypto.getRandomValues(new Uint8Array(24)))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 function buildNimToName() {
   const map = {};
   for (const [name, nim] of Object.entries(STUDENT_NIM_MAP)) {
@@ -122,7 +145,7 @@ function PasswordInput({ value, onChange, placeholder }) {
   );
 }
 
-export default function AuthModal({ isOpen, onClose, onSuccess }) {
+export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = null }) {
   const [tab, setTab] = useState('login');
   const [regRole, setRegRole] = useState('dosen');
 
@@ -144,14 +167,15 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
   const [regNimError, setRegNimError] = useState('');
 
   // Forgot password
-  const [forgotEmail, setForgotEmail] = useState('');
-  const [forgotStep, setForgotStep] = useState(1); // 1=enter email, 2=enter OTP, 3=set new password
-  const [forgotOtp, setForgotOtp] = useState('');
-  const [forgotOtpInput, setForgotOtpInput] = useState('');
-  const [forgotOtpExpiry, setForgotOtpExpiry] = useState(null);
+  // If resetToken prop provided (from URL), resolve email immediately
+  const tokenData = resetToken ? validateResetToken(resetToken) : null;
+  const [forgotEmail, setForgotEmail] = useState(tokenData?.email || '');
+  const [forgotStep, setForgotStep] = useState(tokenData ? 2 : 1); // 1=enter email, 2=set new password
   const [forgotNewPass, setForgotNewPass] = useState('');
   const [forgotConfirm, setForgotConfirm] = useState('');
-  const [forgotError, setForgotError] = useState('');
+  const [forgotError, setForgotError] = useState(
+    resetToken && !tokenData ? 'Link reset sudah kedaluwarsa atau tidak valid. Silakan minta link baru.' : ''
+  );
   const [forgotSuccess, setForgotSuccess] = useState('');
   const [forgotLoading, setForgotLoading] = useState(false);
 
@@ -165,8 +189,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
   const detectedRole = classifyEmail(regEmailLower);
 
   const resetForgot = () => {
-    setForgotEmail(''); setForgotStep(1); setForgotOtp('');
-    setForgotOtpInput(''); setForgotOtpExpiry(null);
+    setForgotEmail(''); setForgotStep(1);
     setForgotNewPass(''); setForgotConfirm('');
     setForgotError(''); setForgotSuccess('');
   };
@@ -181,33 +204,32 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
     onClose();
   };
 
-  const generateOtp = () => String(Math.floor(100000 + Math.random() * 900000));
+  const sendResetLink = async (email) => {
+    const users = getStoredUsers();
+    const found = users.find(u => u.email === email);
+    if (!found) return { error: 'Email tidak terdaftar di sistem. Silakan daftar akun baru.' };
+    const token = generateToken();
+    storeResetToken(email, token);
+    const resetLink = `${window.location.origin}/?reset_token=${token}`;
+    emailjsInit(EMAILJS_PUBLIC_KEY);
+    await emailjsSend(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email: email,
+      user_name: found.name || email.split('@')[0],
+      reset_link: resetLink,
+    });
+    return { success: true };
+  };
 
   const handleForgotStep1 = async (e) => {
     e.preventDefault();
     setForgotError('');
     const email = forgotEmail.trim().toLowerCase();
     if (!email) { setForgotError('Masukkan email Anda.'); return; }
-    const users = getStoredUsers();
-    const found = users.find(u => u.email === email);
-    if (!found) {
-      setForgotError('Email tidak terdaftar di sistem. Silakan daftar akun baru.');
-      return;
-    }
-    const otp = generateOtp();
-    const expiry = Date.now() + 10 * 60 * 1000; // 10 menit
     setForgotLoading(true);
-    setForgotError('');
     try {
-      emailjsInit(EMAILJS_PUBLIC_KEY);
-      await emailjsSend(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-        to_email: email,
-        user_name: found.name || email.split('@')[0],
-        otp_code: otp,
-      });
-      setForgotOtp(otp);
-      setForgotOtpExpiry(expiry);
-      setForgotStep(2);
+      const result = await sendResetLink(email);
+      if (result.error) { setForgotError(result.error); }
+      else { setForgotStep(2); }
     } catch {
       setForgotError('Gagal mengirim email. Periksa koneksi internet atau konfigurasi EmailJS.');
     } finally {
@@ -218,26 +240,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
   const handleForgotStep2 = (e) => {
     e.preventDefault();
     setForgotError('');
-    if (Date.now() > forgotOtpExpiry) {
-      setForgotError('Kode OTP sudah kedaluwarsa. Kirim ulang kode.');
-      return;
-    }
-    if (forgotOtpInput.trim() !== forgotOtp) {
-      setForgotError('Kode OTP salah. Periksa email Anda.');
-      return;
-    }
-    setForgotStep(3);
-  };
-
-  const handleForgotStep3 = (e) => {
-    e.preventDefault();
-    setForgotError('');
     if (forgotNewPass !== forgotConfirm) { setForgotError('Password tidak cocok.'); return; }
     setForgotLoading(true);
     setTimeout(() => {
       const result = resetPassword(forgotEmail, forgotNewPass);
       if (result.error) { setForgotError(result.error); }
       else {
+        if (resetToken) consumeResetToken(resetToken);
         setForgotSuccess('Password berhasil direset. Silakan login dengan password baru.');
         setTimeout(() => { resetForgot(); setTab('login'); }, 2000);
       }
@@ -245,25 +254,15 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
     }, 400);
   };
 
-  const handleResendOtp = async () => {
+  const handleResendLink = async () => {
     setForgotError('');
-    const otp = generateOtp();
-    const expiry = Date.now() + 10 * 60 * 1000;
     setForgotLoading(true);
     try {
-      emailjsInit(EMAILJS_PUBLIC_KEY);
-      const users = getStoredUsers();
-      const found = users.find(u => u.email === forgotEmail.trim().toLowerCase());
-      await emailjsSend(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-        to_email: forgotEmail.trim().toLowerCase(),
-        user_name: found?.name || forgotEmail.split('@')[0],
-        otp_code: otp,
-      });
-      setForgotOtp(otp);
-      setForgotOtpExpiry(expiry);
-      setForgotOtpInput('');
+      const result = await sendResetLink(forgotEmail.trim().toLowerCase());
+      if (result.error) setForgotError(result.error);
+      else setForgotError('');
     } catch {
-      setForgotError('Gagal mengirim ulang kode. Coba lagi.');
+      setForgotError('Gagal mengirim ulang. Coba lagi.');
     } finally {
       setForgotLoading(false);
     }
@@ -437,11 +436,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
               </div>
             )}
 
-            {/* Step 1: enter email */}
+            {/* Step 1: enter email → send link */}
             {forgotStep === 1 && (
               <form onSubmit={handleForgotStep1} className="space-y-4">
                 <div className="px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-600 leading-relaxed">
-                  Masukkan email ITERA yang terdaftar. Kode verifikasi akan dikirim ke email tersebut.
+                  Masukkan email ITERA yang terdaftar. Kami akan mengirimkan link reset password ke email tersebut.
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Email terdaftar</label>
@@ -461,56 +460,40 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
                 <button type="submit" disabled={forgotLoading}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 disabled:opacity-60 rounded-lg transition-all shadow-sm">
                   {forgotLoading
-                    ? <><RefreshCw className="w-4 h-4 animate-spin" /> Mengirim kode...</>
-                    : <><Mail className="w-4 h-4" /> Kirim Kode Verifikasi</>
+                    ? <><RefreshCw className="w-4 h-4 animate-spin" />Mengirim link...</>
+                    : <><Mail className="w-4 h-4" />Kirim Link Reset Password</>
                   }
                 </button>
               </form>
             )}
 
-            {/* Step 2: enter OTP */}
-            {forgotStep === 2 && !forgotSuccess && (
-              <form onSubmit={handleForgotStep2} className="space-y-4">
-                <div className="px-3 py-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-800 leading-relaxed">
-                  Kode verifikasi 6 digit telah dikirim ke{' '}
-                  <span className="font-semibold">{forgotEmail}</span>.{' '}
-                  Periksa kotak masuk atau folder spam.
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Kode verifikasi</label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={6}
-                    value={forgotOtpInput}
-                    onChange={e => setForgotOtpInput(e.target.value.replace(/\D/g, ''))}
-                    placeholder="_ _ _ _ _ _"
-                    autoFocus
-                    required
-                    className="w-full px-3 py-2.5 text-center text-xl font-bold tracking-[0.5em] border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 placeholder:text-slate-300"
-                  />
-                  <div className="mt-1.5 flex items-center justify-between">
-                    <p className="text-[11px] text-slate-400">Berlaku 10 menit</p>
-                    <button type="button" onClick={handleResendOtp} disabled={forgotLoading}
-                      className="text-[11px] text-brand-600 hover:underline font-medium disabled:opacity-50">
-                      Kirim ulang kode
-                    </button>
+            {/* Step 1 success: link sent */}
+            {forgotStep === 2 && !resetToken && !forgotSuccess && (
+              <div className="space-y-4">
+                <div className="px-4 py-4 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-800 text-center space-y-2">
+                  <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mx-auto">
+                    <Mail className="w-5 h-5 text-emerald-600" />
                   </div>
+                  <p className="font-semibold">Link reset dikirim!</p>
+                  <p className="text-xs text-emerald-700">
+                    Cek email <span className="font-semibold">{forgotEmail}</span> dan klik link di dalamnya. Berlaku 1 jam.
+                  </p>
+                  <p className="text-[11px] text-emerald-600">Jika tidak ada di kotak masuk, periksa folder <span className="font-semibold">Spam</span>.</p>
                 </div>
-                <button type="submit"
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition-all shadow-sm">
-                  <KeyRound className="w-4 h-4" />
-                  Verifikasi Kode
+                <button type="button" onClick={handleResendLink} disabled={forgotLoading}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium text-slate-600 hover:text-brand-600 bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-300 rounded-lg transition-colors disabled:opacity-50">
+                  {forgotLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                  Kirim ulang link
                 </button>
-              </form>
+              </div>
             )}
 
-            {/* Step 3: set new password */}
-            {forgotStep === 3 && !forgotSuccess && (
-              <form onSubmit={handleForgotStep3} className="space-y-3">
-                <div className="px-3 py-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-800">
-                  <CheckCircle2 className="w-3.5 h-3.5 inline mr-1.5" />
-                  Identitas terverifikasi. Buat password baru di bawah.
+            {/* Step 2: set new password (after clicking link from email) */}
+            {forgotStep === 2 && resetToken && !forgotSuccess && (
+              <form onSubmit={handleForgotStep2} className="space-y-3">
+                <div className="px-3 py-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-800 flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                  <span>Link terverifikasi untuk <span className="font-semibold">{forgotEmail}</span>. Buat password baru di bawah.</span>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Password baru</label>
