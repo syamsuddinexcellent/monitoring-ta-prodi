@@ -481,14 +481,17 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, isRefresh
                                 </span>
                               </th>
                             ))}
-                            {/* Per-periode columns */}
-                            {weeks.map((w, idx) => (
-                              <th key={w} title={w}
-                                className="px-2 py-2 text-center font-bold text-indigo-600 whitespace-nowrap border-b border-r border-slate-200 bg-indigo-50 min-w-[120px]">
-                                <div className="text-[9px] font-black text-indigo-500">Periode {idx + 1}</div>
-                                <div className="text-[8px] font-normal text-indigo-400 truncate max-w-[112px]">{w}</div>
-                              </th>
-                            ))}
+                            {/* Per-periode columns — terbaru di kiri */}
+                            {[...weeks].reverse().map((w) => {
+                              const realIdx = weeks.indexOf(w);
+                              return (
+                                <th key={w} title={w}
+                                  className="px-2 py-2 text-center font-bold text-indigo-600 whitespace-nowrap border-b border-r border-slate-200 bg-indigo-50 min-w-[120px]">
+                                  <div className="text-[9px] font-black text-indigo-500">Periode {realIdx + 1}</div>
+                                  <div className="text-[8px] font-normal text-indigo-400 truncate max-w-[112px]">{w}</div>
+                                </th>
+                              );
+                            })}
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -520,8 +523,8 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, isRefresh
                                   <span className={`font-black text-xs ${reportedCount === weeks.length && weeks.length > 0 ? 'text-emerald-600' : reportedCount > 0 ? 'text-amber-600' : 'text-rose-400'}`}>{reportedCount}</span>
                                   <span className="text-slate-400">/{weeks.length}</span>
                                 </td>
-                                {/* Per-periode cells */}
-                                {weeks.map(w => {
+                                {/* Per-periode cells — terbaru di kiri */}
+                                {[...weeks].reverse().map(w => {
                                   const upd = s.weeklyUpdates?.[w];
                                   const cls = catCls(upd?.category);
                                   return (
