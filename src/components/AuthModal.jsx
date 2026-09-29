@@ -54,15 +54,15 @@ function saveStoredUsers(users) {
 
 export function loginWithCredentials(identifier, password) {
   if (identifier === ADMIN_USER && btoa(password) === ADMIN_PASS_B64) {
-    return { role: 'admin', email: 'admin', name: 'Administrator', lecturerName: '' };
+    return { role: 'admin', email: ADMIN_USER, name: 'Administrator', lecturerName: '', nim: '' };
   }
   const users = getStoredUsers();
   const found = users.find(u => u.email === identifier.toLowerCase() && u.passwordHash === btoa(password));
-  if (found) return { role: found.role || 'user', email: found.email, name: found.name, lecturerName: found.lecturerName || '' };
+  if (found) return { role: found.role || 'user', email: found.email, name: found.name, lecturerName: found.lecturerName || '', nim: found.nim || '' };
   return null;
 }
 
-export function registerUser(email, password, overrideName = null, overrideRole = null) {
+export function registerUser(email, password, overrideName = null, overrideRole = null, overrideNim = null) {
   if (!email.trim() || !password) return { error: 'Semua field wajib diisi.' };
   const emailLower = email.trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailLower)) return { error: 'Format email tidak valid.' };
@@ -75,7 +75,7 @@ export function registerUser(email, password, overrideName = null, overrideRole 
   if (users.some(u => u.email === emailLower)) return { error: 'Email sudah terdaftar.' };
   const lecturerName = LECTURER_EMAIL_MAP[emailLower] || '';
   const name = overrideName || emailLower.split('@')[0];
-  users.push({ email: emailLower, name, role, lecturerName, passwordHash: btoa(password) });
+  users.push({ email: emailLower, name, role, lecturerName, nim: overrideNim || '', passwordHash: btoa(password) });
   saveStoredUsers(users);
   return { success: true };
 }
@@ -311,9 +311,10 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
       setRegError('Cari NIM terlebih dahulu untuk memverifikasi data mahasiswa.'); return;
     }
     const overrideName = regRole === 'mahasiswa' ? regFoundName : null;
+    const overrideNim  = regRole === 'mahasiswa' ? regNim.trim() : null;
     setRegLoading(true);
     setTimeout(() => {
-      const result = registerUser(regEmail, regPassword, overrideName, regRole);
+      const result = registerUser(regEmail, regPassword, overrideName, regRole, overrideNim);
       if (result.error) { setRegError(result.error); }
       else {
         setRegSuccess('Akun berhasil dibuat! Silakan login.');

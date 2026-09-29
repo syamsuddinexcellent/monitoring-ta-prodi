@@ -11,6 +11,7 @@ import StudentDetailModal from './components/StudentDetailModal';
 import WhatsAppModal from './components/WhatsAppModal';
 import WhatsAppConnectModal from './components/WhatsAppConnectModal';
 import AuthModal, { validateResetToken } from './components/AuthModal';
+import MahasiswaView from './components/MahasiswaView';
 import {
   loadMonitoringData,
   getWeeklyMetrics,
@@ -313,6 +314,50 @@ export default function App() {
         <p className="text-xs text-slate-500 mt-1">
           Menyinkronkan 3 tab angkatan dari Google Spreadsheet
         </p>
+      </div>
+    );
+  }
+
+  // Mahasiswa view: find their student record by NIM (fallback: name match)
+  if (loggedInUser?.role === 'mahasiswa') {
+    const nim = loggedInUser.nim;
+    const name = loggedInUser.name?.toLowerCase();
+    const student = data?.students.find(s =>
+      (nim && s.nim === nim) ||
+      (name && s.nama?.toLowerCase() === name)
+    ) || null;
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col pb-16">
+        <Header
+          lastUpdated={data?.lastUpdated}
+          isRefreshing={isRefreshing}
+          onRefresh={() => fetchData(false)}
+          dataSource={data?.source}
+          totalStudents={data?.students.length || 0}
+          onExportCSV={() => {}}
+          gatewayStatus={gatewayStatus}
+          onOpenGatewayModal={() => {}}
+          isAdmin={false}
+          loggedInUser={loggedInUser}
+          onLoginClick={() => setIsLoginModalOpen(true)}
+          onLogout={() => {
+            try { sessionStorage.removeItem('auth_session'); } catch {}
+            setLoggedInUser(null);
+          }}
+        />
+        <main className="flex-1">
+          <MahasiswaView
+            student={student}
+            weekColumns={data?.weekColumns || []}
+            loggedInUser={loggedInUser}
+          />
+        </main>
+        <AuthModal
+          isOpen={isLoginModalOpen}
+          onClose={() => { setIsLoginModalOpen(false); setResetToken(null); }}
+          onSuccess={(user) => { setLoggedInUser(user); try { sessionStorage.setItem('auth_session', JSON.stringify(user)); } catch {} }}
+          resetToken={resetToken}
+        />
       </div>
     );
   }
