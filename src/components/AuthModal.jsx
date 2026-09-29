@@ -1,9 +1,49 @@
-import React, { useState } from 'react';
-import { Lock, X, Eye, EyeOff, ShieldCheck, AlertCircle, UserPlus, LogIn, Mail, UserCheck } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Lock, X, Eye, EyeOff, ShieldCheck, AlertCircle, UserPlus, LogIn, Mail, Search, GraduationCap, BookOpen } from 'lucide-react';
+import { STUDENT_NIM_MAP } from '../utils/studentDatabase';
 
 const ADMIN_USER = 'admin';
 const ADMIN_PASS_B64 = btoa('prodi2026');
-const ALLOWED_DOMAINS = ['sd.itera.ac.id', 'student.itera.ac.id'];
+
+// Email → Nama lengkap di sistem (untuk auto-filter mahasiswa bimbingan)
+const LECTURER_EMAIL_MAP = {
+  'yoga.sukma@sd.itera.ac.id':             'Yoga Aji Sukma, S.Mat., M.Stat.',
+  'ade.lailani@sd.itera.ac.id':            'Ade Lailani, S.Si., M.Si.',
+  'ahmadluky@sd.itera.ac.id':              'Ahmad Luky Ramdani, S.Komp., M.Kom.',
+  'arbi.julianto@staff.itera.ac.id':       'Arbi Julianto, S.Tr.T',
+  'ardika.satria@sd.itera.ac.id':          'Ardika Satria, S.Si., M.Si.',
+  'christyan.nadeak@sd.itera.ac.id':       'Christyan Tamaro Nadeak, S.Si., M.Si.',
+  'dewi.setiawan@sd.itera.ac.id':          'Dewi Indra Setiawan, S.Si., M.Si.',
+  'dimas.randa@sd.itera.ac.id':            'Dimas Dwi Randa, S.Kom., M.Kom.',
+  'koordinator.ta@itera.ac.id':            'Dr. Koordinator TA',
+  'fajri.farid@sd.itera.ac.id':            'Fajri Farid, S.Si., M.Sc.',
+  'febri.dwi@sd.itera.ac.id':              'Febri Dwi Irawati, S.Si., M.Si.',
+  'fitri.nurjanah@sd.itera.ac.id':         'Fitri Nurjanah, S.Si., M.Mat.',
+  'indah.suciati@sd.itera.ac.id':          'Indah Suciati, S.Mat., M.Mat.',
+  'ira.safitri@sd.itera.ac.id':            'Ira Safitri, S.Si., M.Si., M.Sc.',
+  'linda.rassiyanti@sd.itera.ac.id':       'Linda Rassiyanti, S.Si., M.Si.',
+  'luluk.muthoharoh@sd.itera.ac.id':       'Luluk Muthoharoh, S.Si., M.Si.',
+  'syamsuddin.wisnubroto@sd.itera.ac.id':  'M. Syamsuddin Wisnubroto, S.Si., M.Si.',
+  'mika.alvionita@sd.itera.ac.id':         'Mika Alvionita S, S.Si., M.Si.',
+  'rian.kurnia@sd.itera.ac.id':            'Rian Kurnia, S.Si., M.Si.',
+  'rohmi.astuti@sd.itera.ac.id':           'Rohmi Dyah Astuti, S.Si., M.Cs.',
+  'tirta.setiawan@sd.itera.ac.id':         'Tirta Setiawan, S.Pd., M.Si.',
+  'vina.nurmadani@sd.itera.ac.id':         'Vina Nurmadani, S.Mat., M.Si.',
+  'yuliana@sd.itera.ac.id':               'Yuliana, S.Pd., M.Cs.',
+  'yusni.lestari@sd.itera.ac.id':          'Yusni Puspha Lestari, S.T., M.Si.',
+  'yustida.bellini@sd.itera.ac.id':        'Yustida Bellini, S.Kom., M.Kom.',
+};
+
+const DOSEN_DOMAINS = ['sd.itera.ac.id', 'staff.itera.ac.id', 'itera.ac.id'];
+const STUDENT_DOMAIN = 'student.itera.ac.id';
+
+function classifyEmail(email) {
+  const lower = email.toLowerCase();
+  const domain = lower.split('@')[1] || '';
+  if (domain === STUDENT_DOMAIN) return 'mahasiswa';
+  if (DOSEN_DOMAINS.includes(domain)) return 'dosen';
+  return null;
+}
 
 function getStoredUsers() {
   try { return JSON.parse(localStorage.getItem('app_users') || '[]'); } catch { return []; }
@@ -22,24 +62,30 @@ export function loginWithCredentials(identifier, password) {
   return null;
 }
 
-export function registerUser(email, password, lecturerName = '') {
+export function registerUser(email, password, overrideName = null, overrideRole = null) {
   if (!email.trim() || !password) return { error: 'Semua field wajib diisi.' };
   const emailLower = email.trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailLower)) return { error: 'Format email tidak valid.' };
-  const domain = emailLower.split('@')[1];
-  if (!ALLOWED_DOMAINS.includes(domain)) {
-    return { error: 'Hanya email @sd.itera.ac.id (dosen) atau @student.itera.ac.id (mahasiswa) yang diizinkan.' };
-  }
-  if (domain === 'sd.itera.ac.id' && !lecturerName.trim()) {
-    return { error: 'Silakan pilih nama Anda di sistem.' };
+  const role = overrideRole || classifyEmail(emailLower);
+  if (!role) {
+    return { error: 'Hanya email ITERA yang diizinkan (@sd.itera.ac.id, @student.itera.ac.id, dll.).' };
   }
   if (password.length < 6) return { error: 'Password minimal 6 karakter.' };
   const users = getStoredUsers();
   if (users.some(u => u.email === emailLower)) return { error: 'Email sudah terdaftar.' };
-  const role = domain === 'sd.itera.ac.id' ? 'dosen' : 'mahasiswa';
-  users.push({ email: emailLower, name: emailLower.split('@')[0], role, lecturerName: lecturerName.trim(), passwordHash: btoa(password) });
+  const lecturerName = LECTURER_EMAIL_MAP[emailLower] || '';
+  const name = overrideName || emailLower.split('@')[0];
+  users.push({ email: emailLower, name, role, lecturerName, passwordHash: btoa(password) });
   saveStoredUsers(users);
   return { success: true };
+}
+
+function buildNimToName() {
+  const map = {};
+  for (const [name, nim] of Object.entries(STUDENT_NIM_MAP)) {
+    map[nim] = name.replace(/\b\w/g, c => c.toUpperCase());
+  }
+  return map;
 }
 
 function PasswordInput({ value, onChange, placeholder }) {
@@ -62,8 +108,9 @@ function PasswordInput({ value, onChange, placeholder }) {
   );
 }
 
-export default function AuthModal({ isOpen, onClose, onSuccess, availableLecturers = [] }) {
+export default function AuthModal({ isOpen, onClose, onSuccess }) {
   const [tab, setTab] = useState('login');
+  const [regRole, setRegRole] = useState('dosen');
 
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -71,29 +118,45 @@ export default function AuthModal({ isOpen, onClose, onSuccess, availableLecture
   const [loginLoading, setLoginLoading] = useState(false);
 
   const [regEmail, setRegEmail] = useState('');
-  const [regLecturerName, setRegLecturerName] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [regConfirm, setRegConfirm] = useState('');
   const [regError, setRegError] = useState('');
   const [regSuccess, setRegSuccess] = useState('');
   const [regLoading, setRegLoading] = useState(false);
 
+  // Mahasiswa-specific
+  const [regNim, setRegNim] = useState('');
+  const [regFoundName, setRegFoundName] = useState('');
+  const [regNimError, setRegNimError] = useState('');
+
+  const nimToName = useMemo(() => buildNimToName(), []);
+
   if (!isOpen) return null;
 
-  const regDomain = regEmail.includes('@') ? regEmail.split('@')[1]?.toLowerCase() : '';
-  const isDosen = regDomain === 'sd.itera.ac.id';
+  // Live preview: show detected name while typing (dosen)
+  const regEmailLower = regEmail.trim().toLowerCase();
+  const detectedName = LECTURER_EMAIL_MAP[regEmailLower];
+  const detectedRole = classifyEmail(regEmailLower);
 
   const handleClose = () => {
     setLoginEmail(''); setLoginPassword(''); setLoginError('');
-    setRegEmail(''); setRegLecturerName(''); setRegPassword(''); setRegConfirm('');
+    setRegEmail(''); setRegPassword(''); setRegConfirm('');
     setRegError(''); setRegSuccess('');
+    setRegNim(''); setRegFoundName(''); setRegNimError('');
     onClose();
   };
 
-  const handleEmailChange = (e) => {
-    setRegEmail(e.target.value);
-    // Reset lecturer selection when domain changes
-    setRegLecturerName('');
+  const handleNimSearch = () => {
+    const nim = regNim.trim();
+    if (!nim) { setRegNimError('Masukkan NIM terlebih dahulu.'); return; }
+    const found = nimToName[nim];
+    if (found) {
+      setRegFoundName(found);
+      setRegNimError('');
+    } else {
+      setRegFoundName('');
+      setRegNimError('NIM tidak ditemukan dalam database mahasiswa Prodi Sains Data.');
+    }
   };
 
   const handleLogin = (e) => {
@@ -117,13 +180,18 @@ export default function AuthModal({ isOpen, onClose, onSuccess, availableLecture
     e.preventDefault();
     setRegError(''); setRegSuccess('');
     if (regPassword !== regConfirm) { setRegError('Password tidak cocok.'); return; }
+    if (regRole === 'mahasiswa' && !regFoundName) {
+      setRegError('Cari NIM terlebih dahulu untuk memverifikasi data mahasiswa.'); return;
+    }
+    const overrideName = regRole === 'mahasiswa' ? regFoundName : null;
     setRegLoading(true);
     setTimeout(() => {
-      const result = registerUser(regEmail, regPassword, regLecturerName);
+      const result = registerUser(regEmail, regPassword, overrideName, regRole);
       if (result.error) { setRegError(result.error); }
       else {
         setRegSuccess('Akun berhasil dibuat! Silakan login.');
-        setRegEmail(''); setRegLecturerName(''); setRegPassword(''); setRegConfirm('');
+        setRegEmail(''); setRegPassword(''); setRegConfirm('');
+        setRegNim(''); setRegFoundName(''); setRegNimError('');
         setTimeout(() => setTab('login'), 1200);
       }
       setRegLoading(false);
@@ -155,7 +223,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess, availableLecture
             </button>
           </div>
 
-          {/* Tabs */}
           <div className="flex gap-1 mt-4 bg-white/10 rounded-lg p-1">
             <button onClick={() => setTab('login')}
               className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
@@ -191,7 +258,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, availableLecture
                   type="text"
                   value={loginEmail}
                   onChange={e => setLoginEmail(e.target.value)}
-                  placeholder="Email atau username admin"
+                  placeholder="Email ITERA atau username admin"
                   autoFocus
                   required
                   className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent bg-slate-50 placeholder:text-slate-400"
@@ -219,6 +286,26 @@ export default function AuthModal({ isOpen, onClose, onSuccess, availableLecture
         {/* Register Form */}
         {tab === 'register' && (
           <form onSubmit={handleRegister} className="px-6 py-5 space-y-3">
+            {/* Role selector */}
+            <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
+              <button type="button"
+                onClick={() => { setRegRole('dosen'); setRegEmail(''); setRegNim(''); setRegFoundName(''); setRegNimError(''); setRegError(''); }}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                  regRole === 'dosen' ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                }`}>
+                <BookOpen className="w-3.5 h-3.5" />
+                Dosen
+              </button>
+              <button type="button"
+                onClick={() => { setRegRole('mahasiswa'); setRegEmail(''); setRegNim(''); setRegFoundName(''); setRegNimError(''); setRegError(''); }}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                  regRole === 'mahasiswa' ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                }`}>
+                <GraduationCap className="w-3.5 h-3.5" />
+                Mahasiswa
+              </button>
+            </div>
+
             {regError && (
               <div className="flex items-center gap-2 px-3 py-2.5 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
                 <AlertCircle className="w-4 h-4 shrink-0" />
@@ -232,54 +319,119 @@ export default function AuthModal({ isOpen, onClose, onSuccess, availableLecture
               </div>
             )}
 
-            {/* Email */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Email</label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="email"
-                  value={regEmail}
-                  onChange={handleEmailChange}
-                  placeholder="nama@sd.itera.ac.id atau @student.itera.ac.id"
-                  required
-                  className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 placeholder:text-slate-400"
-                />
-              </div>
-              <p className="mt-1.5 text-[11px] text-slate-400">
-                Dosen: <span className="font-medium text-slate-500">@sd.itera.ac.id</span>
-                {' · '}
-                Mahasiswa: <span className="font-medium text-slate-500">@student.itera.ac.id</span>
-              </p>
-            </div>
-
-            {/* Lecturer name selector — only for @sd.itera.ac.id */}
-            {isDosen && availableLecturers.length > 0 && (
-              <div className="animate-fadeIn">
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  <span className="flex items-center gap-1.5">
-                    <UserCheck className="w-3.5 h-3.5 text-indigo-500" />
-                    Nama Anda di Sistem
-                  </span>
-                </label>
-                <select
-                  value={regLecturerName}
-                  onChange={e => setRegLecturerName(e.target.value)}
-                  required
-                  className="w-full px-3 py-2 text-sm border border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-indigo-50/40 text-slate-700"
-                >
-                  <option value="">-- Pilih nama Anda --</option>
-                  {availableLecturers.map(l => (
-                    <option key={l} value={l}>{l}</option>
-                  ))}
-                </select>
-                <p className="mt-1 text-[11px] text-indigo-500">
-                  Digunakan untuk auto-filter mahasiswa bimbingan Anda
-                </p>
+            {/* ── DOSEN FIELDS ── */}
+            {regRole === 'dosen' && (
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Email ITERA</label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="email"
+                    value={regEmail}
+                    onChange={e => setRegEmail(e.target.value)}
+                    placeholder="nama@sd.itera.ac.id"
+                    required
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 placeholder:text-slate-400"
+                  />
+                </div>
+                {regEmailLower.includes('@') && detectedRole && (
+                  <div className={`mt-2 px-3 py-2 rounded-lg text-xs flex items-start gap-2 ${
+                    detectedName
+                      ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                      : 'bg-indigo-50 border border-indigo-100 text-indigo-700'
+                  }`}>
+                    <ShieldCheck className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                    <div>
+                      {detectedName ? (
+                        <>
+                          <span className="font-semibold">Dosen terdeteksi:</span>{' '}
+                          <span>{detectedName}</span>
+                          <div className="text-emerald-600 mt-0.5 text-[11px]">
+                            Filter mahasiswa bimbingan akan aktif otomatis saat login
+                          </div>
+                        </>
+                      ) : (
+                        <span className="font-medium capitalize">{detectedRole} ITERA terdeteksi</span>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {regEmailLower.includes('@') && !detectedRole && (
+                  <p className="mt-1.5 text-[11px] text-red-500">Hanya email ITERA yang diterima</p>
+                )}
               </div>
             )}
 
-            {/* Password */}
+            {/* ── MAHASISWA FIELDS ── */}
+            {regRole === 'mahasiswa' && (
+              <div className="space-y-3">
+                <div className="px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-600 leading-relaxed">
+                  Cari NIM terlebih dahulu. Setelah nama ditemukan, masukkan email mahasiswa ITERA dengan format{' '}
+                  <span className="font-bold text-slate-800">nama.nim@student.itera.ac.id</span>.
+                </div>
+
+                {/* NIM search */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">NIM</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={regNim}
+                      onChange={e => { setRegNim(e.target.value); setRegNimError(''); setRegFoundName(''); }}
+                      onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleNimSearch())}
+                      placeholder="Contoh: 121450007"
+                      className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 placeholder:text-slate-400"
+                    />
+                    <button type="button" onClick={handleNimSearch}
+                      className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition-colors shrink-0">
+                      <Search className="w-3.5 h-3.5" />
+                      Cari
+                    </button>
+                  </div>
+                  {regNimError && (
+                    <p className="mt-1.5 text-[11px] text-red-500">{regNimError}</p>
+                  )}
+                </div>
+
+                {/* Found name */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Nama mahasiswa</label>
+                  <input
+                    type="text"
+                    value={regFoundName}
+                    readOnly
+                    placeholder="Nama muncul setelah NIM ditemukan"
+                    className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-slate-100 text-slate-700 placeholder:text-slate-400 cursor-default"
+                  />
+                </div>
+
+                {/* Student email */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Email mahasiswa ITERA</label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="email"
+                      value={regEmail}
+                      onChange={e => setRegEmail(e.target.value)}
+                      placeholder="nama.nim@student.itera.ac.id"
+                      required
+                      className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 placeholder:text-slate-400"
+                    />
+                  </div>
+                  {regFoundName && regNim && (
+                    <p className="mt-1 text-[11px] text-slate-400">
+                      Saran: <button type="button"
+                        className="text-brand-600 hover:underline font-medium"
+                        onClick={() => setRegEmail(`${regFoundName.toLowerCase().replace(/\s+/g, '.')}.${regNim}@student.itera.ac.id`)}>
+                        {regFoundName.toLowerCase().replace(/\s+/g, '.')}.{regNim}@student.itera.ac.id
+                      </button>
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">Password</label>
               <PasswordInput value={regPassword} onChange={e => setRegPassword(e.target.value)} placeholder="Min. 6 karakter" />
