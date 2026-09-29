@@ -12,6 +12,8 @@ import WhatsAppModal from './components/WhatsAppModal';
 import WhatsAppConnectModal from './components/WhatsAppConnectModal';
 import AuthModal, { validateResetToken } from './components/AuthModal';
 import MahasiswaView from './components/MahasiswaView';
+import LaporanMasukModal from './components/LaporanMasukModal';
+import { countUnreadLaporan } from './components/LaporanModal';
 import {
   loadMonitoringData,
   getWeeklyMetrics,
@@ -57,6 +59,12 @@ export default function App() {
   const [angkatanFilter, setAngkatanFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [lecturerFilter, setLecturerFilter] = useState('all');
+
+  // Laporan masuk for dosen
+  const [isLaporanMasukOpen, setIsLaporanMasukOpen] = useState(false);
+  const laporanMasukCount = loggedInUser?.role === 'dosen'
+    ? countUnreadLaporan(loggedInUser.lecturerName || '')
+    : 0;
 
   // Modals
   const [detailStudent, setDetailStudent] = useState(null);
@@ -144,26 +152,38 @@ export default function App() {
   }, [data, selectedWeek]);
 
   // Metrics for active week
+  // All-student metrics (admin view)
   const metrics = useMemo(() => {
     if (!data || !selectedWeek) {
-      return {
-        total: 0,
-        reported: 0,
-        notReported: 0,
-        percentage: 0,
-        categoryCounts: {},
-        categoryChartData: [],
-        lecturerChartData: []
-      };
+      return { total: 0, reported: 0, notReported: 0, percentage: 0, categoryCounts: {}, categoryChartData: [], lecturerChartData: [] };
     }
     return getWeeklyMetrics(data.students, selectedWeek);
   }, [data, selectedWeek]);
 
-  // Multi-week trend
+  // Dosen's own students (P1 or P2)
+  const dosenStudents = useMemo(() => {
+    if (!data || loggedInUser?.role !== 'dosen' || !loggedInUser?.lecturerName) return [];
+    const name = loggedInUser.lecturerName;
+    return data.students.filter(s => s.pembimbing1 === name || s.pembimbing2 === name);
+  }, [data, loggedInUser]);
+
+  // Dosen-scoped metrics
+  const dosenMetrics = useMemo(() => {
+    if (!selectedWeek || dosenStudents.length === 0) {
+      return { total: 0, reported: 0, notReported: 0, percentage: 0, categoryCounts: {}, categoryChartData: [], lecturerChartData: [] };
+    }
+    return getWeeklyMetrics(dosenStudents, selectedWeek);
+  }, [dosenStudents, selectedWeek]);
+
+  const isDosen = loggedInUser?.role === 'dosen';
+  const activeMetrics = isDosen ? dosenMetrics : metrics;
+
+  // Multi-week trend (scoped to dosen's students when dosen is logged in)
   const trendData = useMemo(() => {
     if (!data) return [];
-    return getAllWeeksTrend(data.students, data.weekColumns);
-  }, [data]);
+    const students = isDosen && dosenStudents.length > 0 ? dosenStudents : data.students;
+    return getAllWeeksTrend(students, data.weekColumns);
+  }, [data, isDosen, dosenStudents]);
 
   // Distinct angkatan
   const availableAngkatan = useMemo(() => {
@@ -382,18 +402,49 @@ export default function App() {
           setLoggedInUser(null);
           setLecturerFilter('all');
         }}
+        laporanMasukCount={laporanMasukCount}
+        onOpenLaporanMasuk={() => setIsLaporanMasukOpen(true)}
       />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 w-full space-y-6">
+
+        {/* Dosen Banner */}
+        {isDosen && (
+          <div className="bg-gradient-to-r from-brand-600 to-indigo-600 rounded-2xl px-5 py-4 flex items-center justify-between gap-4 shadow-sm">
+            <div>
+              <p className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-0.5">Dashboard Bimbingan</p>
+              <h2 className="text-base font-bold text-white leading-tight">{loggedInUser.lecturerName}</h2>
+              <p className="text-xs text-white/70 mt-0.5">
+                {dosenStudents.length} mahasiswa bimbingan
+                {selectedWeek && ` · Pekan ${selectedWeek}`}
+              </p>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <div className="text-center">
+                <div className="text-2xl font-black text-white">{dosenMetrics.reported}</div>
+                <div className="text-[10px] text-white/70 font-medium">Melapor</div>
+              </div>
+              <div className="w-px h-10 bg-white/20" />
+              <div className="text-center">
+                <div className="text-2xl font-black text-white">{dosenMetrics.notReported}</div>
+                <div className="text-[10px] text-white/70 font-medium">Belum</div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* KPI Cards */}
-        <MetricCards metrics={metrics} selectedWeek={selectedWeek} />
+        <MetricCards metrics={activeMetrics} selectedWeek={selectedWeek} isDosen={isDosen} students={isDosen ? dosenStudents : (data?.students || [])} dosenName={loggedInUser?.lecturerName || ''} />
 
         {/* Analytics Charts */}
         <AnalyticsCharts
-          metrics={metrics}
+          metrics={activeMetrics}
           trendData={trendData}
           selectedWeek={selectedWeek}
+          isDosen={isDosen}
+          dosenStudents={dosenStudents}
+          dosenName={loggedInUser?.lecturerName || ''}
         />
 
         {/* Week Selector & View Mode Switch */}
@@ -433,6 +484,7 @@ export default function App() {
               unreportedCount={unreportedStudents.length}
               onOpenBulkReminder={handleOpenBulkWhatsApp}
               isAdmin={isAdmin}
+              isDosen={isDosen}
             />
 
             {/* Results Count & Active Filter Indicator */}
@@ -574,6 +626,13 @@ export default function App() {
           }
         }}
         resetToken={resetToken}
+      />
+
+      {/* Laporan Masuk Modal (dosen) */}
+      <LaporanMasukModal
+        isOpen={isLaporanMasukOpen}
+        onClose={() => setIsLaporanMasukOpen(false)}
+        dosenName={loggedInUser?.lecturerName || ''}
       />
     </div>
   );

@@ -6,7 +6,8 @@ import {
   LogOut,
   Lock,
   ShieldCheck,
-  User
+  User,
+  Inbox,
 } from 'lucide-react';
 import { formatPhoneDisplay } from '../utils/helpers';
 import { GOOGLE_SHEETS_VIEW_URL } from '../services/dataService';
@@ -23,7 +24,9 @@ export default function Header({
   isAdmin,
   loggedInUser,
   onLoginClick,
-  onLogout
+  onLogout,
+  laporanMasukCount = 0,
+  onOpenLaporanMasuk,
 }) {
   const formatTime = (date) => {
     if (!date) return '-';
@@ -122,6 +125,22 @@ export default function Header({
             {/* Auth: Login / User badge / Logout */}
             {loggedInUser ? (
               <div className="flex items-center gap-1.5">
+                {/* Laporan Masuk button for dosen */}
+                {loggedInUser.role === 'dosen' && onOpenLaporanMasuk && (
+                  <button
+                    onClick={onOpenLaporanMasuk}
+                    className="relative inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:text-brand-700 bg-white hover:bg-brand-50 border border-slate-200 hover:border-brand-300 rounded-lg transition-colors shadow-xs"
+                    title="Laporan Masuk"
+                  >
+                    <Inbox className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Laporan</span>
+                    {laporanMasukCount > 0 && (
+                      <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center text-[10px] font-bold text-white bg-red-500 rounded-full">
+                        {laporanMasukCount > 9 ? '9+' : laporanMasukCount}
+                      </span>
+                    )}
+                  </button>
+                )}
                 {isAdmin ? (
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-brand-50 border border-brand-200 text-xs font-semibold text-brand-700">
                     <ShieldCheck className="w-3.5 h-3.5" />

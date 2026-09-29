@@ -124,7 +124,8 @@ export default function FilterBar({
   availableLecturers,
   unreportedCount,
   onOpenBulkReminder,
-  isAdmin = false
+  isAdmin = false,
+  isDosen = false,
 }) {
   return (
     <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-xs flex flex-col gap-3">
@@ -149,12 +150,19 @@ export default function FilterBar({
           )}
         </div>
 
-        {/* Dosen Bimbingan Custom Dropdown */}
-        <LecturerDropdown
-          lecturerFilter={lecturerFilter}
-          onLecturerFilterChange={onLecturerFilterChange}
-          availableLecturers={availableLecturers}
-        />
+        {/* Dosen Bimbingan — locked badge for dosen role, dropdown for others */}
+        {isDosen ? (
+          <div className="inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg border bg-indigo-600 text-white border-indigo-700 shadow-xs max-w-[260px]">
+            <UserCheck className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate flex-1 text-left">{lecturerFilter !== 'all' ? lecturerFilter.split(',')[0] : '-'}</span>
+          </div>
+        ) : (
+          <LecturerDropdown
+            lecturerFilter={lecturerFilter}
+            onLecturerFilterChange={onLecturerFilterChange}
+            availableLecturers={availableLecturers}
+          />
+        )}
 
         {/* Bulk Reminder to Group Button — admin only */}
         {isAdmin && unreportedCount > 0 && (
