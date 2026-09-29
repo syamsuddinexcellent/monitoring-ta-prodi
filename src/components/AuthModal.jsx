@@ -23,13 +23,14 @@ export function loginWithCredentials(identifier, password) {
   return null;
 }
 
-export function registerUser(email, name, password) {
-  if (!email.trim() || !name.trim() || !password) return { error: 'Semua field wajib diisi.' };
+export function registerUser(email, password) {
+  if (!email.trim() || !password) return { error: 'Semua field wajib diisi.' };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return { error: 'Format email tidak valid.' };
   if (password.length < 6) return { error: 'Password minimal 6 karakter.' };
   const users = getStoredUsers();
   if (users.some(u => u.email === email.trim().toLowerCase())) return { error: 'Email sudah terdaftar.' };
-  users.push({ email: email.trim().toLowerCase(), name: name.trim(), passwordHash: btoa(password) });
+  const emailLower = email.trim().toLowerCase();
+  users.push({ email: emailLower, name: emailLower.split('@')[0], passwordHash: btoa(password) });
   saveStoredUsers(users);
   return { success: true };
 }
@@ -54,7 +55,7 @@ function PasswordInput({ value, onChange, placeholder }) {
   );
 }
 
-export default function AuthModal({ isOpen, onClose, onSuccess, availableLecturers = [] }) {
+export default function AuthModal({ isOpen, onClose, onSuccess }) {
   const [tab, setTab] = useState('login');
 
   // Login state
@@ -65,7 +66,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess, availableLecture
 
   // Register state
   const [regEmail, setRegEmail] = useState('');
-  const [regName, setRegName] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [regConfirm, setRegConfirm] = useState('');
   const [regError, setRegError] = useState('');
@@ -76,7 +76,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, availableLecture
 
   const handleClose = () => {
     setLoginEmail(''); setLoginPassword(''); setLoginError('');
-    setRegEmail(''); setRegName(''); setRegPassword(''); setRegConfirm('');
+    setRegEmail(''); setRegPassword(''); setRegConfirm('');
     setRegError(''); setRegSuccess('');
     onClose();
   };
@@ -104,11 +104,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess, availableLecture
     if (regPassword !== regConfirm) { setRegError('Password tidak cocok.'); return; }
     setRegLoading(true);
     setTimeout(() => {
-      const result = registerUser(regEmail, regName, regPassword);
+      const result = registerUser(regEmail, regPassword);
       if (result.error) { setRegError(result.error); }
       else {
         setRegSuccess('Akun berhasil dibuat! Silakan login.');
-        setRegEmail(''); setRegName(''); setRegPassword(''); setRegConfirm('');
+        setRegEmail(''); setRegPassword(''); setRegConfirm('');
         setTimeout(() => setTab('login'), 1200);
       }
       setRegLoading(false);
@@ -216,20 +216,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess, availableLecture
                 {regSuccess}
               </div>
             )}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Nama Dosen</label>
-              {availableLecturers.length > 0 ? (
-                <select value={regName} onChange={e => setRegName(e.target.value)} required
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 text-slate-700">
-                  <option value="">-- Pilih nama dosen --</option>
-                  {availableLecturers.map(l => <option key={l} value={l}>{l}</option>)}
-                </select>
-              ) : (
-                <input type="text" value={regName} onChange={e => setRegName(e.target.value)}
-                  placeholder="Nama lengkap sesuai data" required
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 placeholder:text-slate-400" />
-              )}
-            </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">Email</label>
               <div className="relative">

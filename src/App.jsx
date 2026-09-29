@@ -503,7 +503,6 @@ export default function App() {
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
         onSuccess={(user) => setLoggedInUser(user)}
-        availableLecturers={availableLecturers}
       />
     </div>
   );
