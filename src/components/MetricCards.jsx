@@ -251,10 +251,16 @@ export default function MetricCards({ metrics, selectedWeek, isDosen = false, is
                         : role === 'Pj1' ? 'Penguji 1 (Pj1)'
                         : role === 'Pj2' ? 'Penguji 2 (Pj2)'
                         : null;
+                      const supervisors = [
+                        s.pembimbing1 ? `👨‍🏫 *Pembimbing 1:* ${s.pembimbing1}` : '',
+                        s.pembimbing2 ? `👨‍🏫 *Pembimbing 2:* ${s.pembimbing2}` : '',
+                        s.penguji1    ? `👨‍⚖️ *Penguji 1:* ${s.penguji1}`    : '',
+                        s.penguji2    ? `👨‍⚖️ *Penguji 2:* ${s.penguji2}`    : '',
+                      ].filter(Boolean).join('\n');
                       const waMsg = encodeURIComponent(
                         roleLabel
                           ? `Halo ${s.nama}, mohon segera melakukan bimbingan dengan saya selaku ${roleLabel} terkait progres Tugas Akhir periode ini. Jika sudah melakukan bimbingan selain dengan saya selaku ${roleLabel}, maka hiraukan pesan ini. Terima kasih 🙏`
-                          : `Halo ${s.nama}, mohon segera melakukan bimbingan dengan dosen pembimbing Anda terkait progres Tugas Akhir periode ini. Terima kasih 🙏`
+                          : `Halo ${s.nama} (${s.nim}), selamat pagi/siang/sore/malam.\n\nMengingatkan kembali terkait perkembangan Tugas Akhir (TA) Program Studi Sains Data periode *${selectedWeek}*.\n\n${supervisors}\n\nDihimbau untuk *segera melakukan sesi bimbingan langsung dengan dosen pembimbing/penguji*, agar progres pengerjaan skripsi/TA Anda dapat dievaluasi dan kendala teknis/penulisan dapat segera teratasi.\n\nSilakan jadwalkan waktu bimbingan Anda ya. Semangat selalu!\n\nSalam,\nKoordinator / Tim Monitoring TA Prodi Sains Data`
                       );
                       const waUrl = phone ? `https://wa.me/${phone}?text=${waMsg}` : null;
                       return (
