@@ -22,6 +22,7 @@ import {
   triggerSyncDatabase,
   mergeLocalReports
 } from './services/dataService';
+import { getLocalPeriods } from './utils/exportUtils';
 import {
   checkGatewayStatus,
   logoutGateway
@@ -125,6 +126,10 @@ export default function App() {
       }
       const result = await loadMonitoringData();
       result.students = mergeLocalReports(result.students);
+      const lp = getLocalPeriods();
+      if (lp.length > 0) {
+        result.weekColumns = [...result.weekColumns, ...lp.filter(p => !result.weekColumns.includes(p))];
+      }
       setData(result);
       if (!selectedWeek && result.weekColumns.length > 0) {
         const lastWithData = [...result.weekColumns].reverse().find(w =>

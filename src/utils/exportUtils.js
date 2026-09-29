@@ -1,0 +1,295 @@
+import * as XLSX from 'xlsx';
+
+// ─── Excel exports ────────────────────────────────────────────────────────────
+
+export function exportExcelPeriode(students, week, weekColumns) {
+  const idx = weekColumns.indexOf(week);
+  const wb = XLSX.utils.book_new();
+  const rows = [
+    ['No', 'NIM', 'Nama', 'Angkatan', 'Pembimbing 1', 'Pembimbing 2', 'Penguji 1', 'Penguji 2',
+      'No WA', 'Status TA', 'Status Lapor', 'Kategori', 'Progres', 'Target Periode Depan'],
+    ...students.map((s, i) => {
+      const upd = s.weeklyUpdates?.[week] || {};
+      return [
+        i + 1, s.nim, s.nama, s.angkatan,
+        s.pembimbing1 || '-', s.pembimbing2 || '-',
+        s.penguji1 || '-', s.penguji2 || '-',
+        s.phone || '-', s.statusTA || '-',
+        upd.reported ? 'Sudah Lapor' : 'Belum Lapor',
+        upd.category || '-',
+        upd.progress || '-',
+        upd.next || '-',
+      ];
+    }),
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [4, 14, 28, 9, 22, 22, 22, 22, 14, 14, 12, 16, 40, 30].map(w => ({ wch: w }));
+  XLSX.utils.book_append_sheet(wb, ws, `Periode ${idx + 1}`);
+  const label = week.replace(/[\/\\?*[\]]/g, '-');
+  XLSX.writeFile(wb, `Rekap_TA_Periode_${idx + 1}_${label}.xlsx`);
+}
+
+export function exportExcelAll(students, weekColumns) {
+  const wb = XLSX.utils.book_new();
+
+  // Sheet 1: Rekap ringkasan semua periode
+  const summaryHeader = [
+    'No', 'NIM', 'Nama', 'Angkatan', 'Pembimbing 1', 'Pembimbing 2',
+    'Penguji 1', 'Penguji 2', 'No WA', 'Status TA',
+    ...weekColumns.map((w, i) => `P${i + 1} – ${w}`),
+    'Total Lapor',
+  ];
+  const summaryRows = [
+    summaryHeader,
+    ...students.map((s, i) => {
+      const perPeriode = weekColumns.map(w => {
+        const upd = s.weeklyUpdates?.[w];
+        return upd?.reported ? upd.category : '-';
+      });
+      const total = weekColumns.filter(w => s.weeklyUpdates?.[w]?.reported).length;
+      return [
+        i + 1, s.nim, s.nama, s.angkatan,
+        s.pembimbing1 || '-', s.pembimbing2 || '-',
+        s.penguji1 || '-', s.penguji2 || '-',
+        s.phone || '-', s.statusTA || '-',
+        ...perPeriode,
+        `${total}/${weekColumns.length}`,
+      ];
+    }),
+  ];
+  const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
+  wsSummary['!cols'] = [4, 14, 28, 9, 22, 22, 18, 18, 14, 14,
+    ...weekColumns.map(() => ({ wch: 18 })), 10].map(w => (typeof w === 'number' ? { wch: w } : w));
+  XLSX.utils.book_append_sheet(wb, wsSummary, 'Rekap Semua Periode');
+
+  // Sheet per periode
+  weekColumns.forEach((week, idx) => {
+    const rows = [
+      ['No', 'NIM', 'Nama', 'Angkatan', 'Pembimbing 1', 'Pembimbing 2',
+        'Status Lapor', 'Kategori', 'Progres', 'Target'],
+      ...students.map((s, i) => {
+        const upd = s.weeklyUpdates?.[week] || {};
+        return [
+          i + 1, s.nim, s.nama, s.angkatan,
+          s.pembimbing1 || '-', s.pembimbing2 || '-',
+          upd.reported ? 'Sudah Lapor' : 'Belum Lapor',
+          upd.category || '-',
+          upd.progress || '-',
+          upd.next || '-',
+        ];
+      }),
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = [4, 14, 28, 9, 22, 22, 12, 16, 40, 30].map(w => ({ wch: w }));
+    const sheetName = `P${idx + 1}`;
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  });
+
+  XLSX.writeFile(wb, `Rekap_Monitoring_TA_Prodi_Sains_Data.xlsx`);
+}
+
+// ─── PDF via print window ─────────────────────────────────────────────────────
+
+export function printStudentHistory(student, weekColumns, verifData = {}) {
+  const nim = student.nim;
+  const verifNim = verifData[nim] || {};
+
+  const periodeRows = weekColumns.map((week, idx) => {
+    const upd = student.weeklyUpdates?.[week] || {};
+    const verif = verifNim[week];
+    const statusColor = upd.reported ? '#065f46' : '#991b1b';
+    const statusBg = upd.reported ? '#d1fae5' : '#fee2e2';
+    const statusLabel = upd.reported ? 'Sudah Lapor' : 'Belum Lapor';
+    const verifBadge = verif?.verified
+      ? `<span style="background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe;padding:1px 6px;border-radius:9999px;font-size:10px;font-weight:700;">✓ Diverifikasi oleh ${verif.dosenName?.split(',')[0] || 'Dosen'}</span>`
+      : '';
+
+    return `
+      <tr>
+        <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;font-weight:600;white-space:nowrap;color:#475569;">
+          P${idx + 1}<br><span style="font-size:10px;font-weight:400;color:#94a3b8;">${week}</span>
+        </td>
+        <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">
+          <span style="background:${statusBg};color:${statusColor};padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:700;">${statusLabel}</span>
+          ${upd.category && upd.reported ? `<span style="margin-left:6px;font-size:11px;color:#64748b;">${upd.category}</span>` : ''}
+          <div style="margin-top:4px;">${verifBadge}</div>
+        </td>
+        <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;color:#1e293b;font-size:12px;">${upd.progress || '<span style="color:#94a3b8;font-style:italic;">-</span>'}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;color:#64748b;font-size:12px;">${upd.next || '-'}</td>
+      </tr>`;
+  }).join('');
+
+  const total = weekColumns.filter(w => student.weeklyUpdates?.[w]?.reported).length;
+  const rate = Math.round((total / (weekColumns.length || 1)) * 100);
+
+  const html = `<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8"/>
+<title>Riwayat Bimbingan – ${student.nama}</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 24px; color: #1e293b; }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  .subtitle { color: #64748b; font-size: 12px; margin-bottom: 20px; }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px solid #e2e8f0; }
+  .info-label { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+  .info-val { font-size: 13px; font-weight: 600; color: #1e293b; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: #f1f5f9; }
+  th { padding: 8px 10px; text-align: left; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid #e2e8f0; }
+  .stat { display: inline-flex; align-items: center; gap: 8px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 8px 16px; margin-bottom: 16px; }
+  @media print { body { padding: 12px; } button { display: none; } }
+</style>
+</head><body>
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+  <div>
+    <h1>Riwayat Bimbingan Tugas Akhir</h1>
+    <div class="subtitle">Program Studi Sains Data · Semester Ganjil 2026/2027</div>
+  </div>
+  <button onclick="window.print()" style="padding:8px 18px;background:#4f46e5;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">Cetak / Simpan PDF</button>
+</div>
+<div class="info-grid">
+  <div><div class="info-label">Nama</div><div class="info-val">${student.nama}</div></div>
+  <div><div class="info-label">NIM</div><div class="info-val" style="font-family:monospace;">${student.nim}</div></div>
+  <div><div class="info-label">Angkatan</div><div class="info-val">${student.angkatan}</div></div>
+  <div><div class="info-label">Pembimbing 1</div><div class="info-val">${student.pembimbing1 || '-'}</div></div>
+  <div><div class="info-label">Pembimbing 2</div><div class="info-val">${student.pembimbing2 || '-'}</div></div>
+  <div><div class="info-label">Status TA</div><div class="info-val">${student.statusTA || '-'}</div></div>
+</div>
+<div class="stat">
+  <span style="font-weight:700;font-size:18px;color:#059669;">${total}</span>
+  <span style="font-size:12px;color:#64748b;">dari ${weekColumns.length} periode terlaporkan</span>
+  <span style="background:#059669;color:white;border-radius:9999px;padding:2px 10px;font-size:12px;font-weight:700;">${rate}%</span>
+</div>
+<table>
+  <thead><tr>
+    <th style="width:140px;">Periode</th>
+    <th style="width:160px;">Status</th>
+    <th>Progres</th>
+    <th style="width:200px;">Target Berikutnya</th>
+  </tr></thead>
+  <tbody>${periodeRows}</tbody>
+</table>
+<div style="margin-top:20px;font-size:10px;color:#94a3b8;text-align:right;">
+  Dicetak dari Sistem Monitoring TA Prodi Sains Data · ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+</div>
+</body></html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+}
+
+export function printRekapPeriode(students, week, weekColumns) {
+  const idx = weekColumns.indexOf(week);
+  const sudah = students.filter(s => s.weeklyUpdates?.[week]?.reported).length;
+  const belum = students.length - sudah;
+
+  const rows = students.map((s, i) => {
+    const upd = s.weeklyUpdates?.[week] || {};
+    const reported = upd.reported;
+    return `<tr style="${i % 2 === 0 ? '' : 'background:#f8fafc;'}">
+      <td style="padding:6px 8px;border-bottom:1px solid #e2e8f0;color:#64748b;">${i + 1}</td>
+      <td style="padding:6px 8px;border-bottom:1px solid #e2e8f0;font-family:monospace;font-size:11px;">${s.nim}</td>
+      <td style="padding:6px 8px;border-bottom:1px solid #e2e8f0;font-weight:600;">${s.nama}</td>
+      <td style="padding:6px 8px;border-bottom:1px solid #e2e8f0;font-size:11px;">${s.angkatan}</td>
+      <td style="padding:6px 8px;border-bottom:1px solid #e2e8f0;font-size:11px;">${s.pembimbing1 || '-'}</td>
+      <td style="padding:6px 8px;border-bottom:1px solid #e2e8f0;">
+        <span style="background:${reported ? '#d1fae5' : '#fee2e2'};color:${reported ? '#065f46' : '#991b1b'};padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:700;">
+          ${reported ? 'Sudah Lapor' : 'Belum Lapor'}
+        </span>
+      </td>
+      <td style="padding:6px 8px;border-bottom:1px solid #e2e8f0;font-size:11px;">${upd.category || '-'}</td>
+      <td style="padding:6px 8px;border-bottom:1px solid #e2e8f0;font-size:11px;max-width:200px;">${upd.progress || '-'}</td>
+    </tr>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8"/>
+<title>Rekap Periode ${idx + 1} – ${week}</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 24px; color: #1e293b; }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  .subtitle { color: #64748b; font-size: 12px; margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead tr { background: #f1f5f9; }
+  th { padding: 8px; text-align: left; font-size: 11px; font-weight: 700; color: #64748b; border-bottom: 2px solid #e2e8f0; }
+  .stats { display: flex; gap: 16px; margin-bottom: 16px; }
+  .stat { flex: 1; padding: 12px 16px; border-radius: 8px; border: 1px solid #e2e8f0; }
+  @media print { button { display: none; } }
+</style>
+</head><body>
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+  <div>
+    <h1>Rekap Monitoring TA – Periode ${idx + 1}</h1>
+    <div class="subtitle">${week} · Program Studi Sains Data</div>
+  </div>
+  <button onclick="window.print()" style="padding:8px 18px;background:#4f46e5;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">Cetak / Simpan PDF</button>
+</div>
+<div class="stats">
+  <div class="stat" style="background:#f0fdf4;border-color:#bbf7d0;">
+    <div style="font-size:22px;font-weight:900;color:#059669;">${sudah}</div>
+    <div style="font-size:12px;color:#64748b;">Sudah Melapor</div>
+  </div>
+  <div class="stat" style="background:#fff1f2;border-color:#fecdd3;">
+    <div style="font-size:22px;font-weight:900;color:#e11d48;">${belum}</div>
+    <div style="font-size:12px;color:#64748b;">Belum Melapor</div>
+  </div>
+  <div class="stat">
+    <div style="font-size:22px;font-weight:900;color:#4f46e5;">${students.length}</div>
+    <div style="font-size:12px;color:#64748b;">Total Mahasiswa</div>
+  </div>
+  <div class="stat" style="background:#eff6ff;border-color:#bfdbfe;">
+    <div style="font-size:22px;font-weight:900;color:#1d4ed8;">${Math.round((sudah / (students.length || 1)) * 100)}%</div>
+    <div style="font-size:12px;color:#64748b;">Tingkat Kepatuhan</div>
+  </div>
+</div>
+<table>
+  <thead><tr>
+    <th>No</th><th>NIM</th><th>Nama</th><th>Angk.</th>
+    <th>Pembimbing 1</th><th>Status</th><th>Kategori</th><th>Progres</th>
+  </tr></thead>
+  <tbody>${rows}</tbody>
+</table>
+<div style="margin-top:16px;font-size:10px;color:#94a3b8;text-align:right;">
+  Dicetak dari Sistem Monitoring TA Prodi Sains Data · ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+</div>
+</body></html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+}
+
+// ─── Verifikasi helpers ───────────────────────────────────────────────────────
+
+const VERIF_KEY = 'verifikasi_laporan';
+
+export function getVerifikasi() {
+  try { return JSON.parse(localStorage.getItem(VERIF_KEY) || '{}'); } catch { return {}; }
+}
+
+export function saveVerifikasi(nim, week, dosenName) {
+  const all = getVerifikasi();
+  if (!all[nim]) all[nim] = {};
+  all[nim][week] = { verified: true, dosenName, at: new Date().toISOString() };
+  localStorage.setItem(VERIF_KEY, JSON.stringify(all));
+}
+
+export function cancelVerifikasi(nim, week) {
+  const all = getVerifikasi();
+  if (all[nim]) delete all[nim][week];
+  localStorage.setItem(VERIF_KEY, JSON.stringify(all));
+}
+
+// ─── Local periods helpers ────────────────────────────────────────────────────
+
+const LOCAL_PERIODS_KEY = 'local_periods';
+
+export function getLocalPeriods() {
+  try { return JSON.parse(localStorage.getItem(LOCAL_PERIODS_KEY) || '[]'); } catch { return []; }
+}
+
+export function saveLocalPeriods(list) {
+  localStorage.setItem(LOCAL_PERIODS_KEY, JSON.stringify(list));
+}

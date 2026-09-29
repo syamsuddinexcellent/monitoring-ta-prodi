@@ -3,9 +3,13 @@ import {
   X, Users, Database, ShieldCheck, GraduationCap, User,
   Trash2, RefreshCw, AlertTriangle, CheckCircle2, Inbox,
   RotateCcw, Calendar, Layers, Clock, Wifi, WifiOff, Search,
-  ChevronUp, ChevronDown, Phone
+  ChevronUp, ChevronDown, Phone, FileSpreadsheet, Printer, Plus, Pencil
 } from 'lucide-react';
 import { getStoredUsersList, deleteStoredUser } from './AuthModal';
+import {
+  exportExcelAll, exportExcelPeriode, printRekapPeriode,
+  getLocalPeriods, saveLocalPeriods
+} from '../utils/exportUtils';
 
 function getRoleLabel(role) {
   if (role === 'dosen') return { label: 'Dosen', cls: 'bg-indigo-50 text-indigo-700 border-indigo-200' };
@@ -45,14 +49,54 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, isRefresh
   const [sortCol, setSortCol] = useState('nim');
   const [sortAsc, setSortAsc] = useState(true);
   const [showPeriode, setShowPeriode] = useState(false);
+  const [localPeriods, setLocalPeriods] = useState([]);
+  const [newPeriodLabel, setNewPeriodLabel] = useState('');
+  const [editPeriodIdx, setEditPeriodIdx] = useState(null);
+  const [editPeriodVal, setEditPeriodVal] = useState('');
+  const [exportPeriodeIdx, setExportPeriodeIdx] = useState('');
 
   const refresh = () => {
     setUsers(getStoredUsersList());
     setReportsSummary(getLocalReportsSummary());
     setDosenSummary(getDosenLaporanSummary());
+    setLocalPeriods(getLocalPeriods());
   };
 
   useEffect(() => { if (isOpen) { refresh(); setConfirmDelete(null); setFlash(''); } }, [isOpen]);
+
+  const allWeekColumns = useMemo(() => {
+    const sheets = sheetsData?.weekColumns || [];
+    const local = localPeriods.filter(p => !sheets.includes(p));
+    return [...sheets, ...local];
+  }, [sheetsData, localPeriods]);
+
+  const handleAddPeriod = () => {
+    const label = newPeriodLabel.trim();
+    if (!label || allWeekColumns.includes(label)) return;
+    const updated = [...localPeriods, label];
+    saveLocalPeriods(updated);
+    setLocalPeriods(updated);
+    setNewPeriodLabel('');
+    showFlash(`Periode "${label}" berhasil ditambahkan.`);
+  };
+
+  const handleDeleteLocalPeriod = (label) => {
+    const updated = localPeriods.filter(p => p !== label);
+    saveLocalPeriods(updated);
+    setLocalPeriods(updated);
+    showFlash(`Periode "${label}" dihapus.`);
+  };
+
+  const handleSaveEditPeriod = (oldLabel) => {
+    const newLabel = editPeriodVal.trim();
+    if (!newLabel || (newLabel !== oldLabel && allWeekColumns.includes(newLabel))) return;
+    const updated = localPeriods.map(p => p === oldLabel ? newLabel : p);
+    saveLocalPeriods(updated);
+    setLocalPeriods(updated);
+    setEditPeriodIdx(null);
+    setEditPeriodVal('');
+    showFlash(`Periode diperbarui.`);
+  };
 
   const showFlash = (msg) => { setFlash(msg); setTimeout(() => setFlash(''), 2500); };
 
@@ -509,6 +553,140 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, isRefresh
                     </div>
                   );
                 })()}
+              </div>
+
+              {/* ── Export ── */}
+              <div className="rounded-xl border border-slate-200 overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
+                  <div className="flex items-center gap-2">
+                    <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+                    <span className="text-xs font-bold text-slate-700">Export Laporan</span>
+                  </div>
+                </div>
+                <div className="px-4 py-3 space-y-3">
+                  {/* Export semua periode */}
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <div>
+                      <p className="text-xs font-semibold text-slate-700">Rekap Semua Periode</p>
+                      <p className="text-[10px] text-slate-400">Excel dengan 1 sheet per periode + sheet ringkasan</p>
+                    </div>
+                    <button
+                      onClick={() => sheetsData?.students && exportExcelAll(sheetsData.students, allWeekColumns)}
+                      disabled={!sheetsData?.students}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-40 transition-colors shrink-0"
+                    >
+                      <FileSpreadsheet className="w-3 h-3" />
+                      Download Excel
+                    </button>
+                  </div>
+
+                  {/* Export per periode */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <select
+                      value={exportPeriodeIdx}
+                      onChange={e => setExportPeriodeIdx(e.target.value)}
+                      className="flex-1 text-[10px] font-semibold border border-slate-200 rounded-lg px-2 py-1.5 bg-white text-slate-600 outline-none focus:ring-1 focus:ring-brand-400"
+                    >
+                      <option value="">Pilih periode untuk export…</option>
+                      {allWeekColumns.map((w, i) => (
+                        <option key={w} value={i}>Periode {i + 1} – {w}</option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={() => {
+                        const week = allWeekColumns[Number(exportPeriodeIdx)];
+                        if (week && sheetsData?.students) exportExcelPeriode(sheetsData.students, week, allWeekColumns);
+                      }}
+                      disabled={exportPeriodeIdx === '' || !sheetsData?.students}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 disabled:opacity-40 transition-colors shrink-0"
+                    >
+                      <FileSpreadsheet className="w-3 h-3" />
+                      Excel
+                    </button>
+                    <button
+                      onClick={() => {
+                        const week = allWeekColumns[Number(exportPeriodeIdx)];
+                        if (week && sheetsData?.students) printRekapPeriode(sheetsData.students, week, allWeekColumns);
+                      }}
+                      disabled={exportPeriodeIdx === '' || !sheetsData?.students}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-slate-700 hover:bg-slate-800 text-white disabled:opacity-40 transition-colors shrink-0"
+                    >
+                      <Printer className="w-3 h-3" />
+                      PDF
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Kelola Periode ── */}
+              <div className="rounded-xl border border-slate-200 overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-indigo-600" />
+                    <span className="text-xs font-bold text-slate-700">Kelola Periode</span>
+                    <span className="text-[10px] text-slate-400">({allWeekColumns.length} total)</span>
+                  </div>
+                </div>
+                <div className="px-4 py-3 space-y-3">
+                  {/* Dari Google Sheets */}
+                  {(sheetsData?.weekColumns || []).map((w, i) => (
+                    <div key={w} className="flex items-center gap-2 text-xs">
+                      <span className="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+                      <span className="flex-1 text-slate-700">{w}</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 font-semibold">Sheets</span>
+                    </div>
+                  ))}
+                  {/* Periode lokal */}
+                  {localPeriods.map((p, i) => {
+                    const isEditing = editPeriodIdx === i;
+                    const globalIdx = (sheetsData?.weekColumns?.length || 0) + i;
+                    return (
+                      <div key={p} className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold flex items-center justify-center shrink-0">{globalIdx + 1}</span>
+                        {isEditing ? (
+                          <>
+                            <input
+                              type="text"
+                              value={editPeriodVal}
+                              onChange={e => setEditPeriodVal(e.target.value)}
+                              onKeyDown={e => e.key === 'Enter' && handleSaveEditPeriod(p)}
+                              className="flex-1 text-xs border border-brand-300 rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-brand-400"
+                              autoFocus
+                            />
+                            <button onClick={() => handleSaveEditPeriod(p)} className="text-[10px] font-bold text-emerald-700 hover:text-emerald-900">Simpan</button>
+                            <button onClick={() => setEditPeriodIdx(null)} className="text-[10px] text-slate-400 hover:text-slate-600">Batal</button>
+                          </>
+                        ) : (
+                          <>
+                            <span className="flex-1 text-xs text-slate-700">{p}</span>
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-semibold">Lokal</span>
+                            <button onClick={() => { setEditPeriodIdx(i); setEditPeriodVal(p); }} className="p-1 text-slate-400 hover:text-brand-600"><Pencil className="w-3 h-3" /></button>
+                            <button onClick={() => handleDeleteLocalPeriod(p)} className="p-1 text-slate-400 hover:text-rose-600"><Trash2 className="w-3 h-3" /></button>
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
+                  {/* Tambah periode baru */}
+                  <div className="flex items-center gap-2 pt-1 border-t border-slate-100">
+                    <input
+                      type="text"
+                      placeholder="Nama periode baru, cth: 05 - 09 Oktober 26"
+                      value={newPeriodLabel}
+                      onChange={e => setNewPeriodLabel(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && handleAddPeriod()}
+                      className="flex-1 text-[10px] border border-slate-200 rounded-lg px-2 py-1.5 outline-none focus:ring-1 focus:ring-brand-400"
+                    />
+                    <button
+                      onClick={handleAddPeriod}
+                      disabled={!newPeriodLabel.trim()}
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold bg-brand-600 hover:bg-brand-700 text-white disabled:opacity-40 transition-colors shrink-0"
+                    >
+                      <Plus className="w-3 h-3" />
+                      Tambah
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* ── Laporan Lokal Mahasiswa ── */}

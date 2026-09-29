@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Inbox, CheckCircle2, Clock, ArrowRight, BookOpen, Users, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, Inbox, CheckCircle2, Clock, ArrowRight, BookOpen, Users, ChevronDown, ChevronUp, ShieldCheck, ShieldOff } from 'lucide-react';
 import { getDosenLaporan, markDosenLaporanRead } from './LaporanModal';
 import { getCategoryBadgeStyle } from '../utils/helpers';
+import { getVerifikasi, saveVerifikasi, cancelVerifikasi } from '../utils/exportUtils';
 
 function formatDate(iso) {
   if (!iso) return '-';
@@ -11,13 +12,23 @@ function formatDate(iso) {
   }).format(new Date(iso));
 }
 
-function LaporanCard({ item, dosenName, onRead }) {
+function LaporanCard({ item, dosenName, onRead, verifData, onVerifChange }) {
   const [expanded, setExpanded] = useState(false);
   const badge = getCategoryBadgeStyle(item.category);
+  const isVerified = verifData?.[item.nim]?.[item.week]?.verified;
 
   const handleExpand = () => {
     if (!item.read) onRead(dosenName, item.nim, item.week);
     setExpanded(v => !v);
+  };
+
+  const handleVerify = () => {
+    if (isVerified) {
+      cancelVerifikasi(item.nim, item.week);
+    } else {
+      saveVerifikasi(item.nim, item.week, dosenName);
+    }
+    onVerifChange();
   };
 
   return (
@@ -46,6 +57,7 @@ function LaporanCard({ item, dosenName, onRead }) {
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0 ml-1">
+          {isVerified && <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" title="Terverifikasi" />}
           <span className="text-[10px] text-slate-400 hidden sm:block">{formatDate(item.submittedAt)}</span>
           {expanded ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
         </div>
@@ -86,8 +98,22 @@ function LaporanCard({ item, dosenName, onRead }) {
             </div>
           )}
 
-          <div className="text-[10px] text-slate-400 text-right">
-            Dikirim {formatDate(item.submittedAt)}
+          {/* Verifikasi */}
+          <div className="flex items-center justify-between">
+            <div className="text-[10px] text-slate-400">
+              Dikirim {formatDate(item.submittedAt)}
+            </div>
+            <button
+              onClick={handleVerify}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                isVerified
+                  ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
+                  : 'bg-slate-100 text-slate-500 hover:bg-indigo-50 hover:text-indigo-700 border border-slate-200 hover:border-indigo-200'
+              }`}
+            >
+              {isVerified ? <ShieldCheck className="w-3.5 h-3.5" /> : <ShieldOff className="w-3.5 h-3.5" />}
+              {isVerified ? 'Terverifikasi' : 'Tandai Terverifikasi'}
+            </button>
           </div>
         </div>
       )}
@@ -97,10 +123,14 @@ function LaporanCard({ item, dosenName, onRead }) {
 
 export default function LaporanMasukModal({ isOpen, onClose, dosenName }) {
   const [laporan, setLaporan] = useState([]);
+  const [verifData, setVerifData] = useState({});
+
+  const refreshVerif = () => setVerifData(getVerifikasi());
 
   useEffect(() => {
     if (isOpen && dosenName) {
       setLaporan(getDosenLaporan(dosenName));
+      refreshVerif();
     }
   }, [isOpen, dosenName]);
 
@@ -156,6 +186,8 @@ export default function LaporanMasukModal({ isOpen, onClose, dosenName }) {
                 item={item}
                 dosenName={dosenName}
                 onRead={handleRead}
+                verifData={verifData}
+                onVerifChange={refreshVerif}
               />
             ))
           )}
