@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Lock, X, Eye, EyeOff, ShieldCheck, AlertCircle, UserPlus, LogIn, Mail, Search, GraduationCap, BookOpen, KeyRound, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { STUDENT_NIM_MAP } from '../utils/studentDatabase';
 
-const ADMIN_USER = 'admin';
+const ADMIN_USER = 'datascience@itera.ac.id';
 const ADMIN_PASS_B64 = btoa('prodi2026');
 
 // Email → Nama lengkap di sistem (untuk auto-filter mahasiswa bimbingan)
@@ -317,7 +317,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
                   type="text"
                   value={loginEmail}
                   onChange={e => setLoginEmail(e.target.value)}
-                  placeholder="Email ITERA atau username admin"
+                  placeholder="Email ITERA"
                   autoFocus
                   required
                   className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent bg-slate-50 placeholder:text-slate-400"
