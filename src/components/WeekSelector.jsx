@@ -1,5 +1,13 @@
 import React from 'react';
-import { Calendar, LayoutGrid, ListFilter, Table2 } from 'lucide-react';
+import { Calendar, ChevronDown, LayoutGrid, ListFilter, Table2 } from 'lucide-react';
+
+const SEMESTERS = [
+  'Semester Ganjil 2026/2027',
+  'Semester Genap 2025/2026',
+  'Semester Ganjil 2025/2026',
+  'Semester Genap 2024/2025',
+  'Semester Ganjil 2024/2025',
+];
 
 export default function WeekSelector({
   weekColumns,
@@ -7,61 +15,81 @@ export default function WeekSelector({
   onSelectWeek,
   viewMode,
   onViewModeChange,
-  students
+  students,
+  selectedSemester,
+  onSelectSemester,
 }) {
-  return (
-    <div className="bg-white rounded-xl p-3 sm:p-4 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-      {/* Week Tabs */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-        <div className="flex items-center gap-2 mr-2 shrink-0">
-          <div className="flex items-center text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            <Calendar className="w-4 h-4 mr-1 text-slate-400" />
-            Periode:
-          </div>
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-brand-50 text-brand-700 border border-brand-200">
-            Semester Ganjil 2026/2027
-          </span>
-        </div>
-        {[...weekColumns].reverse().map((week, idx) => {
-          const isSelected = selectedWeek === week && viewMode !== 'matrix';
-          let count = 0;
-          students.forEach(s => {
-            if (s.weeklyUpdates[week]?.reported) count++;
-          });
-          const hasData = count > 0;
+  const countMap = {};
+  weekColumns.forEach(w => {
+    countMap[w] = students.filter(s => s.weeklyUpdates[w]?.reported).length;
+  });
 
+  const reversedWeeks = [...weekColumns].reverse();
+
+  return (
+    <div className="bg-white rounded-xl px-3 py-2.5 sm:px-4 border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+      {/* Left: Semester + Periode dropdowns */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
+        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider shrink-0">Periode:</span>
+
+        {/* Semester dropdown */}
+        <div className="relative">
+          <select
+            value={selectedSemester}
+            onChange={e => onSelectSemester?.(e.target.value)}
+            className="appearance-none pl-3 pr-7 py-1.5 rounded-lg text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200 outline-none focus:ring-2 focus:ring-brand-400 cursor-pointer"
+          >
+            {SEMESTERS.map(s => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+          <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-brand-600" />
+        </div>
+
+        {/* Periode dropdown */}
+        <div className="relative">
+          <select
+            value={viewMode === 'matrix' ? '' : selectedWeek}
+            onChange={e => {
+              if (!e.target.value) return;
+              onSelectWeek(e.target.value);
+              if (viewMode === 'matrix') onViewModeChange('cards');
+            }}
+            className="appearance-none pl-3 pr-7 py-1.5 rounded-lg text-xs font-semibold bg-slate-700 text-white border border-slate-600 outline-none focus:ring-2 focus:ring-slate-400 cursor-pointer"
+          >
+            {viewMode === 'matrix' && (
+              <option value="">— Semua Periode —</option>
+            )}
+            {reversedWeeks.map((week, i) => {
+              const count = countMap[week] ?? 0;
+              const label = `${week}  (${count}/${students.length})`;
+              return (
+                <option key={week} value={week}>{label}</option>
+              );
+            })}
+          </select>
+          <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-300" />
+        </div>
+
+        {/* Laporan count badge for selected periode */}
+        {selectedWeek && viewMode !== 'matrix' && (() => {
+          const count = countMap[selectedWeek] ?? 0;
+          const hasData = count > 0;
           return (
-            <button
-              key={week}
-              onClick={() => {
-                onSelectWeek(week);
-                if (viewMode === 'matrix') onViewModeChange('cards');
-              }}
-              className={`shrink-0 flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                isSelected
-                  ? 'bg-brand-600 text-white shadow-sm shadow-brand-500/30'
-                  : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
-              }`}
-            >
-              <span>{week}</span>
-              <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                  isSelected
-                    ? 'bg-white/20 text-white'
-                    : hasData
-                    ? 'bg-emerald-100 text-emerald-700'
-                    : 'bg-slate-200 text-slate-600'
-                }`}
-              >
-                {count}/{students.length}
-              </span>
-            </button>
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+              hasData
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                : 'bg-slate-100 text-slate-500 border-slate-200'
+            }`}>
+              {count}/{students.length} laporan
+            </span>
           );
-        })}
+        })()}
       </div>
 
-      {/* View Mode Toggle: Cards, Table, Matrix */}
-      <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg self-start md:self-auto border border-slate-200 shrink-0">
+      {/* Right: View Mode Toggle */}
+      <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg self-start sm:self-auto border border-slate-200 shrink-0">
         <button
           onClick={() => onViewModeChange('cards')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
@@ -69,7 +97,6 @@ export default function WeekSelector({
               ? 'bg-white text-slate-900 shadow-xs font-semibold'
               : 'text-slate-600 hover:text-slate-900'
           }`}
-          title="Tampilan Kartu"
         >
           <LayoutGrid className="w-3.5 h-3.5" />
           <span>Kartu</span>
@@ -82,7 +109,6 @@ export default function WeekSelector({
               ? 'bg-white text-slate-900 shadow-xs font-semibold'
               : 'text-slate-600 hover:text-slate-900'
           }`}
-          title="Tampilan Tabel"
         >
           <ListFilter className="w-3.5 h-3.5" />
           <span>Tabel</span>
@@ -95,7 +121,6 @@ export default function WeekSelector({
               ? 'bg-white text-slate-900 shadow-xs font-semibold'
               : 'text-slate-600 hover:text-slate-900'
           }`}
-          title="Matriks Semua Minggu"
         >
           <Table2 className="w-3.5 h-3.5" />
           <span>Matriks Lintas Periode</span>

@@ -35,6 +35,7 @@ export default function App() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedWeek, setSelectedWeek] = useState('');
   const [viewMode, setViewMode] = useState('cards'); // 'cards' | 'table' | 'matrix'
+  const [selectedSemester, setSelectedSemester] = useState('Semester Ganjil 2026/2027');
 
   // WhatsApp Gateway State
   const [gatewayStatus, setGatewayStatus] = useState({
@@ -423,6 +424,8 @@ export default function App() {
             viewMode={viewMode}
             onViewModeChange={setViewMode}
             students={data?.students || []}
+            selectedSemester={selectedSemester}
+            onSelectSemester={setSelectedSemester}
           />
         }
       />
