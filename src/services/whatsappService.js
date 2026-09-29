@@ -1,6 +1,7 @@
-const GATEWAY_URL = (typeof window !== 'undefined' && window.location.port === '5174')
-  ? 'http://localhost:3002'
-  : (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3002');
+const GATEWAY_URL = import.meta.env.VITE_API_URL ||
+  ((typeof window !== 'undefined' && window.location.port === '5174')
+    ? 'http://localhost:3002'
+    : (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3002'));
 
 export const DEFAULT_WA_GROUP_LINK = 'https://chat.whatsapp.com/H2uFKAw0TWu7hpGtFQrP80';
 export const DEFAULT_WA_GROUP_CODE = 'H2uFKAw0TWu7hpGtFQrP80';

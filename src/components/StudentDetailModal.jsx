@@ -19,7 +19,8 @@ export default function StudentDetailModal({
   student,
   weekColumns,
   onClose,
-  onOpenWhatsApp
+  onOpenWhatsApp,
+  isAdmin = false
 }) {
   if (!student) return null;
 
@@ -210,13 +211,15 @@ export default function StudentDetailModal({
             Tutup
           </button>
 
-          <button
-            onClick={() => onOpenWhatsApp(student)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition-colors shadow-xs"
-          >
-            <MessageCircle className="w-4 h-4" />
-            <span>Kirim WhatsApp</span>
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => onOpenWhatsApp(student)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition-colors shadow-xs"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>Kirim WhatsApp</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

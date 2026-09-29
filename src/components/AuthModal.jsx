@@ -1,7 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { Lock, X, Eye, EyeOff, ShieldCheck, AlertCircle, UserPlus, LogIn, Mail, Search, GraduationCap, BookOpen, KeyRound, ArrowLeft, CheckCircle2, RefreshCw } from 'lucide-react';
-import { send as emailjsSend, init as emailjsInit } from '@emailjs/browser';
-import { EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, EMAILJS_PUBLIC_KEY } from '../config/emailjs';
 import { STUDENT_NIM_MAP } from '../utils/studentDatabase';
 
 const ADMIN_USER = 'datascience@itera.ac.id';
@@ -211,12 +209,19 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
     const token = generateToken();
     storeResetToken(email, token);
     const resetLink = `${window.location.origin}/?reset_token=${token}`;
-    emailjsInit(EMAILJS_PUBLIC_KEY);
-    await emailjsSend(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      to_email: email,
-      user_name: found.name || email.split('@')[0],
-      reset_link: resetLink,
+    const res = await fetch('/api/send-reset-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        resetLink,
+        userName: found.name || email.split('@')[0],
+      }),
     });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || 'Gagal mengirim email.');
+    }
     return { success: true };
   };
 
@@ -230,8 +235,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
       const result = await sendResetLink(email);
       if (result.error) { setForgotError(result.error); }
       else { setForgotStep(2); }
-    } catch {
-      setForgotError('Gagal mengirim email. Periksa koneksi internet atau konfigurasi EmailJS.');
+    } catch (err) {
+      setForgotError(err.message || 'Gagal mengirim email. Periksa koneksi internet.');
     } finally {
       setForgotLoading(false);
     }
@@ -261,8 +266,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
       const result = await sendResetLink(forgotEmail.trim().toLowerCase());
       if (result.error) setForgotError(result.error);
       else setForgotError('');
-    } catch {
-      setForgotError('Gagal mengirim ulang. Coba lagi.');
+    } catch (err) {
+      setForgotError(err.message || 'Gagal mengirim ulang. Coba lagi.');
     } finally {
       setForgotLoading(false);
     }

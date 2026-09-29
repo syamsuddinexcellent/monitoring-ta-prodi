@@ -17,7 +17,7 @@ export default function WeekSelector({
           <Calendar className="w-4 h-4 mr-1 text-slate-400" />
           Pekan:
         </div>
-        {weekColumns.map((week, idx) => {
+        {[...weekColumns].reverse().map((week, idx) => {
           const isSelected = selectedWeek === week && viewMode !== 'matrix';
           let count = 0;
           students.forEach(s => {

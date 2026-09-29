@@ -13,7 +13,10 @@ import { exec } from 'child_process';
 const app = express();
 const PORT = process.env.PORT || 3002;
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.ALLOWED_ORIGIN ? [process.env.ALLOWED_ORIGIN, 'http://localhost:5174'] : true,
+  credentials: true
+}));
 app.use(express.json());
 
 const AUTH_DIR = path.join(process.cwd(), 'auth_info_baileys_prodi');

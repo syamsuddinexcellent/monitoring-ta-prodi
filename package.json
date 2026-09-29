@@ -11,13 +11,13 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "@emailjs/browser": "^4.4.1",
     "@whiskeysockets/baileys": "^6.7.12",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "lucide-react": "^0.475.0",
+    "nodemailer": "^10.0.12",
     "papaparse": "^5.5.2",
     "pino": "^9.6.0",
     "qrcode": "^1.5.4",

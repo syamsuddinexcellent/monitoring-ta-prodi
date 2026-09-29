@@ -24,7 +24,8 @@ export default function StudentTable({
   onOpenWhatsApp,
   nextWeek = '',
   gatewayStatus,
-  onOpenGatewayModal
+  onOpenGatewayModal,
+  isAdmin = false
 }) {
   const [sendingNim, setSendingNim] = useState(null);
   const [sentNim, setSentNim] = useState(null);
@@ -245,8 +246,8 @@ export default function StudentTable({
                         <History className="w-4 h-4" />
                       </button>
 
-                      {/* Quick Auto Send */}
-                      {isGatewayConnected && student.phone && (
+                      {/* Quick Auto Send — admin only */}
+                      {isAdmin && isGatewayConnected && student.phone && (
                         <button
                           onClick={() => handleQuickAutoSend(student, update)}
                           disabled={isSendingThis}
@@ -268,14 +269,16 @@ export default function StudentTable({
                         </button>
                       )}
 
-                      {/* Format modal button */}
-                      <button
-                        onClick={() => onOpenWhatsApp(student)}
-                        className="px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
-                        title="Format pesan WhatsApp"
-                      >
-                        <MessageCircle className="w-3.5 h-3.5" />
-                      </button>
+                      {/* Format modal button — admin only */}
+                      {isAdmin && (
+                        <button
+                          onClick={() => onOpenWhatsApp(student)}
+                          className="px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+                          title="Format pesan WhatsApp"
+                        >
+                          <MessageCircle className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

@@ -1,7 +1,7 @@
 export async function triggerSyncDatabase() {
   try {
-    let baseUrl = 'http://localhost:3002';
-    if (typeof window !== 'undefined') {
+    let baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002';
+    if (!import.meta.env.VITE_API_URL && typeof window !== 'undefined') {
       if (window.location.port === '5174' || window.location.port === '3002') {
         baseUrl = 'http://localhost:3002';
       } else if (window.location.port === '5173' || window.location.port === '3001') {
@@ -138,6 +138,7 @@ export function processTabsData(tabs, source = 'google_sheets') {
     const statusHeader = headers.find(h => /^status$/i.test(h));
     const targetHeader = headers.find(h => /^target$/i.test(h));
     const ketHeader = headers.find(h => /keterangan/i.test(h));
+    const dokHeader = headers.find(h => /dokumen/i.test(h));
 
     const metaHeaders = new Set([
       namaHeader,
@@ -149,7 +150,8 @@ export function processTabsData(tabs, source = 'google_sheets') {
       pj2Header,
       statusHeader,
       targetHeader,
-      ketHeader
+      ketHeader,
+      dokHeader
     ].filter(Boolean));
 
     const tabWeeks = headers.filter(h => h && !metaHeaders.has(h) && !h.startsWith('Unnamed') && !h.startsWith('_') && h.trim().length > 1);

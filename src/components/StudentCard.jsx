@@ -28,7 +28,8 @@ export default function StudentCard({
   onOpenWhatsApp,
   nextWeek = '',
   gatewayStatus,
-  onOpenGatewayModal
+  onOpenGatewayModal,
+  isAdmin = false
 }) {
   const [copiedPhone, setCopiedPhone] = useState(false);
   const [autoSending, setAutoSending] = useState(false);
@@ -318,15 +319,17 @@ export default function StudentCard({
             </button>
           )}
 
-          {/* Regular Message Modal Button */}
-          <button
-            onClick={() => onOpenWhatsApp(student)}
-            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition-all shadow-xs"
-            title="Lihat teks atau edit sebelum kirim"
-          >
-            <MessageCircle className="w-3.5 h-3.5" />
-            <span>Format</span>
-          </button>
+          {/* Regular Message Modal Button — admin only */}
+          {isAdmin && (
+            <button
+              onClick={() => onOpenWhatsApp(student)}
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition-all shadow-xs"
+              title="Lihat teks atau edit sebelum kirim"
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              <span>Format</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

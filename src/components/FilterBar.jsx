@@ -1,5 +1,112 @@
-import React from 'react';
-import { Search, X, Users, UserCheck } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Search, X, Users, UserCheck, ChevronDown, Check } from 'lucide-react';
+
+function LecturerDropdown({ lecturerFilter, onLecturerFilterChange, availableLecturers }) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const isFiltered = lecturerFilter !== 'all';
+  const filtered = availableLecturers.filter(l =>
+    l.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const label = isFiltered ? lecturerFilter : 'Mahasiswa Bimbingan Saya';
+  const shortLabel = isFiltered
+    ? lecturerFilter.split(',')[0]
+    : 'Mahasiswa Bimbingan Saya';
+
+  return (
+    <div className="relative shrink-0" ref={ref}>
+      <button
+        onClick={() => setOpen(v => !v)}
+        className={`inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg border transition-all w-full max-w-[260px] ${
+          isFiltered
+            ? 'bg-indigo-600 text-white border-indigo-700 shadow-xs'
+            : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200'
+        }`}
+      >
+        <UserCheck className="w-3.5 h-3.5 shrink-0" />
+        <span className="truncate flex-1 text-left">{shortLabel}</span>
+        {isFiltered && (
+          <button
+            onClick={e => { e.stopPropagation(); onLecturerFilterChange('all'); setOpen(false); }}
+            className="ml-0.5 text-white/70 hover:text-white shrink-0"
+          >
+            <X className="w-3 h-3" />
+          </button>
+        )}
+        <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform ${open ? 'rotate-180' : ''} ${isFiltered ? 'text-white/70' : 'text-indigo-400'}`} />
+      </button>
+
+      {open && (
+        <div className="absolute z-50 top-full mt-1.5 left-0 w-72 bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden">
+          {/* Search inside dropdown */}
+          <div className="p-2 border-b border-slate-100">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Cari nama dosen..."
+                autoFocus
+                className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400/30 focus:border-indigo-400"
+              />
+            </div>
+          </div>
+
+          {/* Options list */}
+          <div className="max-h-60 overflow-y-auto">
+            {/* "Semua" option */}
+            <button
+              onClick={() => { onLecturerFilterChange('all'); setOpen(false); setSearch(''); }}
+              className={`w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-slate-50 transition-colors text-left ${
+                !isFiltered ? 'text-indigo-700 font-semibold bg-indigo-50' : 'text-slate-600'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+              <span className="flex-1">Semua Dosen (Tampilkan Semua)</span>
+              {!isFiltered && <Check className="w-3.5 h-3.5 text-indigo-600 shrink-0" />}
+            </button>
+
+            <div className="h-px bg-slate-100 mx-2" />
+
+            {filtered.length === 0 && (
+              <div className="px-4 py-3 text-xs text-slate-400 text-center">
+                Tidak ada dosen ditemukan
+              </div>
+            )}
+            {filtered.map(lect => {
+              const active = lecturerFilter === lect;
+              return (
+                <button
+                  key={lect}
+                  onClick={() => { onLecturerFilterChange(lect); setOpen(false); setSearch(''); }}
+                  className={`w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-slate-50 transition-colors text-left ${
+                    active ? 'text-indigo-700 font-semibold bg-indigo-50' : 'text-slate-700'
+                  }`}
+                >
+                  <UserCheck className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-indigo-500' : 'text-slate-300'}`} />
+                  <span className="flex-1 truncate">{lect}</span>
+                  {active && <Check className="w-3.5 h-3.5 text-indigo-600 shrink-0" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function FilterBar({
   searchQuery,
@@ -16,10 +123,9 @@ export default function FilterBar({
   onLecturerFilterChange,
   availableLecturers,
   unreportedCount,
-  onOpenBulkReminder
+  onOpenBulkReminder,
+  isAdmin = false
 }) {
-  const isMyStudentsActive = lecturerFilter === 'M. Syamsuddin Wisnubroto, S.Si., M.Si.';
-
   return (
     <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-xs flex flex-col gap-3">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
@@ -43,28 +149,15 @@ export default function FilterBar({
           )}
         </div>
 
-        {/* Quick Filter: Bimbingan MSW */}
-        <button
-          onClick={() => {
-            if (isMyStudentsActive) {
-              onLecturerFilterChange('all');
-            } else {
-              onLecturerFilterChange('M. Syamsuddin Wisnubroto, S.Si., M.Si.');
-            }
-          }}
-          className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg border transition-all shrink-0 ${
-            isMyStudentsActive
-              ? 'bg-brand-600 text-white border-brand-700 shadow-xs'
-              : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200'
-          }`}
-          title="Filter cepat khusus mahasiswa bimbingan Pak M. Syamsuddin Wisnubroto"
-        >
-          <UserCheck className="w-3.5 h-3.5" />
-          <span>{isMyStudentsActive ? '✓ Mahasiswa Bimbingan Saya' : 'Mahasiswa Bimbingan Saya'}</span>
-        </button>
+        {/* Dosen Bimbingan Custom Dropdown */}
+        <LecturerDropdown
+          lecturerFilter={lecturerFilter}
+          onLecturerFilterChange={onLecturerFilterChange}
+          availableLecturers={availableLecturers}
+        />
 
-        {/* Bulk Reminder to Group Button */}
-        {unreportedCount > 0 && (
+        {/* Bulk Reminder to Group Button — admin only */}
+        {isAdmin && unreportedCount > 0 && (
           <button
             onClick={onOpenBulkReminder}
             className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg transition-colors shadow-xs shrink-0"
@@ -99,20 +192,6 @@ export default function FilterBar({
           {availableAngkatan.map(ang => (
             <option key={ang} value={ang}>
               Angkatan {ang}
-            </option>
-          ))}
-        </select>
-
-        {/* Dosen Pembimbing Filter */}
-        <select
-          value={lecturerFilter}
-          onChange={e => onLecturerFilterChange(e.target.value)}
-          className="px-3 py-1.5 text-xs bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20 max-w-[220px] truncate"
-        >
-          <option value="all">Semua Dosen Pembimbing</option>
-          {availableLecturers.map(lect => (
-            <option key={lect} value={lect}>
-              {lect}
             </option>
           ))}
         </select>
