@@ -453,3 +453,24 @@ export function getAllWeeksTrend(students, weekColumns) {
     };
   });
 }
+
+// Merge mahasiswa local reports (localStorage) into Google Sheets student data.
+// Local report fills in for a week only when Sheets has no report for that week.
+export function mergeLocalReports(students) {
+  try {
+    const localAll = JSON.parse(localStorage.getItem('mahasiswa_reports') || '{}');
+    return students.map(student => {
+      const localReports = localAll[student.nim];
+      if (!localReports) return student;
+      const mergedUpdates = { ...student.weeklyUpdates };
+      Object.entries(localReports).forEach(([week, report]) => {
+        if (!mergedUpdates[week]?.reported) {
+          mergedUpdates[week] = { ...report };
+        }
+      });
+      return { ...student, weeklyUpdates: mergedUpdates };
+    });
+  } catch {
+    return students;
+  }
+}

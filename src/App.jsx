@@ -18,7 +18,8 @@ import {
   loadMonitoringData,
   getWeeklyMetrics,
   getAllWeeksTrend,
-  triggerSyncDatabase
+  triggerSyncDatabase,
+  mergeLocalReports
 } from './services/dataService';
 import {
   checkGatewayStatus,
@@ -120,6 +121,7 @@ export default function App() {
         await triggerSyncDatabase();
       }
       const result = await loadMonitoringData();
+      result.students = mergeLocalReports(result.students);
       setData(result);
       if (!selectedWeek && result.weekColumns.length > 0) {
         const lastWithData = [...result.weekColumns].reverse().find(w =>
