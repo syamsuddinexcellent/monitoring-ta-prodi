@@ -13,6 +13,7 @@ import WhatsAppConnectModal from './components/WhatsAppConnectModal';
 import AuthModal, { validateResetToken } from './components/AuthModal';
 import MahasiswaView from './components/MahasiswaView';
 import LaporanMasukModal from './components/LaporanMasukModal';
+import AdminPanelModal from './components/AdminPanelModal';
 import { countUnreadLaporan } from './components/LaporanModal';
 import {
   loadMonitoringData,
@@ -66,6 +67,8 @@ export default function App() {
   const laporanMasukCount = loggedInUser?.role === 'dosen'
     ? countUnreadLaporan(loggedInUser.lecturerName || '')
     : 0;
+
+  const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
 
   // Modals
   const [detailStudent, setDetailStudent] = useState(null);
@@ -406,6 +409,7 @@ export default function App() {
         }}
         laporanMasukCount={laporanMasukCount}
         onOpenLaporanMasuk={() => setIsLaporanMasukOpen(true)}
+        onOpenAdminPanel={() => setIsAdminPanelOpen(true)}
         bottomRow={
           <WeekSelector
             weekColumns={data?.weekColumns || []}
@@ -641,6 +645,15 @@ export default function App() {
         isOpen={isLaporanMasukOpen}
         onClose={() => setIsLaporanMasukOpen(false)}
         dosenName={loggedInUser?.lecturerName || ''}
+      />
+
+      {/* Admin Panel Modal */}
+      <AdminPanelModal
+        isOpen={isAdminPanelOpen}
+        onClose={() => setIsAdminPanelOpen(false)}
+        sheetsData={data}
+        isRefreshing={isRefreshing}
+        onRefreshSheets={() => fetchData(true)}
       />
     </div>
   );

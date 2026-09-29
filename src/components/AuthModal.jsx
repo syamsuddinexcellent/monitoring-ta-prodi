@@ -80,6 +80,13 @@ export function registerUser(email, password, overrideName = null, overrideRole 
   return { success: true };
 }
 
+export function getStoredUsersList() {
+  return getStoredUsers().map(({ passwordHash, ...u }) => u);
+}
+export function deleteStoredUser(email) {
+  saveStoredUsers(getStoredUsers().filter(u => u.email !== email.toLowerCase()));
+}
+
 export function resetPassword(email, newPassword) {
   const emailLower = email.trim().toLowerCase();
   if (!emailLower || !newPassword) return { error: 'Semua field wajib diisi.' };

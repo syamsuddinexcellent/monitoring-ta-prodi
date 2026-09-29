@@ -27,6 +27,7 @@ export default function Header({
   onLogout,
   laporanMasukCount = 0,
   onOpenLaporanMasuk,
+  onOpenAdminPanel,
   bottomRow,
 }) {
   const formatTime = (date) => {
@@ -138,10 +139,14 @@ export default function Header({
                   </button>
                 )}
                 {isAdmin ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-brand-50 border border-brand-200 text-xs font-semibold text-brand-700">
+                  <button
+                    onClick={onOpenAdminPanel}
+                    className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-brand-50 hover:bg-brand-100 border border-brand-200 text-xs font-semibold text-brand-700 transition-colors"
+                    title="Buka Panel Admin"
+                  >
                     <ShieldCheck className="w-3.5 h-3.5" />
                     Admin
-                  </span>
+                  </button>
                 ) : (
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-indigo-50 border border-indigo-200 text-xs font-semibold text-indigo-700 max-w-[160px]">
                     <User className="w-3.5 h-3.5 shrink-0" />
