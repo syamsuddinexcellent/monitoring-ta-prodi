@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Lock, X, Eye, EyeOff, ShieldCheck, AlertCircle, UserPlus, LogIn, Mail, Search, GraduationCap, BookOpen } from 'lucide-react';
+import { Lock, X, Eye, EyeOff, ShieldCheck, AlertCircle, UserPlus, LogIn, Mail, Search, GraduationCap, BookOpen, KeyRound, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { STUDENT_NIM_MAP } from '../utils/studentDatabase';
 
 const ADMIN_USER = 'admin';
@@ -80,6 +80,18 @@ export function registerUser(email, password, overrideName = null, overrideRole 
   return { success: true };
 }
 
+export function resetPassword(email, newPassword) {
+  const emailLower = email.trim().toLowerCase();
+  if (!emailLower || !newPassword) return { error: 'Semua field wajib diisi.' };
+  if (newPassword.length < 6) return { error: 'Password minimal 6 karakter.' };
+  const users = getStoredUsers();
+  const idx = users.findIndex(u => u.email === emailLower);
+  if (idx === -1) return { error: 'Email tidak ditemukan. Pastikan Anda sudah mendaftar.' };
+  users[idx].passwordHash = btoa(newPassword);
+  saveStoredUsers(users);
+  return { success: true, name: users[idx].name };
+}
+
 function buildNimToName() {
   const map = {};
   for (const [name, nim] of Object.entries(STUDENT_NIM_MAP)) {
@@ -129,6 +141,15 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
   const [regFoundName, setRegFoundName] = useState('');
   const [regNimError, setRegNimError] = useState('');
 
+  // Forgot password
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotStep, setForgotStep] = useState(1); // 1=enter email, 2=set new password
+  const [forgotNewPass, setForgotNewPass] = useState('');
+  const [forgotConfirm, setForgotConfirm] = useState('');
+  const [forgotError, setForgotError] = useState('');
+  const [forgotSuccess, setForgotSuccess] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+
   const nimToName = useMemo(() => buildNimToName(), []);
 
   if (!isOpen) return null;
@@ -138,12 +159,48 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
   const detectedName = LECTURER_EMAIL_MAP[regEmailLower];
   const detectedRole = classifyEmail(regEmailLower);
 
+  const resetForgot = () => {
+    setForgotEmail(''); setForgotStep(1); setForgotNewPass('');
+    setForgotConfirm(''); setForgotError(''); setForgotSuccess('');
+  };
+
   const handleClose = () => {
     setLoginEmail(''); setLoginPassword(''); setLoginError('');
     setRegEmail(''); setRegPassword(''); setRegConfirm('');
     setRegError(''); setRegSuccess('');
     setRegNim(''); setRegFoundName(''); setRegNimError('');
+    resetForgot();
+    setTab('login');
     onClose();
+  };
+
+  const handleForgotStep1 = (e) => {
+    e.preventDefault();
+    setForgotError('');
+    const email = forgotEmail.trim().toLowerCase();
+    if (!email) { setForgotError('Masukkan email Anda.'); return; }
+    const users = getStoredUsers();
+    if (!users.some(u => u.email === email)) {
+      setForgotError('Email tidak terdaftar di sistem. Silakan daftar akun baru.');
+      return;
+    }
+    setForgotStep(2);
+  };
+
+  const handleForgotStep2 = (e) => {
+    e.preventDefault();
+    setForgotError('');
+    if (forgotNewPass !== forgotConfirm) { setForgotError('Password tidak cocok.'); return; }
+    setForgotLoading(true);
+    setTimeout(() => {
+      const result = resetPassword(forgotEmail, forgotNewPass);
+      if (result.error) { setForgotError(result.error); }
+      else {
+        setForgotSuccess(`Password berhasil direset. Silakan login dengan password baru.`);
+        setTimeout(() => { resetForgot(); setTab('login'); }, 2000);
+      }
+      setForgotLoading(false);
+    }, 400);
   };
 
   const handleNimSearch = () => {
@@ -212,7 +269,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
               </div>
               <div>
                 <h2 className="text-base font-bold text-white">
-                  {tab === 'login' ? 'Masuk' : 'Daftar Akun'}
+                  {tab === 'login' ? 'Masuk' : tab === 'register' ? 'Daftar Akun' : 'Reset Password'}
                 </h2>
                 <p className="text-xs text-white/70">Monitoring TA Prodi Sains Data</p>
               </div>
@@ -223,22 +280,24 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
             </button>
           </div>
 
-          <div className="flex gap-1 mt-4 bg-white/10 rounded-lg p-1">
-            <button onClick={() => setTab('login')}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                tab === 'login' ? 'bg-white text-brand-700 shadow-sm' : 'text-white/80 hover:text-white'
-              }`}>
-              <LogIn className="w-3.5 h-3.5" />
-              Masuk
-            </button>
-            <button onClick={() => setTab('register')}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                tab === 'register' ? 'bg-white text-brand-700 shadow-sm' : 'text-white/80 hover:text-white'
-              }`}>
-              <UserPlus className="w-3.5 h-3.5" />
-              Daftar
-            </button>
-          </div>
+          {tab !== 'forgot' && (
+            <div className="flex gap-1 mt-4 bg-white/10 rounded-lg p-1">
+              <button onClick={() => setTab('login')}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                  tab === 'login' ? 'bg-white text-brand-700 shadow-sm' : 'text-white/80 hover:text-white'
+                }`}>
+                <LogIn className="w-3.5 h-3.5" />
+                Masuk
+              </button>
+              <button onClick={() => setTab('register')}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                  tab === 'register' ? 'bg-white text-brand-700 shadow-sm' : 'text-white/80 hover:text-white'
+                }`}>
+                <UserPlus className="w-3.5 h-3.5" />
+                Daftar
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Login Form */}
@@ -266,7 +325,14 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Password</label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-semibold text-slate-700">Password</label>
+                <button type="button"
+                  onClick={() => { setTab('forgot'); setForgotEmail(loginEmail.trim()); }}
+                  className="text-[11px] text-brand-600 hover:underline font-medium">
+                  Lupa password?
+                </button>
+              </div>
               <PasswordInput value={loginPassword} onChange={e => setLoginPassword(e.target.value)} placeholder="Masukkan password" />
             </div>
             <button type="submit" disabled={loginLoading}
@@ -281,6 +347,81 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
               </button>
             </p>
           </form>
+        )}
+
+        {/* Forgot Password Form */}
+        {tab === 'forgot' && (
+          <div className="px-6 py-5 space-y-4">
+            <button type="button" onClick={() => { resetForgot(); setTab('login'); }}
+              className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-brand-600 transition-colors">
+              <ArrowLeft className="w-3.5 h-3.5" />
+              Kembali ke halaman masuk
+            </button>
+
+            {forgotError && (
+              <div className="flex items-center gap-2 px-3 py-2.5 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                {forgotError}
+              </div>
+            )}
+            {forgotSuccess && (
+              <div className="flex items-center gap-2 px-3 py-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-700">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                {forgotSuccess}
+              </div>
+            )}
+
+            {/* Step 1: enter email */}
+            {forgotStep === 1 && (
+              <form onSubmit={handleForgotStep1} className="space-y-4">
+                <div className="px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-600 leading-relaxed">
+                  Masukkan email yang terdaftar di sistem. Anda akan dapat membuat password baru.
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Email terdaftar</label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="email"
+                      value={forgotEmail}
+                      onChange={e => setForgotEmail(e.target.value)}
+                      placeholder="nama@sd.itera.ac.id"
+                      autoFocus
+                      required
+                      className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 placeholder:text-slate-400"
+                    />
+                  </div>
+                </div>
+                <button type="submit"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition-all shadow-sm">
+                  <KeyRound className="w-4 h-4" />
+                  Lanjutkan
+                </button>
+              </form>
+            )}
+
+            {/* Step 2: set new password */}
+            {forgotStep === 2 && !forgotSuccess && (
+              <form onSubmit={handleForgotStep2} className="space-y-3">
+                <div className="px-3 py-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-800">
+                  Email <span className="font-semibold">{forgotEmail}</span> ditemukan. Buat password baru di bawah.
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Password baru</label>
+                  <PasswordInput value={forgotNewPass} onChange={e => setForgotNewPass(e.target.value)} placeholder="Min. 6 karakter" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Konfirmasi password baru</label>
+                  <PasswordInput value={forgotConfirm} onChange={e => setForgotConfirm(e.target.value)} placeholder="Ulangi password baru" />
+                </div>
+                <button type="submit" disabled={forgotLoading}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 disabled:opacity-60 rounded-lg transition-all shadow-sm">
+                  <CheckCircle2 className="w-4 h-4" />
+                  {forgotLoading ? 'Menyimpan...' : 'Simpan Password Baru'}
+                </button>
+              </form>
+            )}
+          </div>
         )}
 
         {/* Register Form */}
