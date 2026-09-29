@@ -76,7 +76,7 @@ const MONTH_ID = {
   juli: 6, agustus: 7, september: 8, oktober: 9, november: 10, desember: 11,
 };
 
-function parseWeekRange(weekStr) {
+export function parseWeekRange(weekStr) {
   const match = weekStr.match(/^(\d+)\s*-\s*(\d+)\s+(\w+)\s+(\d+)/);
   if (!match) return null;
   const [, startDay, endDay, monthName, yearSuffix] = match;
@@ -113,6 +113,7 @@ function getDefaultWeek(weekColumns, existingData) {
 export default function LaporanModal({
   isOpen, onClose, weekColumns, nim, mahasiswaName = '', existingData,
   pembimbing1 = '', pembimbing2 = '', penguji1 = '', penguji2 = '',
+  forceWeek = '',
 }) {
   const dosenList = [
     { key: 'p1',  label: 'P1',  name: pembimbing1 },
@@ -140,17 +141,35 @@ export default function LaporanModal({
   // Reset form each time the modal opens
   useEffect(() => {
     if (isOpen) {
-      const defaultWeek = getDefaultWeek(weekColumns, existingData);
-      setWeek(defaultWeek);
-      setDosenHadir(new Set());
+      if (forceWeek) {
+        // Edit mode: pre-fill with existing data for that week
+        setWeek(forceWeek);
+        const existing = existingData?.[forceWeek];
+        setProgres(existing?.progress || '');
+        setNext(existing?.next || '');
+        setKategori(existing?.category && KATEGORI.includes(existing.category) ? existing.category : KATEGORI[0]);
+        const existingDosen = new Set(
+          (existing?.dosenHadir || []).map(d =>
+            d.label === 'P1' ? 'p1' : d.label === 'P2' ? 'p2' : d.label === 'Pj1' ? 'pj1' : d.label === 'Pj2' ? 'pj2' : null
+          ).filter(Boolean)
+        );
+        setDosenHadir(existingDosen);
+      } else {
+        const defaultWeek = getDefaultWeek(weekColumns, existingData);
+        setWeek(defaultWeek);
+        setProgres(''); setNext(''); setKategori(KATEGORI[0]);
+        setDosenHadir(new Set());
+      }
       setError('');
       setSuccess(false);
     }
   }, [isOpen]);
 
-  // Clear form when week changes (only unreported weeks are selectable)
+  // Clear form when week changes in new-report mode
   useEffect(() => {
-    setProgres(''); setNext(''); setKategori(KATEGORI[0]);
+    if (!forceWeek) {
+      setProgres(''); setNext(''); setKategori(KATEGORI[0]);
+    }
   }, [week]);
 
   if (!isOpen) return null;
@@ -158,7 +177,7 @@ export default function LaporanModal({
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
-    if (!week) { setError('Pilih pekan terlebih dahulu.'); return; }
+    if (!week) { setError('Pilih periode terlebih dahulu.'); return; }
     if (!progres.trim()) { setError('Isian progres tidak boleh kosong.'); return; }
     const selectedDosen = dosenList
       .filter(d => dosenHadir.has(d.key))
@@ -183,8 +202,8 @@ export default function LaporanModal({
     }
   };
 
-  // Only show weeks that haven't been reported yet
-  const unreported = weekColumns.filter(w => !existingData?.[w]?.reported);
+  // Only show weeks that haven't been reported yet (but include forceWeek for editing)
+  const unreported = weekColumns.filter(w => !existingData?.[w]?.reported || w === forceWeek);
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
@@ -201,7 +220,7 @@ export default function LaporanModal({
             </div>
             <div>
               <h2 className="text-sm font-bold text-white">Laporan Progres Bimbingan</h2>
-              <p className="text-xs text-white/70">Isi progres TA pekan ini</p>
+              <p className="text-xs text-white/70">Isi progres TA periode ini</p>
             </div>
           </div>
           <button onClick={onClose}
@@ -210,15 +229,15 @@ export default function LaporanModal({
           </button>
         </div>
 
-        {/* Semua pekan sudah terkunci */}
+        {/* Semua periode sudah terkunci */}
         {unreported.length === 0 && (
           <div className="px-5 py-8 flex flex-col items-center text-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
               <CheckCircle2 className="w-6 h-6 text-emerald-500" />
             </div>
             <div>
-              <p className="text-sm font-bold text-slate-800">Semua pekan sudah dilaporkan</p>
-              <p className="text-xs text-slate-500 mt-1">Tidak ada pekan yang tersisa untuk dilaporkan.</p>
+              <p className="text-sm font-bold text-slate-800">Semua periode sudah dilaporkan</p>
+              <p className="text-xs text-slate-500 mt-1">Tidak ada periode yang tersisa untuk dilaporkan.</p>
             </div>
             <button type="button" onClick={onClose}
               className="mt-2 px-5 py-2 text-sm font-semibold text-brand-600 bg-brand-50 hover:bg-brand-100 border border-brand-200 rounded-xl transition-colors">
@@ -242,10 +261,10 @@ export default function LaporanModal({
             </div>
           )}
 
-          {/* Pekan */}
+          {/* Periode */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-              Pekan <span className="text-red-500">*</span>
+              Periode <span className="text-red-500">*</span>
             </label>
             <select
               value={week}
@@ -253,7 +272,7 @@ export default function LaporanModal({
               required
               className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 text-slate-800"
             >
-              <option value="">-- Pilih Pekan --</option>
+              <option value="">-- Pilih Periode --</option>
               {unreported.map(w => <option key={w} value={w}>{w}</option>)}
             </select>
           </div>
@@ -273,7 +292,7 @@ export default function LaporanModal({
           {/* Progres */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-              Progres Pekan Ini <span className="text-red-500">*</span>
+              Progres Periode Ini <span className="text-red-500">*</span>
             </label>
             <textarea
               value={progres}
@@ -288,7 +307,7 @@ export default function LaporanModal({
           {/* Next */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-              Target Pekan Depan
+              Target Periode Depan
             </label>
             <textarea
               value={next}

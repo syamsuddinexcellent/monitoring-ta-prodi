@@ -57,7 +57,7 @@ function LaporanCard({ item, dosenName, onRead }) {
           <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-100">
             <div className="flex items-center gap-1.5 mb-1.5">
               <BookOpen className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Progres Pekan Ini</span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Progres Periode Ini</span>
             </div>
             <p className="text-sm text-slate-800 font-medium leading-relaxed">{item.progress}</p>
           </div>
@@ -67,7 +67,7 @@ function LaporanCard({ item, dosenName, onRead }) {
             <div className="flex items-start gap-2 bg-brand-50/60 rounded-xl p-3.5 border border-brand-100">
               <ArrowRight className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
               <div>
-                <span className="text-[10px] font-bold text-brand-700 uppercase tracking-wider block mb-0.5">Target Pekan Depan</span>
+                <span className="text-[10px] font-bold text-brand-700 uppercase tracking-wider block mb-0.5">Target Periode Depan</span>
                 <p className="text-sm text-slate-800 font-semibold">{item.next}</p>
               </div>
             </div>

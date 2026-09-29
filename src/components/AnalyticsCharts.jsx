@@ -54,7 +54,7 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
             </div>
             <h4 className="text-sm font-bold text-slate-800">Kepatuhan Pelaporan</h4>
           </div>
-          <span className="text-xs text-slate-400 font-medium">Pekan Ini</span>
+          <span className="text-xs text-slate-400 font-medium">Periode Ini</span>
         </div>
 
         <div className="h-52 w-full flex items-center justify-center relative">
@@ -95,7 +95,7 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
               </div>
               <h4 className="text-sm font-bold text-slate-800">Status Laporan Mahasiswa</h4>
             </div>
-            <span className="text-xs text-slate-400 font-medium">Pekan Ini</span>
+            <span className="text-xs text-slate-400 font-medium">Periode Ini</span>
           </div>
 
           <div className="flex-1 overflow-y-auto space-y-1.5 max-h-52">
@@ -106,6 +106,11 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
                 const lapor = s.weeklyUpdates?.[selectedWeek]?.reported;
                 const category = s.weeklyUpdates?.[selectedWeek]?.category || '—';
                 const badge = getCategoryBadgeStyle(category);
+                const phone = s.phone?.replace(/\D/g, '');
+                const waMsg = encodeURIComponent(
+                  `Halo ${s.nama}, mohon segera mengisi laporan progres bimbingan TA untuk periode ini. Terima kasih 🙏`
+                );
+                const waUrl = !lapor && phone ? `https://wa.me/${phone}?text=${waMsg}` : null;
                 return (
                   <div key={s.nim || i} className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border ${lapor ? 'bg-emerald-50/60 border-emerald-100' : 'bg-rose-50/40 border-rose-100'}`}>
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${lapor ? 'bg-emerald-100' : 'bg-rose-100'}`}>
@@ -122,9 +127,22 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
                         </span>
                       )}
                     </div>
-                    <span className={`text-[10px] font-bold shrink-0 ${lapor ? 'text-emerald-600' : 'text-rose-500'}`}>
-                      {lapor ? '✓ Lapor' : '— Belum'}
-                    </span>
+                    {waUrl ? (
+                      <a
+                        href={waUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-bold transition-colors shrink-0"
+                        title="Kirim pengingat WhatsApp"
+                      >
+                        <MessageCircle className="w-3 h-3" />
+                        <span>WA</span>
+                      </a>
+                    ) : (
+                      <span className={`text-[10px] font-bold shrink-0 ${lapor ? 'text-emerald-600' : 'text-rose-400'}`}>
+                        {lapor ? '✓ Lapor' : !phone ? 'No WA' : '— Belum'}
+                      </span>
+                    )}
                   </div>
                 );
               })
@@ -132,7 +150,7 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
           </div>
 
           <p className="text-[11px] text-slate-500 text-center border-t border-slate-100 pt-3 mt-3">
-            Rekap status pelaporan bimbingan pekan ini
+            Rekap status pelaporan bimbingan periode ini
           </p>
         </div>
       ) : (
@@ -214,7 +232,7 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
               <div className="flex flex-col items-center justify-center py-8 gap-2">
                 <CheckCircle2 className="w-8 h-8 text-emerald-400" />
                 <p className="text-xs font-medium text-slate-600">Semua mahasiswa sudah melapor!</p>
-                <p className="text-[10px] text-slate-400">Tidak ada yang perlu diingatkan pekan ini</p>
+                <p className="text-[10px] text-slate-400">Tidak ada yang perlu diingatkan periode ini</p>
               </div>
             ) : (
               belumLapor.map((s, i) => {
@@ -233,8 +251,8 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
                   : null;
                 const waMsg = encodeURIComponent(
                   roleLabel
-                    ? `Halo ${s.nama}, mohon segera melakukan bimbingan dengan saya selaku ${roleLabel} terkait progres Tugas Akhir pekan ini. Jika sudah melakukan bimbingan selain dengan saya selaku ${roleLabel}, maka hiraukan pesan ini. Terima kasih 🙏`
-                    : `Halo ${s.nama}, mohon segera melakukan bimbingan dengan dosen pembimbing Anda terkait progres Tugas Akhir pekan ini. Terima kasih 🙏`
+                    ? `Halo ${s.nama}, mohon segera melakukan bimbingan dengan saya selaku ${roleLabel} terkait progres Tugas Akhir periode ini. Jika sudah melakukan bimbingan selain dengan saya selaku ${roleLabel}, maka hiraukan pesan ini. Terima kasih 🙏`
+                    : `Halo ${s.nama}, mohon segera melakukan bimbingan dengan dosen pembimbing Anda terkait progres Tugas Akhir periode ini. Terima kasih 🙏`
                 );
                 const waUrl = phone ? `https://wa.me/${phone}?text=${waMsg}` : null;
                 return (
@@ -267,7 +285,7 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
           </div>
 
           <p className="text-[11px] text-slate-500 text-center border-t border-slate-100 pt-3 mt-3">
-            Mahasiswa bimbingan yang belum mengirim laporan pekan ini
+            Mahasiswa bimbingan yang belum mengirim laporan periode ini
           </p>
         </div>
       ) : (
@@ -280,7 +298,7 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
               </div>
               <h4 className="text-sm font-bold text-slate-800">Tren Pelaporan Mingguan</h4>
             </div>
-            <span className="text-xs text-slate-400 font-medium">Lintas Pekan</span>
+            <span className="text-xs text-slate-400 font-medium">Lintas Periode</span>
           </div>
 
           <div className="h-52 w-full">
@@ -299,7 +317,7 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
           </div>
 
           <p className="text-[11px] text-slate-500 text-center border-t border-slate-100 pt-3">
-            Perbandingan jumlah mahasiswa yang aktif berkonsultasi per pekan
+            Perbandingan jumlah mahasiswa yang aktif berkonsultasi per periode
           </p>
         </div>
       )}

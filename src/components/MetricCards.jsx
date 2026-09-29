@@ -15,7 +15,7 @@ function usePopover() {
   return { open, setOpen, ref };
 }
 
-export default function MetricCards({ metrics, selectedWeek, isDosen = false, students = [], dosenName = '' }) {
+export default function MetricCards({ metrics, selectedWeek, isDosen = false, isAdmin = false, students = [], dosenName = '' }) {
   const { total, reported, notReported, percentage, categoryCounts } = metrics;
 
   const totalPopover = usePopover();
@@ -253,8 +253,8 @@ export default function MetricCards({ metrics, selectedWeek, isDosen = false, st
                         : null;
                       const waMsg = encodeURIComponent(
                         roleLabel
-                          ? `Halo ${s.nama}, mohon segera melakukan bimbingan dengan saya selaku ${roleLabel} terkait progres Tugas Akhir pekan ini. Jika sudah melakukan bimbingan selain dengan saya selaku ${roleLabel}, maka hiraukan pesan ini. Terima kasih 🙏`
-                          : `Halo ${s.nama}, mohon segera melakukan bimbingan dengan dosen pembimbing Anda terkait progres Tugas Akhir pekan ini. Terima kasih 🙏`
+                          ? `Halo ${s.nama}, mohon segera melakukan bimbingan dengan saya selaku ${roleLabel} terkait progres Tugas Akhir periode ini. Jika sudah melakukan bimbingan selain dengan saya selaku ${roleLabel}, maka hiraukan pesan ini. Terima kasih 🙏`
+                          : `Halo ${s.nama}, mohon segera melakukan bimbingan dengan dosen pembimbing Anda terkait progres Tugas Akhir periode ini. Terima kasih 🙏`
                       );
                       const waUrl = phone ? `https://wa.me/${phone}?text=${waMsg}` : null;
                       return (
@@ -266,7 +266,7 @@ export default function MetricCards({ metrics, selectedWeek, isDosen = false, st
                             <p className="text-xs font-semibold text-slate-800 truncate">{s.nama}</p>
                             <p className="text-[10px] text-slate-400">{s.nim} · {s.angkatan}</p>
                           </div>
-                          {waUrl ? (
+                          {(isAdmin || isDosen) && (waUrl ? (
                             <a
                               href={waUrl}
                               target="_blank"
@@ -279,7 +279,7 @@ export default function MetricCards({ metrics, selectedWeek, isDosen = false, st
                             </a>
                           ) : (
                             <span className="text-[10px] text-slate-400 shrink-0">No WA</span>
-                          )}
+                          ))}
                         </div>
                       );
                     })
@@ -289,9 +289,18 @@ export default function MetricCards({ metrics, selectedWeek, isDosen = false, st
             )}
           </div>
         </div>
-        <p className="text-xs text-rose-600 mt-3 flex items-center gap-1 font-medium">
-          {notReported > 0 ? '⚠️ Butuh pengingat WhatsApp' : '🎉 Semua mahasiswa telah melapor!'}
-        </p>
+        <div className="mt-3">
+          <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+            <div
+              className="bg-rose-500 h-full rounded-full transition-all duration-500"
+              style={{ width: `${total > 0 ? 100 - percentage : 0}%` }}
+            ></div>
+          </div>
+          <p className="text-xs text-slate-500 mt-1.5 flex justify-between">
+            <span>{notReported > 0 ? 'Perlu Pengingat' : 'Semua Melapor!'}</span>
+            <span className="font-medium text-rose-600">{notReported} dari {total}</span>
+          </p>
+        </div>
       </div>
 
       {/* Tahapan Terbanyak */}
@@ -299,7 +308,7 @@ export default function MetricCards({ metrics, selectedWeek, isDosen = false, st
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold text-brand-600 uppercase tracking-wider">
-              Fokus Utama Pekan Ini
+              Fokus Utama Periode Ini
             </p>
             <h3 className="text-lg font-bold text-slate-900 mt-1 truncate max-w-[180px]" title={topCategory}>
               {topCategory}
@@ -320,7 +329,7 @@ export default function MetricCards({ metrics, selectedWeek, isDosen = false, st
               <div className="absolute right-0 top-12 z-50 w-72 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
                 <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-purple-500 to-indigo-600">
                   <div>
-                    <p className="text-xs font-bold text-white">Fokus Pekan Ini</p>
+                    <p className="text-xs font-bold text-white">Fokus Periode Ini</p>
                     <p className="text-[10px] text-white/70">Distribusi kategori bimbingan</p>
                   </div>
                   <button onClick={() => focusPopover.setOpen(false)}

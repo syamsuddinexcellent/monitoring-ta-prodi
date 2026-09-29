@@ -68,7 +68,7 @@ export default function WhatsAppModal({
       let bulkMsg = `📢 *PEMBERITAHUAN MONITORING TUGAS AKHIR (TA) PRODI SAINS DATA*\n`;
       bulkMsg += `🗓 *Periode:* ${selectedWeek}\n\n`;
       bulkMsg += `Halo rekan-rekan mahasiswa Tugas Akhir Sains Data ITERA, selamat pagi/siang/sore/malam.\n\n`;
-      bulkMsg += `Berikut adalah daftar mahasiswa yang tercatat *belum melaporkan progres bimbingan TA* pada pekan ini:\n\n`;
+      bulkMsg += `Berikut adalah daftar mahasiswa yang tercatat *belum melaporkan progres bimbingan TA* pada periode ini:\n\n`;
 
       unreportedStudents.forEach((st, idx) => {
         const dosenParts = [
@@ -181,9 +181,9 @@ export default function WhatsAppModal({
                   : `Pemberitahuan Bimbingan: ${student?.nama}`}
               </h3>
               <p className="text-xs text-slate-500">
-                Pekan Saat Ini: <span className="font-medium text-slate-700">{selectedWeek}</span>
+                Periode Saat Ini: <span className="font-medium text-slate-700">{selectedWeek}</span>
                 {nextWeek && (
-                  <> • Pekan Depan: <span className="font-medium text-brand-700">{nextWeek}</span></>
+                  <> • Periode Depan: <span className="font-medium text-brand-700">{nextWeek}</span></>
                 )}
               </p>
             </div>

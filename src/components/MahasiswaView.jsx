@@ -5,7 +5,7 @@ import {
   PlusCircle, CloudOff
 } from 'lucide-react';
 import { getCategoryBadgeStyle } from '../utils/helpers';
-import LaporanModal, { getLocalReportsForNim } from './LaporanModal';
+import LaporanModal, { getLocalReportsForNim, parseWeekRange } from './LaporanModal';
 
 function ProgressRing({ pct }) {
   const r = 36, circ = 2 * Math.PI * r;
@@ -29,7 +29,26 @@ function ProgressRing({ pct }) {
 
 export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
   const [isLaporanOpen, setIsLaporanOpen] = useState(false);
+  const [editWeek, setEditWeek] = useState('');
   const [localReports, setLocalReports] = useState({});
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const isWeekEditable = (weekStr) => {
+    const range = parseWeekRange(weekStr);
+    return range && range.end >= today;
+  };
+
+  const openEdit = (weekStr) => {
+    setEditWeek(weekStr);
+    setIsLaporanOpen(true);
+  };
+
+  const handleClose = () => {
+    setIsLaporanOpen(false);
+    setEditWeek('');
+  };
 
   const nim = student?.nim || loggedInUser?.nim || '';
 
@@ -162,16 +181,16 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
             </h3>
             <div className="space-y-2">
               <div className="flex justify-between items-center text-sm">
-                <span className="text-slate-600">Total pekan monitoring</span>
+                <span className="text-slate-600">Total periode monitoring</span>
                 <span className="font-bold text-slate-900">{weekColumns.length}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-slate-600">Sudah lapor</span>
-                <span className="font-bold text-emerald-600">{reported.length} pekan</span>
+                <span className="font-bold text-emerald-600">{reported.length} periode</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-slate-600">Belum lapor</span>
-                <span className="font-bold text-rose-500">{weekColumns.length - reported.length} pekan</span>
+                <span className="font-bold text-rose-500">{weekColumns.length - reported.length} periode</span>
               </div>
             </div>
             <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
@@ -211,7 +230,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
                 <div className="bg-white rounded-xl p-3.5 border border-indigo-100 flex items-start gap-2">
                   <ArrowRight className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
                   <div>
-                    <span className="text-[10px] font-bold text-brand-700 uppercase block mb-0.5">Target Pekan Depan</span>
+                    <span className="text-[10px] font-bold text-brand-700 uppercase block mb-0.5">Target Periode Depan</span>
                     <p className="text-sm text-slate-800 font-semibold">{latestUpdate.next}</p>
                   </div>
                 </div>
@@ -244,7 +263,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
                   }`}>
                     <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-900">Pekan {idx + 1}</span>
+                        <span className="text-xs font-bold text-slate-900">Periode {idx + 1}</span>
                         <span className="text-xs text-slate-400">({week})</span>
                         {isLocal && (
                           <span className="flex items-center gap-0.5 text-[10px] font-medium text-amber-600 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full">
@@ -277,11 +296,22 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
                             <p className="text-slate-800 font-semibold">{upd.next}</p>
                           </div>
                         )}
+                        {/* Edit button — only for local reports on non-past weeks */}
+                        {isLocal && isWeekEditable(week) && (
+                          <div className="flex justify-end">
+                            <button
+                              onClick={() => openEdit(week)}
+                              className="text-[11px] font-semibold text-brand-600 hover:text-brand-700 hover:underline"
+                            >
+                              ✏️ Edit Laporan
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div className="flex items-center justify-between mt-1">
                         <p className="text-xs text-slate-400 italic">
-                          Belum ada laporan bimbingan untuk pekan ini.
+                          Belum ada laporan bimbingan untuk periode ini.
                         </p>
                         <button
                           onClick={() => setIsLaporanOpen(true)}
@@ -301,7 +331,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
 
       <LaporanModal
         isOpen={isLaporanOpen}
-        onClose={() => setIsLaporanOpen(false)}
+        onClose={handleClose}
         weekColumns={weekColumns}
         nim={nim}
         mahasiswaName={student.nama || ''}
@@ -310,6 +340,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
         pembimbing2={student.pembimbing2 || ''}
         penguji1={student.penguji1 || ''}
         penguji2={student.penguji2 || ''}
+        forceWeek={editWeek}
       />
     </>
   );

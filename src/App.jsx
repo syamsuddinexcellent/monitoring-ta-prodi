@@ -268,7 +268,7 @@ export default function App() {
     if (!data || !selectedWeek) return;
 
     let csvContent = 'data:text/csv;charset=utf-8,';
-    csvContent += 'No,NIM,Nama,Angkatan,Pembimbing 1,Pembimbing 2,Penguji 1,Status TA,Nomor WA,Status Lapor,Tahapan,Catatan Progres,Target Pekan Depan\n';
+    csvContent += 'No,NIM,Nama,Angkatan,Pembimbing 1,Pembimbing 2,Penguji 1,Status TA,Nomor WA,Status Lapor,Tahapan,Catatan Progres,Target Periode Depan\n';
 
     filteredStudents.forEach((st, idx) => {
       const update = st.weeklyUpdates[selectedWeek] || {
@@ -404,6 +404,16 @@ export default function App() {
         }}
         laporanMasukCount={laporanMasukCount}
         onOpenLaporanMasuk={() => setIsLaporanMasukOpen(true)}
+        bottomRow={
+          <WeekSelector
+            weekColumns={data?.weekColumns || []}
+            selectedWeek={selectedWeek}
+            onSelectWeek={setSelectedWeek}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            students={data?.students || []}
+          />
+        }
       />
 
       {/* Main Content */}
@@ -411,31 +421,34 @@ export default function App() {
 
         {/* Dosen Banner */}
         {isDosen && (
-          <div className="bg-gradient-to-r from-brand-600 to-indigo-600 rounded-2xl px-5 py-4 flex items-center justify-between gap-4 shadow-sm">
-            <div>
-              <p className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-0.5">Dashboard Bimbingan</p>
-              <h2 className="text-base font-bold text-white leading-tight">{loggedInUser.lecturerName}</h2>
-              <p className="text-xs text-white/70 mt-0.5">
-                {dosenStudents.length} mahasiswa bimbingan
-                {selectedWeek && ` · Pekan ${selectedWeek}`}
-              </p>
-            </div>
-            <div className="flex items-center gap-3 shrink-0">
-              <div className="text-center">
-                <div className="text-2xl font-black text-white">{dosenMetrics.reported}</div>
-                <div className="text-[10px] text-white/70 font-medium">Melapor</div>
+          <>
+            <div className="bg-gradient-to-r from-brand-600 to-indigo-600 rounded-2xl px-5 py-4 flex items-center justify-between gap-4 shadow-sm">
+              <div>
+                <p className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-0.5">Dashboard Bimbingan</p>
+                <h2 className="text-base font-bold text-white leading-tight">{loggedInUser.lecturerName}</h2>
+                <p className="text-xs text-white/70 mt-0.5">
+                  {dosenStudents.length} mahasiswa bimbingan
+                  {selectedWeek && ` · Periode ${selectedWeek}`}
+                </p>
               </div>
-              <div className="w-px h-10 bg-white/20" />
-              <div className="text-center">
-                <div className="text-2xl font-black text-white">{dosenMetrics.notReported}</div>
-                <div className="text-[10px] text-white/70 font-medium">Belum</div>
+              <div className="flex items-center gap-3 shrink-0">
+                <div className="text-center">
+                  <div className="text-2xl font-black text-white">{dosenMetrics.reported}</div>
+                  <div className="text-[10px] text-white/70 font-medium">Melapor</div>
+                </div>
+                <div className="w-px h-10 bg-white/20" />
+                <div className="text-center">
+                  <div className="text-2xl font-black text-white">{dosenMetrics.notReported}</div>
+                  <div className="text-[10px] text-white/70 font-medium">Belum</div>
+                </div>
               </div>
             </div>
-          </div>
+
+          </>
         )}
 
         {/* KPI Cards */}
-        <MetricCards metrics={activeMetrics} selectedWeek={selectedWeek} isDosen={isDosen} students={isDosen ? dosenStudents : (data?.students || [])} dosenName={loggedInUser?.lecturerName || ''} />
+        <MetricCards metrics={activeMetrics} selectedWeek={selectedWeek} isDosen={isDosen} isAdmin={isAdmin} students={isDosen ? dosenStudents : (data?.students || [])} dosenName={loggedInUser?.lecturerName || ''} />
 
         {/* Analytics Charts */}
         <AnalyticsCharts
@@ -445,16 +458,6 @@ export default function App() {
           isDosen={isDosen}
           dosenStudents={dosenStudents}
           dosenName={loggedInUser?.lecturerName || ''}
-        />
-
-        {/* Week Selector & View Mode Switch */}
-        <WeekSelector
-          weekColumns={data?.weekColumns || []}
-          selectedWeek={selectedWeek}
-          onSelectWeek={setSelectedWeek}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-          students={data?.students || []}
         />
 
         {/* Content Area Based on View Mode */}
@@ -494,12 +497,12 @@ export default function App() {
                 <span className="font-bold text-slate-900">
                   {filteredStudents.length}
                 </span>{' '}
-                dari {data?.students.length} mahasiswa pada pekan{' '}
+                dari {data?.students.length} mahasiswa pada periode{' '}
                 <span className="font-semibold text-brand-700">
                   {selectedWeek}
                 </span>
                 {nextWeek && (
-                  <span className="text-slate-400"> (Pekan berikutnya: {nextWeek})</span>
+                  <span className="text-slate-400"> (Periode berikutnya: {nextWeek})</span>
                 )}
                 {lecturerFilter !== 'all' && (
                   <span className="ml-1 text-indigo-600 font-medium">• Dosen: {lecturerFilter.split(',')[0]}</span>
@@ -561,6 +564,9 @@ export default function App() {
                     gatewayStatus={gatewayStatus}
                     onOpenGatewayModal={() => setIsGatewayModalOpen(true)}
                     isAdmin={isAdmin}
+                    isDosen={isDosen}
+                    dosenName={loggedInUser?.lecturerName || ''}
+                    highlightLecturer={lecturerFilter !== 'all' ? lecturerFilter : ''}
                   />
                 ))}
               </div>

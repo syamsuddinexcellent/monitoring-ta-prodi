@@ -196,7 +196,7 @@ export function formatWhatsAppReminder(
   if (!isReported) {
     return `Halo ${student.nama} (${student.nim}), selamat pagi/siang/sore/malam.
 
-Mengingatkan kembali terkait perkembangan Tugas Akhir (TA) Program Studi Sains Data pekan *${weekName}*.
+Mengingatkan kembali terkait perkembangan Tugas Akhir (TA) Program Studi Sains Data periode *${weekName}*.
 ${dosenLines ? `\n${dosenLines}\n` : ''}
 Dihimbau untuk *segera melakukan sesi bimbingan langsung dengan dosen pembimbing/penguji*, agar progres pengerjaan skripsi/TA Anda dapat dievaluasi dan kendala teknis/penulisan dapat segera teratasi.
 
@@ -208,12 +208,12 @@ Koordinator / Tim Monitoring TA Prodi Sains Data`;
 
   // Khusus untuk yang sudah ada progres dan target
   const nextScheduleText = nextWeekName
-    ? `pekan depan, tanggal ${nextWeekName}`
-    : 'pekan depan';
+    ? `periode depan, tanggal ${nextWeekName}`
+    : 'periode depan';
 
   return `Halo ${student.nama} (${student.nim}), selamat pagi/siang/sore/malam.
 
-Terima kasih telah mencatatkan progres bimbingan Tugas Akhir (TA) pada pekan *${weekName}*:
+Terima kasih telah mencatatkan progres bimbingan Tugas Akhir (TA) pada periode *${weekName}*:
 📌 *Progres Saat Ini:* ${progressInfo.progress}
 🎯 *Target:* ${progressInfo.next || '-'}
 ${dosenLines ? `${dosenLines}\n` : ''}

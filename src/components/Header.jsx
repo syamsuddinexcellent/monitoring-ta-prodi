@@ -27,6 +27,7 @@ export default function Header({
   onLogout,
   laporanMasukCount = 0,
   onOpenLaporanMasuk,
+  bottomRow,
 }) {
   const formatTime = (date) => {
     if (!date) return '-';
@@ -52,16 +53,11 @@ export default function Header({
               <span className="text-2xl">📊</span>
             </div>
             <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-                  Monitoring TA Prodi Sains Data
-                </h1>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200">
-                  Semester Ganjil 2026/2027
-                </span>
-              </div>
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                Monitoring Tugas Akhir Program Studi Sains Data
+              </h1>
               <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                Pemantauan berkala progres & tahapan bimbingan Tugas Akhir seluruh angkatan
+                Pemantauan berkala tahapan bimbingan Tugas Akhir mahasiswa
               </p>
             </div>
           </div>
@@ -174,6 +170,13 @@ export default function Header({
           </div>
         </div>
       </div>
+      {bottomRow && (
+        <div className="border-t border-slate-100 px-4 sm:px-6 lg:px-8 py-2">
+          <div className="max-w-7xl mx-auto">
+            {bottomRow}
+          </div>
+        </div>
+      )}
     </header>
   );
 }

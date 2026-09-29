@@ -106,7 +106,7 @@ export default function StudentDetailModal({
           <div className="flex items-center gap-2">
             <span className="text-slate-500">Tingkat Keaktifan Bimbingan:</span>
             <span className="font-bold text-slate-900">
-              {filledCount} dari {weekColumns.length} Pekan
+              {filledCount} dari {weekColumns.length} Periode
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -143,7 +143,7 @@ export default function StudentDetailModal({
                     <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-xs text-slate-900">
-                          Pekan {idx + 1}
+                          Periode {idx + 1}
                         </span>
                         <span className="text-xs text-slate-400">({week})</span>
                       </div>
@@ -192,7 +192,7 @@ export default function StudentDetailModal({
                       </div>
                     ) : (
                       <p className="text-xs text-slate-400 italic mt-1">
-                        Mahasiswa belum mencatatkan progres di formulir monitoring pada pekan ini.
+                        Mahasiswa belum mencatatkan progres di formulir monitoring pada periode ini.
                       </p>
                     )}
                   </div>

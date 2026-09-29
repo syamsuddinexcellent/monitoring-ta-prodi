@@ -14,7 +14,7 @@ export default function MatrixView({
       <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div>
           <h3 className="font-bold text-slate-900 text-sm">
-            Matriks Pemantauan Lintas Pekan Prodi
+            Matriks Pemantauan Lintas Periode Prodi
           </h3>
           <p className="text-xs text-slate-500">
             Peta komparasi perkembangan seluruh mahasiswa Tugas Akhir dari minggu ke minggu
@@ -51,7 +51,7 @@ export default function MatrixView({
                 return (
                   <th key={week} className="py-3 px-3 min-w-[200px] border-r border-slate-100">
                     <div className="flex flex-col">
-                      <span className="text-slate-800 font-bold">Pekan {idx + 1}</span>
+                      <span className="text-slate-800 font-bold">Periode {idx + 1}</span>
                       <span className="text-[10px] text-slate-400 font-normal">{week}</span>
                       <span className="text-[10px] text-emerald-600 font-semibold mt-0.5">
                         {count}/{students.length} Lapor
@@ -185,7 +185,7 @@ export default function MatrixView({
               {selectedCell.update.next && (
                 <div className="bg-brand-50 p-3 rounded-lg border border-brand-100">
                   <span className="text-[11px] font-bold text-brand-700 uppercase tracking-wider block mb-1">
-                    Target Pekan Depan
+                    Target Periode Depan
                   </span>
                   <p className="text-slate-800 text-sm font-semibold">
                     {selectedCell.update.next}

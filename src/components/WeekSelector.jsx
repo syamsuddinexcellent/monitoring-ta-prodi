@@ -13,9 +13,14 @@ export default function WeekSelector({
     <div className="bg-white rounded-xl p-3 sm:p-4 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-3">
       {/* Week Tabs */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-        <div className="flex items-center text-xs font-semibold text-slate-500 uppercase tracking-wider mr-2 shrink-0">
-          <Calendar className="w-4 h-4 mr-1 text-slate-400" />
-          Pekan:
+        <div className="flex items-center gap-2 mr-2 shrink-0">
+          <div className="flex items-center text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <Calendar className="w-4 h-4 mr-1 text-slate-400" />
+            Periode:
+          </div>
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-brand-50 text-brand-700 border border-brand-200">
+            Semester Ganjil 2026/2027
+          </span>
         </div>
         {[...weekColumns].reverse().map((week, idx) => {
           const isSelected = selectedWeek === week && viewMode !== 'matrix';
@@ -93,7 +98,7 @@ export default function WeekSelector({
           title="Matriks Semua Minggu"
         >
           <Table2 className="w-3.5 h-3.5" />
-          <span>Matriks Lintas Pekan</span>
+          <span>Matriks Lintas Periode</span>
         </button>
       </div>
     </div>

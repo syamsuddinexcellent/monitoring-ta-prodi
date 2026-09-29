@@ -29,7 +29,10 @@ export default function StudentCard({
   nextWeek = '',
   gatewayStatus,
   onOpenGatewayModal,
-  isAdmin = false
+  isAdmin = false,
+  isDosen = false,
+  dosenName = '',
+  highlightLecturer = '',
 }) {
   const [copiedPhone, setCopiedPhone] = useState(false);
   const [autoSending, setAutoSending] = useState(false);
@@ -171,38 +174,25 @@ export default function StudentCard({
 
         {/* Supervisors & Target Row */}
         <div className="mt-3 py-2 px-2.5 bg-slate-50 rounded-lg border border-slate-100 text-[11px] space-y-1">
-          {student.pembimbing1 && (
-            <div className="flex items-center justify-between gap-1">
-              <span className="text-slate-400">P1:</span>
-              <span className="font-semibold text-slate-700 truncate text-right" title={student.pembimbing1}>
-                {student.pembimbing1}
-              </span>
-            </div>
-          )}
-          {student.pembimbing2 && (
-            <div className="flex items-center justify-between gap-1">
-              <span className="text-slate-400">P2:</span>
-              <span className="text-slate-600 truncate text-right" title={student.pembimbing2}>
-                {student.pembimbing2}
-              </span>
-            </div>
-          )}
-          {student.penguji1 && (
-            <div className="flex items-center justify-between gap-1">
-              <span className="text-slate-400">Pj1:</span>
-              <span className="text-slate-600 truncate text-right" title={student.penguji1}>
-                {student.penguji1}
-              </span>
-            </div>
-          )}
-          {student.penguji2 && (
-            <div className="flex items-center justify-between gap-1">
-              <span className="text-slate-400">Pj2:</span>
-              <span className="text-slate-600 truncate text-right" title={student.penguji2}>
-                {student.penguji2}
-              </span>
-            </div>
-          )}
+          {[
+            { label: 'P1', name: student.pembimbing1 },
+            { label: 'P2', name: student.pembimbing2 },
+            { label: 'Pj1', name: student.penguji1 },
+            { label: 'Pj2', name: student.penguji2 },
+          ].filter(d => d.name).map(({ label, name }) => {
+            const isMatch = highlightLecturer && name === highlightLecturer;
+            return (
+              <div key={label} className="flex items-center justify-between gap-1">
+                <span className={`shrink-0 ${isMatch ? 'text-brand-600 font-bold' : 'text-slate-400'}`}>{label}:</span>
+                <span
+                  className={`truncate text-right ${isMatch ? 'font-bold text-brand-700' : 'text-slate-600'}`}
+                  title={name}
+                >
+                  {name}
+                </span>
+              </div>
+            );
+          })}
           {(student.statusTA || student.target) && (
             <div className="flex items-center justify-between gap-1 pt-1 border-t border-slate-200/50">
               <span className="text-slate-400">Target/Status:</span>
@@ -223,8 +213,8 @@ export default function StudentCard({
             <span>{update.category}</span>
           </span>
 
-          {/* WhatsApp Direct Badge */}
-          {hasPhone ? (
+          {/* WhatsApp Direct Badge — admin & dosen only */}
+          {(isAdmin || isDosen) && (hasPhone ? (
             <div className="inline-flex items-center gap-1 text-xs bg-emerald-50/80 border border-emerald-200/80 text-emerald-800 rounded-md px-2 py-0.5 font-medium">
               <Phone className="w-3 h-3 text-emerald-600" />
               <button
@@ -250,7 +240,7 @@ export default function StudentCard({
             <span className="text-[11px] text-slate-400 italic">
               Nomor WA belum ada
             </span>
-          )}
+          ))}
         </div>
 
         {/* Progress Content */}
@@ -265,7 +255,7 @@ export default function StudentCard({
               </p>
             ) : (
               <p className="text-rose-600 italic">
-                Belum ada catatan progres yang dilaporkan pada pekan ini.
+                Belum ada catatan progres yang dilaporkan pada periode ini.
               </p>
             )}
           </div>
@@ -275,7 +265,7 @@ export default function StudentCard({
             <div className="bg-brand-50/60 rounded-lg p-3 border border-brand-100 text-xs">
               <div className="flex items-center gap-1 text-[11px] font-semibold text-brand-700 uppercase tracking-wider mb-1">
                 <ArrowRight className="w-3 h-3" />
-                <span>Target Pekan Depan</span>
+                <span>Target Periode Depan</span>
               </div>
               <p className="text-slate-800 font-semibold leading-relaxed">
                 {update.next}
@@ -284,7 +274,7 @@ export default function StudentCard({
           ) : !update.reported ? null : (
             <div className="bg-slate-50 rounded-lg p-2.5 border border-slate-100 text-xs text-slate-500">
               <span className="italic">
-                Belum menetapkan target spesifik pekan depan
+                Belum menetapkan target spesifik periode depan
               </span>
             </div>
           )}
@@ -330,6 +320,35 @@ export default function StudentCard({
               <span>Format</span>
             </button>
           )}
+
+          {/* WA Reminder Button — dosen only */}
+          {isDosen && hasPhone && !update.reported && (() => {
+            const role = dosenName
+              ? student.pembimbing1 === dosenName ? 'Pembimbing 1 (P1)'
+              : student.pembimbing2 === dosenName ? 'Pembimbing 2 (P2)'
+              : student.penguji1 === dosenName ? 'Penguji 1 (Pj1)'
+              : student.penguji2 === dosenName ? 'Penguji 2 (Pj2)'
+              : null
+              : null;
+            const msg = encodeURIComponent(
+              role
+                ? `Halo ${student.nama}, mohon segera melakukan bimbingan dengan saya selaku ${role} terkait progres Tugas Akhir periode ini. Jika sudah melakukan bimbingan selain dengan saya selaku ${role}, maka hiraukan pesan ini. Terima kasih 🙏`
+                : `Halo ${student.nama}, mohon segera melakukan bimbingan dengan dosen pembimbing Anda terkait progres Tugas Akhir periode ini. Terima kasih 🙏`
+            );
+            return (
+              <a
+                href={`https://wa.me/${student.phone?.replace(/\D/g, '')}?text=${msg}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 hover:bg-emerald-600 text-white transition-colors shadow-xs"
+                title="Kirim pengingat WhatsApp"
+                onClick={e => e.stopPropagation()}
+              >
+                <MessageCircle className="w-3.5 h-3.5" />
+                <span>WA</span>
+              </a>
+            );
+          })()}
         </div>
       </div>
     </div>

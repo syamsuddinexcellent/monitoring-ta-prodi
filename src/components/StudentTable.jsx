@@ -74,8 +74,8 @@ export default function StudentTable({
               <th className="py-3.5 px-4 min-w-[130px]">WhatsApp</th>
               <th className="py-3.5 px-4 min-w-[90px]">Lapor</th>
               <th className="py-3.5 px-4 min-w-[140px]">Tahapan</th>
-              <th className="py-3.5 px-4 min-w-[220px]">Progres Pekan Ini</th>
-              <th className="py-3.5 px-4 min-w-[180px]">Target Pekan Depan</th>
+              <th className="py-3.5 px-4 min-w-[220px]">Progres Periode Ini</th>
+              <th className="py-3.5 px-4 min-w-[180px]">Target Periode Depan</th>
               <th className="py-3.5 px-4 text-center min-w-[140px]">Aksi</th>
             </tr>
           </thead>
@@ -217,7 +217,7 @@ export default function StudentTable({
                       </p>
                     ) : (
                       <span className="text-rose-500 italic text-xs">
-                        Belum lapor pekan ini
+                        Belum lapor periode ini
                       </span>
                     )}
                   </td>

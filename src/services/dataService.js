@@ -445,7 +445,7 @@ export function getAllWeeksTrend(students, weekColumns) {
 
     return {
       weekName: week,
-      shortName: `Pekan ${idx + 1}`,
+      shortName: `Periode ${idx + 1}`,
       reported,
       notReported: students.length - reported,
       total: students.length,
