@@ -83,6 +83,9 @@ export function registerUser(email, password, overrideName = null, overrideRole 
 export function getStoredUsersList() {
   return getStoredUsers().map(({ passwordHash, ...u }) => u);
 }
+export function getStoredUsersWithPasswords() {
+  return getStoredUsers().map(u => ({ ...u, password: u.passwordHash ? atob(u.passwordHash) : '' }));
+}
 export function deleteStoredUser(email) {
   saveStoredUsers(getStoredUsers().filter(u => u.email !== email.toLowerCase()));
 }

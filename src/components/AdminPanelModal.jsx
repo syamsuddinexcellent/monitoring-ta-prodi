@@ -3,9 +3,10 @@ import {
   X, Users, Database, ShieldCheck, GraduationCap, User,
   Trash2, RefreshCw, AlertTriangle, CheckCircle2, Inbox,
   RotateCcw, Calendar, Layers, Clock, Wifi, WifiOff, Search,
-  ChevronUp, ChevronDown, Phone, FileSpreadsheet, Printer, Plus, Pencil
+  ChevronUp, ChevronDown, Phone, FileSpreadsheet, Printer, Plus, Pencil,
+  Eye, EyeOff, KeyRound
 } from 'lucide-react';
-import { getStoredUsersList, deleteStoredUser } from './AuthModal';
+import { getStoredUsersList, getStoredUsersWithPasswords, deleteStoredUser, resetPassword } from './AuthModal';
 import {
   exportExcelAll, exportExcelPeriode, printRekapPeriode, printRekapAll,
   getLocalPeriods, saveLocalPeriods
@@ -54,9 +55,12 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, isRefresh
   const [editPeriodIdx, setEditPeriodIdx] = useState(null);
   const [editPeriodVal, setEditPeriodVal] = useState('');
   const [exportPeriodeIdx, setExportPeriodeIdx] = useState('');
+  // password show/hide & reset per user (keyed by email)
+  const [showPass, setShowPass] = useState({});
+  const [resetForm, setResetForm] = useState({}); // { [email]: { open, value, error } }
 
   const refresh = () => {
-    setUsers(getStoredUsersList());
+    setUsers(getStoredUsersWithPasswords());
     setReportsSummary(getLocalReportsSummary());
     setDosenSummary(getDosenLaporanSummary());
     setLocalPeriods(getLocalPeriods());
@@ -99,6 +103,23 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, isRefresh
   };
 
   const showFlash = (msg) => { setFlash(msg); setTimeout(() => setFlash(''), 2500); };
+
+  const handleResetPassword = (email) => {
+    const form = resetForm[email] || {};
+    const newPass = (form.value || '').trim();
+    if (newPass.length < 6) {
+      setResetForm(prev => ({ ...prev, [email]: { ...form, error: 'Minimal 6 karakter.' } }));
+      return;
+    }
+    const result = resetPassword(email, newPass);
+    if (result?.error) {
+      setResetForm(prev => ({ ...prev, [email]: { ...form, error: result.error } }));
+    } else {
+      refresh();
+      setResetForm(prev => ({ ...prev, [email]: { open: false, value: '', error: '' } }));
+      showFlash(`Password akun ${email} berhasil direset.`);
+    }
+  };
 
   const handleDeleteUser = (email) => {
     if (confirmDelete === email) {
@@ -266,36 +287,105 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, isRefresh
                     const isConfirming = confirmDelete === u.email;
                     return (
                       <div key={u.email}
-                        className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
-                          isConfirming ? 'border-rose-300 bg-rose-50' : 'border-slate-200 bg-white hover:bg-slate-50'
+                        className={`rounded-xl border transition-colors ${
+                          isConfirming ? 'border-rose-300 bg-rose-50' : 'border-slate-200 bg-white'
                         }`}
                       >
-                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${
-                          u.role === 'dosen' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-700'
-                        }`}>
-                          {u.name?.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() || '?'}
+                        {/* Main row */}
+                        <div className="flex items-center gap-3 p-3">
+                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${
+                            u.role === 'dosen' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-700'
+                          }`}>
+                            {u.name?.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() || '?'}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold text-slate-800 truncate">{u.name}</p>
+                            <p className="text-[10px] text-slate-400 truncate">{u.email}</p>
+                            {u.lecturerName && <p className="text-[10px] text-indigo-500 truncate">{u.lecturerName}</p>}
+                            {u.nim && <p className="text-[10px] text-emerald-600 font-mono">{u.nim}</p>}
+                            {/* Password row */}
+                            <div className="flex items-center gap-1.5 mt-1">
+                              <span className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">Password:</span>
+                              <span className="font-mono text-[10px] text-slate-700 tracking-widest">
+                                {showPass[u.email] ? (u.password || '—') : '••••••••'}
+                              </span>
+                              <button
+                                onClick={() => setShowPass(prev => ({ ...prev, [u.email]: !prev[u.email] }))}
+                                className="text-slate-400 hover:text-slate-600 transition-colors"
+                                title={showPass[u.email] ? 'Sembunyikan' : 'Tampilkan password'}
+                              >
+                                {showPass[u.email] ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                              </button>
+                            </div>
+                          </div>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${cls} shrink-0`}>
+                            {label}
+                          </span>
+                          {/* Reset password button */}
+                          <button
+                            onClick={() => setResetForm(prev => ({
+                              ...prev,
+                              [u.email]: { open: !prev[u.email]?.open, value: '', error: '' }
+                            }))}
+                            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-colors shrink-0 ${
+                              resetForm[u.email]?.open
+                                ? 'bg-amber-100 text-amber-700 border border-amber-300'
+                                : 'bg-slate-50 text-slate-600 hover:bg-amber-50 hover:text-amber-700 border border-slate-200 hover:border-amber-200'
+                            }`}
+                            title="Reset password"
+                          >
+                            <KeyRound className="w-3 h-3" />
+                            Reset
+                          </button>
+                          <button
+                            onClick={() => handleDeleteUser(u.email)}
+                            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-colors shrink-0 ${
+                              isConfirming
+                                ? 'bg-rose-600 text-white hover:bg-rose-700'
+                                : 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200'
+                            }`}
+                            title={isConfirming ? 'Klik sekali lagi untuk konfirmasi hapus' : 'Hapus akun'}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            {isConfirming ? 'Yakin?' : 'Hapus'}
+                          </button>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-slate-800 truncate">{u.name}</p>
-                          <p className="text-[10px] text-slate-400 truncate">{u.email}</p>
-                          {u.lecturerName && <p className="text-[10px] text-indigo-500 truncate">{u.lecturerName}</p>}
-                          {u.nim && <p className="text-[10px] text-emerald-600 font-mono">{u.nim}</p>}
-                        </div>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${cls} shrink-0`}>
-                          {label}
-                        </span>
-                        <button
-                          onClick={() => handleDeleteUser(u.email)}
-                          className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-colors shrink-0 ${
-                            isConfirming
-                              ? 'bg-rose-600 text-white hover:bg-rose-700'
-                              : 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200'
-                          }`}
-                          title={isConfirming ? 'Klik sekali lagi untuk konfirmasi hapus' : 'Hapus akun'}
-                        >
-                          <Trash2 className="w-3 h-3" />
-                          {isConfirming ? 'Yakin?' : 'Hapus'}
-                        </button>
+
+                        {/* Reset password form (inline) */}
+                        {resetForm[u.email]?.open && (
+                          <div className="px-3 pb-3 border-t border-slate-100 pt-2.5">
+                            <p className="text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Password Baru</p>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                placeholder="Minimal 6 karakter"
+                                value={resetForm[u.email]?.value || ''}
+                                onChange={e => setResetForm(prev => ({
+                                  ...prev,
+                                  [u.email]: { ...prev[u.email], value: e.target.value, error: '' }
+                                }))}
+                                onKeyDown={e => e.key === 'Enter' && handleResetPassword(u.email)}
+                                className="flex-1 text-xs border border-slate-200 rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-amber-400 font-mono"
+                                autoFocus
+                              />
+                              <button
+                                onClick={() => handleResetPassword(u.email)}
+                                className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-[10px] font-bold transition-colors shrink-0"
+                              >
+                                Simpan
+                              </button>
+                              <button
+                                onClick={() => setResetForm(prev => ({ ...prev, [u.email]: { open: false, value: '', error: '' } }))}
+                                className="px-2.5 py-1.5 text-slate-400 hover:text-slate-600 rounded-lg text-[10px] transition-colors shrink-0"
+                              >
+                                Batal
+                              </button>
+                            </div>
+                            {resetForm[u.email]?.error && (
+                              <p className="text-[10px] text-rose-600 mt-1">{resetForm[u.email].error}</p>
+                            )}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
