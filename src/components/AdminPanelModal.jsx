@@ -396,87 +396,119 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, isRefresh
                 </div>
 
                 {/* Table */}
-                <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
-                  <table className="w-full text-[10px] border-collapse">
-                    <thead className="sticky top-0 z-10 bg-slate-100">
-                      <tr>
-                        {[
-                          { col: null, label: 'No', w: 'w-8' },
-                          { col: 'nim', label: 'NIM', w: 'w-24' },
-                          { col: 'nama', label: 'Nama', w: 'w-40' },
-                          { col: 'angkatan', label: 'Angk.', w: 'w-14' },
-                          { col: 'pembimbing1', label: 'P1', w: 'w-32' },
-                          { col: 'pembimbing2', label: 'P2', w: 'w-32' },
-                          { col: 'penguji1', label: 'Pj1', w: 'w-32' },
-                          { col: 'penguji2', label: 'Pj2', w: 'w-32' },
-                          { col: 'phone', label: 'WA', w: 'w-24' },
-                          { col: 'statusTA', label: 'Status', w: 'w-20' },
-                          { col: 'laporan', label: 'Laporan', w: 'w-16' },
-                        ].map(({ col, label, w }) => (
-                          <th
-                            key={label}
-                            onClick={col ? () => handleSort(col) : undefined}
-                            className={`${w} px-2 py-2 text-left font-bold text-slate-600 whitespace-nowrap border-b border-slate-200 ${col ? 'cursor-pointer hover:text-brand-700 select-none' : ''}`}
-                          >
-                            <span className="flex items-center gap-0.5">
-                              {label}
-                              {col && sortCol === col && (
-                                sortAsc ? <ChevronUp className="w-2.5 h-2.5" /> : <ChevronDown className="w-2.5 h-2.5" />
-                              )}
-                            </span>
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {filteredStudents.length === 0 ? (
-                        <tr>
-                          <td colSpan={11} className="text-center py-8 text-slate-400 italic">Tidak ada data mahasiswa.</td>
-                        </tr>
-                      ) : filteredStudents.map((s, i) => {
-                        const reported = Object.values(s.weeklyUpdates || {}).filter(w => w.reported).length;
-                        return (
-                          <tr key={s.nim} className={`${i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'} hover:bg-brand-50/40 transition-colors`}>
-                            <td className="px-2 py-1.5 text-slate-400 font-mono">{i + 1}</td>
-                            <td className="px-2 py-1.5 text-slate-700 font-mono font-semibold whitespace-nowrap">{s.nim}</td>
-                            <td className="px-2 py-1.5 text-slate-800 font-medium max-w-[160px]">
-                              <span className="line-clamp-2">{s.nama}</span>
-                            </td>
-                            <td className="px-2 py-1.5 text-center">
-                              <span className="px-1.5 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-200 font-bold">{s.angkatan}</span>
-                            </td>
-                            <td className="px-2 py-1.5 text-slate-600 max-w-[128px]">
-                              <span className="line-clamp-2">{s.pembimbing1 || <span className="text-slate-300">-</span>}</span>
-                            </td>
-                            <td className="px-2 py-1.5 text-slate-600 max-w-[128px]">
-                              <span className="line-clamp-2">{s.pembimbing2 || <span className="text-slate-300">-</span>}</span>
-                            </td>
-                            <td className="px-2 py-1.5 text-slate-600 max-w-[128px]">
-                              <span className="line-clamp-2">{s.penguji1 || <span className="text-slate-300">-</span>}</span>
-                            </td>
-                            <td className="px-2 py-1.5 text-slate-600 max-w-[128px]">
-                              <span className="line-clamp-2">{s.penguji2 || <span className="text-slate-300">-</span>}</span>
-                            </td>
-                            <td className="px-2 py-1.5 whitespace-nowrap">
-                              {s.phone
-                                ? <span className="flex items-center gap-0.5 text-emerald-700"><Phone className="w-2.5 h-2.5" />{s.phone}</span>
-                                : <span className="text-slate-300">-</span>}
-                            </td>
-                            <td className="px-2 py-1.5">
-                              {s.statusTA
-                                ? <span className="px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[9px] font-semibold whitespace-nowrap">{s.statusTA}</span>
-                                : <span className="text-slate-300">-</span>}
-                            </td>
-                            <td className="px-2 py-1.5 text-center whitespace-nowrap">
-                              <span className={`font-bold ${reported > 0 ? 'text-emerald-700' : 'text-rose-400'}`}>{reported}</span>
-                              <span className="text-slate-400">/{totalPeriode}</span>
-                            </td>
+                {(() => {
+                  const weeks = sheetsData?.weekColumns || [];
+                  const totalCols = 11 + weeks.length;
+                  const catCls = (cat) => {
+                    if (!cat || cat === 'Belum Lapor') return null;
+                    const map = {
+                      Bimbingan: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                      Seminar:   'bg-blue-50 text-blue-700 border-blue-200',
+                      Sidang:    'bg-purple-50 text-purple-700 border-purple-200',
+                      Revisi:    'bg-amber-50 text-amber-700 border-amber-200',
+                      Lainnya:   'bg-slate-100 text-slate-600 border-slate-200',
+                    };
+                    return map[cat] || 'bg-slate-100 text-slate-600 border-slate-200';
+                  };
+                  return (
+                    <div className="overflow-x-auto max-h-[480px] overflow-y-auto">
+                      <table className="w-full text-[10px] border-collapse">
+                        <thead className="sticky top-0 z-10 bg-slate-100">
+                          <tr>
+                            {/* Fixed columns */}
+                            {[
+                              { col: null,           label: 'No',    w: 'w-8' },
+                              { col: 'nim',          label: 'NIM',   w: 'w-24' },
+                              { col: 'nama',         label: 'Nama',  w: 'w-40' },
+                              { col: 'angkatan',     label: 'Angk.', w: 'w-14' },
+                              { col: 'pembimbing1',  label: 'P1',    w: 'w-28' },
+                              { col: 'pembimbing2',  label: 'P2',    w: 'w-28' },
+                              { col: 'penguji1',     label: 'Pj1',   w: 'w-28' },
+                              { col: 'penguji2',     label: 'Pj2',   w: 'w-28' },
+                              { col: 'phone',        label: 'WA',    w: 'w-24' },
+                              { col: 'statusTA',     label: 'Status',w: 'w-20' },
+                              { col: 'laporan',      label: 'Total', w: 'w-14' },
+                            ].map(({ col, label, w }) => (
+                              <th key={label} onClick={col ? () => handleSort(col) : undefined}
+                                className={`${w} px-2 py-2 text-left font-bold text-slate-600 whitespace-nowrap border-b border-r border-slate-200 bg-slate-100 ${col ? 'cursor-pointer hover:text-brand-700 select-none' : ''}`}>
+                                <span className="flex items-center gap-0.5">
+                                  {label}
+                                  {col && sortCol === col && (sortAsc ? <ChevronUp className="w-2.5 h-2.5" /> : <ChevronDown className="w-2.5 h-2.5" />)}
+                                </span>
+                              </th>
+                            ))}
+                            {/* Per-periode columns */}
+                            {weeks.map((w, idx) => (
+                              <th key={w} title={w}
+                                className="px-2 py-2 text-center font-bold text-indigo-600 whitespace-nowrap border-b border-r border-slate-200 bg-indigo-50 min-w-[120px]">
+                                <div className="text-[9px] font-black text-indigo-500">Periode {idx + 1}</div>
+                                <div className="text-[8px] font-normal text-indigo-400 truncate max-w-[112px]">{w}</div>
+                              </th>
+                            ))}
                           </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {filteredStudents.length === 0 ? (
+                            <tr><td colSpan={totalCols} className="text-center py-8 text-slate-400 italic">Tidak ada data mahasiswa.</td></tr>
+                          ) : filteredStudents.map((s, i) => {
+                            const reportedCount = weeks.filter(w => s.weeklyUpdates?.[w]?.reported).length;
+                            return (
+                              <tr key={s.nim} className={`${i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'} hover:bg-brand-50/30 transition-colors`}>
+                                <td className="px-2 py-2 text-slate-400 font-mono border-r border-slate-100">{i + 1}</td>
+                                <td className="px-2 py-2 text-slate-700 font-mono font-semibold whitespace-nowrap border-r border-slate-100">{s.nim}</td>
+                                <td className="px-2 py-2 text-slate-800 font-medium border-r border-slate-100 max-w-[160px]">
+                                  <span className="line-clamp-2">{s.nama}</span>
+                                </td>
+                                <td className="px-2 py-2 text-center border-r border-slate-100">
+                                  <span className="px-1.5 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-200 font-bold">{s.angkatan}</span>
+                                </td>
+                                <td className="px-2 py-2 text-slate-600 border-r border-slate-100 max-w-[112px]"><span className="line-clamp-2">{s.pembimbing1 || <span className="text-slate-300">-</span>}</span></td>
+                                <td className="px-2 py-2 text-slate-600 border-r border-slate-100 max-w-[112px]"><span className="line-clamp-2">{s.pembimbing2 || <span className="text-slate-300">-</span>}</span></td>
+                                <td className="px-2 py-2 text-slate-600 border-r border-slate-100 max-w-[112px]"><span className="line-clamp-2">{s.penguji1 || <span className="text-slate-300">-</span>}</span></td>
+                                <td className="px-2 py-2 text-slate-600 border-r border-slate-100 max-w-[112px]"><span className="line-clamp-2">{s.penguji2 || <span className="text-slate-300">-</span>}</span></td>
+                                <td className="px-2 py-2 whitespace-nowrap border-r border-slate-100">
+                                  {s.phone ? <span className="flex items-center gap-0.5 text-emerald-700"><Phone className="w-2.5 h-2.5" />{s.phone}</span> : <span className="text-slate-300">-</span>}
+                                </td>
+                                <td className="px-2 py-2 border-r border-slate-100">
+                                  {s.statusTA ? <span className="px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[9px] font-semibold whitespace-nowrap">{s.statusTA}</span> : <span className="text-slate-300">-</span>}
+                                </td>
+                                <td className="px-2 py-2 text-center whitespace-nowrap border-r border-slate-200 bg-slate-50">
+                                  <span className={`font-black text-xs ${reportedCount === weeks.length && weeks.length > 0 ? 'text-emerald-600' : reportedCount > 0 ? 'text-amber-600' : 'text-rose-400'}`}>{reportedCount}</span>
+                                  <span className="text-slate-400">/{weeks.length}</span>
+                                </td>
+                                {/* Per-periode cells */}
+                                {weeks.map(w => {
+                                  const upd = s.weeklyUpdates?.[w];
+                                  const cls = catCls(upd?.category);
+                                  return (
+                                    <td key={w} className="px-2 py-2 border-r border-slate-100 min-w-[120px] align-top"
+                                      title={upd?.reported ? `${upd.category}\n${upd.progress}${upd.next ? '\nTarget: ' + upd.next : ''}` : 'Belum Melapor'}>
+                                      {upd?.reported ? (
+                                        <div className="space-y-0.5">
+                                          <span className={`inline-flex px-1.5 py-0.5 rounded-full border text-[9px] font-bold ${cls}`}>
+                                            {upd.category}
+                                          </span>
+                                          {upd.progress && (
+                                            <p className="text-[9px] text-slate-500 leading-tight line-clamp-2">{upd.progress}</p>
+                                          )}
+                                          {upd.next && (
+                                            <p className="text-[9px] text-slate-400 leading-tight line-clamp-1 italic">→ {upd.next}</p>
+                                          )}
+                                        </div>
+                                      ) : (
+                                        <span className="text-slate-300 text-center block">–</span>
+                                      )}
+                                    </td>
+                                  );
+                                })}
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* ── Laporan Lokal Mahasiswa ── */}
