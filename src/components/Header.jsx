@@ -1,12 +1,12 @@
 import React from 'react';
 import {
   RefreshCw,
-  ExternalLink,
-  Download,
   Database,
   Zap,
-  CheckCircle2,
-  Smartphone
+  LogOut,
+  Lock,
+  ShieldCheck,
+  User
 } from 'lucide-react';
 import { formatPhoneDisplay } from '../utils/helpers';
 import { GOOGLE_SHEETS_VIEW_URL } from '../services/dataService';
@@ -19,7 +19,11 @@ export default function Header({
   totalStudents,
   onExportCSV,
   gatewayStatus,
-  onOpenGatewayModal
+  onOpenGatewayModal,
+  isAdmin,
+  loggedInUser,
+  onLoginClick,
+  onLogout
 }) {
   const formatTime = (date) => {
     if (!date) return '-';
@@ -61,23 +65,39 @@ export default function Header({
 
           {/* Action Bar */}
           <div className="flex items-center flex-wrap gap-2 sm:gap-3">
-            {/* Auto-Send Gateway Status Button */}
-            <button
-              onClick={onOpenGatewayModal}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all shadow-xs ${
-                isGatewayConnected
-                  ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
-                  : 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-300 animate-pulse'
-              }`}
-              title="Klik untuk melihat status / scan QR Auto-Send WhatsApp"
-            >
-              <Zap className={`w-3.5 h-3.5 ${isGatewayConnected ? 'text-emerald-600' : 'text-amber-600'}`} />
-              {isGatewayConnected ? (
-                <span>Auto-Send: {formatPhoneDisplay(gatewayStatus.connectedPhone || '6285768292580')}</span>
-              ) : (
-                <span>Hubungkan Auto-Send (Scan QR)</span>
-              )}
-            </button>
+            {/* Admin-only buttons */}
+            {isAdmin && (
+              <>
+                {/* Auto-Send Gateway Status Button */}
+                <button
+                  onClick={onOpenGatewayModal}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all shadow-xs ${
+                    isGatewayConnected
+                      ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+                      : 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-300 animate-pulse'
+                  }`}
+                  title="Klik untuk melihat status / scan QR Auto-Send WhatsApp"
+                >
+                  <Zap className={`w-3.5 h-3.5 ${isGatewayConnected ? 'text-emerald-600' : 'text-amber-600'}`} />
+                  {isGatewayConnected ? (
+                    <span>Auto-Send: {formatPhoneDisplay(gatewayStatus.connectedPhone || '6285768292580')}</span>
+                  ) : (
+                    <span>Hubungkan Auto-Send (Scan QR)</span>
+                  )}
+                </button>
+
+                {/* Sync Button */}
+                <button
+                  onClick={onRefresh}
+                  disabled={isRefreshing}
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-50 rounded-lg transition-all shadow-sm shadow-emerald-600/25 cursor-pointer"
+                  title="Perbarui database otomatis langsung dari Google Sheet terbaru"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  <span>{isRefreshing ? 'Menyinkronkan...' : 'Sinkronkan Google Sheet'}</span>
+                </button>
+              </>
+            )}
 
             {/* Google Sheets Status indicator */}
             <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600">
@@ -99,38 +119,39 @@ export default function Header({
               <span className="text-slate-500">{formatTime(lastUpdated)}</span>
             </div>
 
-            {/* View Original Sheet */}
-            <a
-              href={GOOGLE_SHEETS_VIEW_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-brand-600 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors shadow-xs"
-              title="Buka Spreadsheet di Google Sheets"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Google Sheet</span>
-            </a>
-
-            {/* Export CSV */}
-            <button
-              onClick={onExportCSV}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors shadow-xs"
-              title="Unduh Data CSV"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Ekspor</span>
-            </button>
-
-            {/* Sync Button */}
-            <button
-              onClick={onRefresh}
-              disabled={isRefreshing}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-50 rounded-lg transition-all shadow-sm shadow-emerald-600/25 cursor-pointer"
-              title="Perbarui database otomatis langsung dari Google Sheet terbaru"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-              <span>{isRefreshing ? 'Menyinkronkan...' : 'Sinkronkan Google Sheet'}</span>
-            </button>
+            {/* Auth: Login / User badge / Logout */}
+            {loggedInUser ? (
+              <div className="flex items-center gap-1.5">
+                {isAdmin ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-brand-50 border border-brand-200 text-xs font-semibold text-brand-700">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    Admin
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-indigo-50 border border-indigo-200 text-xs font-semibold text-indigo-700 max-w-[160px]">
+                    <User className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">{loggedInUser.name}</span>
+                  </span>
+                )}
+                <button
+                  onClick={onLogout}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:text-red-600 bg-white hover:bg-red-50 border border-slate-200 hover:border-red-200 rounded-lg transition-colors shadow-xs"
+                  title="Keluar"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Keluar</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={onLoginClick}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-brand-700 bg-white hover:bg-brand-50 border border-slate-200 hover:border-brand-300 rounded-lg transition-colors shadow-xs"
+                title="Masuk ke akun"
+              >
+                <Lock className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Masuk</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

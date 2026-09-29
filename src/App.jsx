@@ -10,6 +10,7 @@ import MatrixView from './components/MatrixView';
 import StudentDetailModal from './components/StudentDetailModal';
 import WhatsAppModal from './components/WhatsAppModal';
 import WhatsAppConnectModal from './components/WhatsAppConnectModal';
+import AuthModal from './components/AuthModal';
 import {
   loadMonitoringData,
   getWeeklyMetrics,
@@ -37,6 +38,16 @@ export default function App() {
     qr: null
   });
   const [isGatewayModalOpen, setIsGatewayModalOpen] = useState(false);
+
+  // Auth state
+  const [loggedInUser, setLoggedInUser] = useState(() => {
+    try {
+      const s = sessionStorage.getItem('auth_session');
+      return s ? JSON.parse(s) : null;
+    } catch { return null; }
+  });
+  const isAdmin = loggedInUser?.role === 'admin';
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -83,8 +94,10 @@ export default function App() {
       const result = await loadMonitoringData();
       setData(result);
       if (!selectedWeek && result.weekColumns.length > 0) {
-        const bestWeek = result.weekColumns.find(w => w.includes('07 - 11 September')) || result.weekColumns[0];
-        setSelectedWeek(bestWeek);
+        const lastWithData = [...result.weekColumns].reverse().find(w =>
+          result.students.some(s => s.weeklyUpdates[w]?.reported)
+        ) || result.weekColumns[result.weekColumns.length - 1];
+        setSelectedWeek(lastWithData);
       }
     } catch (err) {
       console.error('Failed to load data:', err);
@@ -297,6 +310,13 @@ export default function App() {
         onExportCSV={handleExportCSV}
         gatewayStatus={gatewayStatus}
         onOpenGatewayModal={() => setIsGatewayModalOpen(true)}
+        isAdmin={isAdmin}
+        loggedInUser={loggedInUser}
+        onLoginClick={() => setIsLoginModalOpen(true)}
+        onLogout={() => {
+          try { sessionStorage.removeItem('auth_session'); } catch {}
+          setLoggedInUser(null);
+        }}
       />
 
       {/* Main Content */}
@@ -347,6 +367,7 @@ export default function App() {
               availableLecturers={availableLecturers}
               unreportedCount={unreportedStudents.length}
               onOpenBulkReminder={handleOpenBulkWhatsApp}
+              isAdmin={isAdmin}
             />
 
             {/* Results Count & Active Filter Indicator */}
@@ -422,6 +443,7 @@ export default function App() {
                     onOpenWhatsApp={handleOpenSingleWhatsApp}
                     gatewayStatus={gatewayStatus}
                     onOpenGatewayModal={() => setIsGatewayModalOpen(true)}
+                    isAdmin={isAdmin}
                   />
                 ))}
               </div>
@@ -434,6 +456,7 @@ export default function App() {
                 onOpenWhatsApp={handleOpenSingleWhatsApp}
                 gatewayStatus={gatewayStatus}
                 onOpenGatewayModal={() => setIsGatewayModalOpen(true)}
+                isAdmin={isAdmin}
               />
             )}
           </div>
@@ -447,6 +470,7 @@ export default function App() {
           weekColumns={data?.weekColumns || []}
           onClose={() => setDetailStudent(null)}
           onOpenWhatsApp={handleOpenSingleWhatsApp}
+          isAdmin={isAdmin}
         />
       )}
 
@@ -472,6 +496,14 @@ export default function App() {
         gatewayStatus={gatewayStatus}
         onLogout={handleLogoutGateway}
         onRefresh={checkGatewayStatus}
+      />
+
+      {/* Auth Modal (Login + Register) */}
+      <AuthModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onSuccess={(user) => setLoggedInUser(user)}
+        availableLecturers={availableLecturers}
       />
     </div>
   );
