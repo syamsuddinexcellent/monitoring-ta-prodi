@@ -260,7 +260,7 @@ export default function MetricCards({ metrics, selectedWeek, isDosen = false, is
                       const waMsg = encodeURIComponent(
                         roleLabel
                           ? `Halo ${s.nama}, mohon segera melakukan bimbingan dengan saya selaku ${roleLabel} terkait progres Tugas Akhir periode ini. Jika sudah melakukan bimbingan selain dengan saya selaku ${roleLabel}, maka hiraukan pesan ini. Terima kasih 🙏`
-                          : `Halo ${s.nama} (${s.nim}), selamat pagi/siang/sore/malam.\n\nMengingatkan kembali terkait perkembangan Tugas Akhir (TA) Program Studi Sains Data periode *${selectedWeek}*.\n\n${supervisors}\n\nDihimbau untuk *segera melakukan sesi bimbingan langsung dengan dosen pembimbing/penguji*, agar progres pengerjaan skripsi/TA Anda dapat dievaluasi dan kendala teknis/penulisan dapat segera teratasi.\n\nSilakan jadwalkan waktu bimbingan Anda ya. Semangat selalu!\n\nSalam,\nKoordinator / Tim Monitoring TA Prodi Sains Data`
+                          : `Halo ${s.nama} (${s.nim}),\n\nMengingatkan kembali terkait perkembangan Tugas Akhir (TA) Program Studi Sains Data periode *${selectedWeek}*.\n\n${supervisors}\n\nDihimbau untuk *segera melakukan sesi bimbingan langsung dengan dosen pembimbing/penguji*, agar progres pengerjaan skripsi/TA Anda dapat dievaluasi dan kendala teknis/penulisan dapat segera teratasi.\n\nSilakan jadwalkan waktu bimbingan Anda ya. Semangat selalu!\n\nSalam,\nKoordinator / Tim Monitoring TA Prodi Sains Data`
                       );
                       const waUrl = phone ? `https://wa.me/${phone}?text=${waMsg}` : null;
                       return (

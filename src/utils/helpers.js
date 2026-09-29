@@ -194,7 +194,7 @@ export function formatWhatsAppReminder(
   ].filter(Boolean).join('\n');
 
   if (!isReported) {
-    return `Halo ${student.nama} (${student.nim}), selamat pagi/siang/sore/malam.
+    return `Halo ${student.nama} (${student.nim}),
 
 Mengingatkan kembali terkait perkembangan Tugas Akhir (TA) Program Studi Sains Data periode *${weekName}*.
 ${dosenLines ? `\n${dosenLines}\n` : ''}
@@ -211,7 +211,7 @@ Koordinator / Tim Monitoring TA Prodi Sains Data`;
     ? `periode depan, tanggal ${nextWeekName}`
     : 'periode depan';
 
-  return `Halo ${student.nama} (${student.nim}), selamat pagi/siang/sore/malam.
+  return `Halo ${student.nama} (${student.nim}),
 
 Terima kasih telah mencatatkan progres bimbingan Tugas Akhir (TA) pada periode *${weekName}*:
 📌 *Progres Saat Ini:* ${progressInfo.progress}
