@@ -69,6 +69,13 @@ export default function App() {
     fetchData();
   }, []);
 
+  // Restore lecturer filter when dosen session is active on load
+  useEffect(() => {
+    if (loggedInUser?.role === 'dosen' && loggedInUser?.lecturerName) {
+      setLecturerFilter(loggedInUser.lecturerName);
+    }
+  }, []);
+
   // Poll Gateway Status
   useEffect(() => {
     let timer = null;
@@ -316,6 +323,7 @@ export default function App() {
         onLogout={() => {
           try { sessionStorage.removeItem('auth_session'); } catch {}
           setLoggedInUser(null);
+          setLecturerFilter('all');
         }}
       />
 
@@ -502,7 +510,13 @@ export default function App() {
       <AuthModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
-        onSuccess={(user) => setLoggedInUser(user)}
+        onSuccess={(user) => {
+          setLoggedInUser(user);
+          if (user.role === 'dosen' && user.lecturerName) {
+            setLecturerFilter(user.lecturerName);
+          }
+        }}
+        availableLecturers={availableLecturers}
       />
     </div>
   );

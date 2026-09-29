@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Lock, X, Eye, EyeOff, ShieldCheck, AlertCircle, UserPlus, LogIn, Mail } from 'lucide-react';
+import { Lock, X, Eye, EyeOff, ShieldCheck, AlertCircle, UserPlus, LogIn, Mail, UserCheck } from 'lucide-react';
 
 const ADMIN_USER = 'admin';
 const ADMIN_PASS_B64 = btoa('prodi2026');
+const ALLOWED_DOMAINS = ['sd.itera.ac.id', 'student.itera.ac.id'];
 
 function getStoredUsers() {
   try { return JSON.parse(localStorage.getItem('app_users') || '[]'); } catch { return []; }
@@ -12,20 +13,16 @@ function saveStoredUsers(users) {
 }
 
 export function loginWithCredentials(identifier, password) {
-  // Check admin (by username "admin")
   if (identifier === ADMIN_USER && btoa(password) === ADMIN_PASS_B64) {
-    return { role: 'admin', email: 'admin', name: 'Administrator' };
+    return { role: 'admin', email: 'admin', name: 'Administrator', lecturerName: '' };
   }
-  // Check registered users by email
   const users = getStoredUsers();
   const found = users.find(u => u.email === identifier.toLowerCase() && u.passwordHash === btoa(password));
-  if (found) return { role: found.role || 'user', email: found.email, name: found.name };
+  if (found) return { role: found.role || 'user', email: found.email, name: found.name, lecturerName: found.lecturerName || '' };
   return null;
 }
 
-const ALLOWED_DOMAINS = ['sd.itera.ac.id', 'student.itera.ac.id'];
-
-export function registerUser(email, password) {
+export function registerUser(email, password, lecturerName = '') {
   if (!email.trim() || !password) return { error: 'Semua field wajib diisi.' };
   const emailLower = email.trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailLower)) return { error: 'Format email tidak valid.' };
@@ -33,11 +30,14 @@ export function registerUser(email, password) {
   if (!ALLOWED_DOMAINS.includes(domain)) {
     return { error: 'Hanya email @sd.itera.ac.id (dosen) atau @student.itera.ac.id (mahasiswa) yang diizinkan.' };
   }
+  if (domain === 'sd.itera.ac.id' && !lecturerName.trim()) {
+    return { error: 'Silakan pilih nama Anda di sistem.' };
+  }
   if (password.length < 6) return { error: 'Password minimal 6 karakter.' };
   const users = getStoredUsers();
   if (users.some(u => u.email === emailLower)) return { error: 'Email sudah terdaftar.' };
   const role = domain === 'sd.itera.ac.id' ? 'dosen' : 'mahasiswa';
-  users.push({ email: emailLower, name: emailLower.split('@')[0], role, passwordHash: btoa(password) });
+  users.push({ email: emailLower, name: emailLower.split('@')[0], role, lecturerName: lecturerName.trim(), passwordHash: btoa(password) });
   saveStoredUsers(users);
   return { success: true };
 }
@@ -62,17 +62,16 @@ function PasswordInput({ value, onChange, placeholder }) {
   );
 }
 
-export default function AuthModal({ isOpen, onClose, onSuccess }) {
+export default function AuthModal({ isOpen, onClose, onSuccess, availableLecturers = [] }) {
   const [tab, setTab] = useState('login');
 
-  // Login state
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
 
-  // Register state
   const [regEmail, setRegEmail] = useState('');
+  const [regLecturerName, setRegLecturerName] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [regConfirm, setRegConfirm] = useState('');
   const [regError, setRegError] = useState('');
@@ -81,11 +80,20 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
 
   if (!isOpen) return null;
 
+  const regDomain = regEmail.includes('@') ? regEmail.split('@')[1]?.toLowerCase() : '';
+  const isDosen = regDomain === 'sd.itera.ac.id';
+
   const handleClose = () => {
     setLoginEmail(''); setLoginPassword(''); setLoginError('');
-    setRegEmail(''); setRegPassword(''); setRegConfirm('');
+    setRegEmail(''); setRegLecturerName(''); setRegPassword(''); setRegConfirm('');
     setRegError(''); setRegSuccess('');
     onClose();
+  };
+
+  const handleEmailChange = (e) => {
+    setRegEmail(e.target.value);
+    // Reset lecturer selection when domain changes
+    setRegLecturerName('');
   };
 
   const handleLogin = (e) => {
@@ -111,11 +119,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
     if (regPassword !== regConfirm) { setRegError('Password tidak cocok.'); return; }
     setRegLoading(true);
     setTimeout(() => {
-      const result = registerUser(regEmail, regPassword);
+      const result = registerUser(regEmail, regPassword, regLecturerName);
       if (result.error) { setRegError(result.error); }
       else {
         setRegSuccess('Akun berhasil dibuat! Silakan login.');
-        setRegEmail(''); setRegPassword(''); setRegConfirm('');
+        setRegEmail(''); setRegLecturerName(''); setRegPassword(''); setRegConfirm('');
         setTimeout(() => setTab('login'), 1200);
       }
       setRegLoading(false);
@@ -223,6 +231,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
                 {regSuccess}
               </div>
             )}
+
+            {/* Email */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">Email</label>
               <div className="relative">
@@ -230,7 +240,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
                 <input
                   type="email"
                   value={regEmail}
-                  onChange={e => setRegEmail(e.target.value)}
+                  onChange={handleEmailChange}
                   placeholder="nama@sd.itera.ac.id atau @student.itera.ac.id"
                   required
                   className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 placeholder:text-slate-400"
@@ -242,6 +252,34 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
                 Mahasiswa: <span className="font-medium text-slate-500">@student.itera.ac.id</span>
               </p>
             </div>
+
+            {/* Lecturer name selector — only for @sd.itera.ac.id */}
+            {isDosen && availableLecturers.length > 0 && (
+              <div className="animate-fadeIn">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  <span className="flex items-center gap-1.5">
+                    <UserCheck className="w-3.5 h-3.5 text-indigo-500" />
+                    Nama Anda di Sistem
+                  </span>
+                </label>
+                <select
+                  value={regLecturerName}
+                  onChange={e => setRegLecturerName(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 text-sm border border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-indigo-50/40 text-slate-700"
+                >
+                  <option value="">-- Pilih nama Anda --</option>
+                  {availableLecturers.map(l => (
+                    <option key={l} value={l}>{l}</option>
+                  ))}
+                </select>
+                <p className="mt-1 text-[11px] text-indigo-500">
+                  Digunakan untuk auto-filter mahasiswa bimbingan Anda
+                </p>
+              </div>
+            )}
+
+            {/* Password */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">Password</label>
               <PasswordInput value={regPassword} onChange={e => setRegPassword(e.target.value)} placeholder="Min. 6 karakter" />
@@ -250,6 +288,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">Konfirmasi Password</label>
               <PasswordInput value={regConfirm} onChange={e => setRegConfirm(e.target.value)} placeholder="Ulangi password" />
             </div>
+
             <button type="submit" disabled={regLoading}
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 rounded-lg transition-all shadow-sm">
               <UserPlus className="w-4 h-4" />
