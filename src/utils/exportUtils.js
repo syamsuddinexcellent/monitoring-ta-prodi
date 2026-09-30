@@ -455,6 +455,28 @@ export async function cancelPenolakan(nim, week) {
   localStorage.setItem(PENOLAKAN_KEY, JSON.stringify(all));
 }
 
+// ─── Built-in semesters (hardcoded baseline) ─────────────────────────────────
+
+export const BUILTIN_SEMESTERS = [
+  'Semester Ganjil 2026/2027',
+  'Semester Genap 2025/2026',
+  'Semester Ganjil 2025/2026',
+  'Semester Genap 2024/2025',
+  'Semester Ganjil 2024/2025',
+];
+
+// ─── Local semesters helpers (admin-added) ────────────────────────────────────
+
+const LOCAL_SEMESTERS_KEY = 'local_semesters';
+
+export function getLocalSemesters() {
+  try { return JSON.parse(localStorage.getItem(LOCAL_SEMESTERS_KEY) || '[]'); } catch { return []; }
+}
+
+export function saveLocalSemesters(list) {
+  localStorage.setItem(LOCAL_SEMESTERS_KEY, JSON.stringify(list));
+}
+
 // ─── Local periods helpers ────────────────────────────────────────────────────
 
 const LOCAL_PERIODS_KEY = 'local_periods';

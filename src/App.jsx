@@ -21,7 +21,7 @@ import {
   getAllWeeksTrend,
   mergeSupabaseReports
 } from './services/dataService';
-import { getLocalPeriods } from './utils/exportUtils';
+import { getLocalPeriods, BUILTIN_SEMESTERS, getLocalSemesters } from './utils/exportUtils';
 import {
   checkGatewayStatus,
   logoutGateway
@@ -35,6 +35,11 @@ export default function App() {
   const [selectedWeek, setSelectedWeek] = useState('');
   const [viewMode, setViewMode] = useState('cards'); // 'cards' | 'table' | 'matrix'
   const [selectedSemester, setSelectedSemester] = useState('Semester Ganjil 2026/2027');
+  const [localSemesters, setLocalSemesters] = useState(() => getLocalSemesters());
+  const availableSemesters = useMemo(
+    () => [...BUILTIN_SEMESTERS, ...localSemesters],
+    [localSemesters]
+  );
 
   // WhatsApp Gateway State
   const [gatewayStatus, setGatewayStatus] = useState({
@@ -462,6 +467,7 @@ export default function App() {
             students={data?.students || []}
             selectedSemester={selectedSemester}
             onSelectSemester={setSelectedSemester}
+            availableSemesters={availableSemesters}
           />
         }
       />
@@ -696,6 +702,7 @@ export default function App() {
         isOpen={isAdminPanelOpen}
         onClose={() => setIsAdminPanelOpen(false)}
         sheetsData={data}
+        onSemestersChange={setLocalSemesters}
       />
     </div>
   );

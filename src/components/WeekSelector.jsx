@@ -1,14 +1,6 @@
 import React from 'react';
 import { Calendar, ChevronDown, LayoutGrid, ListFilter, Table2 } from 'lucide-react';
 
-const SEMESTERS = [
-  'Semester Ganjil 2026/2027',
-  'Semester Genap 2025/2026',
-  'Semester Ganjil 2025/2026',
-  'Semester Genap 2024/2025',
-  'Semester Ganjil 2024/2025',
-];
-
 export default function WeekSelector({
   weekColumns,
   selectedWeek,
@@ -18,6 +10,7 @@ export default function WeekSelector({
   students,
   selectedSemester,
   onSelectSemester,
+  availableSemesters = [],
 }) {
   const countMap = {};
   weekColumns.forEach(w => {
@@ -40,7 +33,7 @@ export default function WeekSelector({
             onChange={e => onSelectSemester?.(e.target.value)}
             className="appearance-none pl-3 pr-7 py-1.5 rounded-lg text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200 outline-none focus:ring-2 focus:ring-brand-400 cursor-pointer"
           >
-            {SEMESTERS.map(s => (
+            {availableSemesters.map(s => (
               <option key={s} value={s}>{s}</option>
             ))}
           </select>

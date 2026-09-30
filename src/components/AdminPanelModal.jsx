@@ -9,7 +9,8 @@ import {
 import { getStoredUsersList, getStoredUsersWithPasswords, deleteStoredUser, resetPassword } from './AuthModal';
 import {
   exportExcelAll, exportExcelPeriode, printRekapPeriode, printRekapAll,
-  getLocalPeriods, saveLocalPeriods
+  getLocalPeriods, saveLocalPeriods,
+  BUILTIN_SEMESTERS, getLocalSemesters, saveLocalSemesters
 } from '../utils/exportUtils';
 
 function getRoleLabel(role) {
@@ -38,7 +39,7 @@ function getDosenLaporanSummary() {
   } catch { return []; }
 }
 
-export default function AdminPanelModal({ isOpen, onClose, sheetsData }) {
+export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemestersChange }) {
   const [tab, setTab] = useState('akun');
   const [users, setUsers] = useState([]);
   const [reportsSummary, setReportsSummary] = useState({ students: 0, total: 0 });
@@ -55,6 +56,8 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData }) {
   const [editPeriodIdx, setEditPeriodIdx] = useState(null);
   const [editPeriodVal, setEditPeriodVal] = useState('');
   const [exportPeriodeIdx, setExportPeriodeIdx] = useState('');
+  const [localSemesters, setLocalSemesters] = useState([]);
+  const [newSemesterLabel, setNewSemesterLabel] = useState('');
   // password show/hide & reset per user (keyed by email)
   const [showPass, setShowPass] = useState({});
   const [resetForm, setResetForm] = useState({}); // { [email]: { open, value, error } }
@@ -64,6 +67,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData }) {
     setReportsSummary(getLocalReportsSummary());
     setDosenSummary(getDosenLaporanSummary());
     setLocalPeriods(getLocalPeriods());
+    setLocalSemesters(getLocalSemesters());
   };
 
   useEffect(() => { if (isOpen) { refresh(); setConfirmDelete(null); setFlash(''); } }, [isOpen]);
@@ -100,6 +104,27 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData }) {
     setEditPeriodIdx(null);
     setEditPeriodVal('');
     showFlash(`Periode diperbarui.`);
+  };
+
+  const allSemesters = [...BUILTIN_SEMESTERS, ...localSemesters];
+
+  const handleAddSemester = () => {
+    const label = newSemesterLabel.trim();
+    if (!label || allSemesters.includes(label)) return;
+    const updated = [...localSemesters, label];
+    saveLocalSemesters(updated);
+    setLocalSemesters(updated);
+    onSemestersChange?.(updated);
+    setNewSemesterLabel('');
+    showFlash(`Semester "${label}" berhasil ditambahkan.`);
+  };
+
+  const handleDeleteLocalSemester = (label) => {
+    const updated = localSemesters.filter(s => s !== label);
+    saveLocalSemesters(updated);
+    setLocalSemesters(updated);
+    onSemestersChange?.(updated);
+    showFlash(`Semester "${label}" dihapus.`);
   };
 
   const showFlash = (msg) => { setFlash(msg); setTimeout(() => setFlash(''), 2500); };
@@ -777,6 +802,53 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData }) {
                       onClick={handleAddPeriod}
                       disabled={!newPeriodLabel.trim()}
                       className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold bg-brand-600 hover:bg-brand-700 text-white disabled:opacity-40 transition-colors shrink-0"
+                    >
+                      <Plus className="w-3 h-3" />
+                      Tambah
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Kelola Semester ── */}
+              <div className="rounded-xl border border-slate-200 overflow-hidden">
+                <div className="flex items-center gap-2 px-4 py-3 bg-slate-50 border-b border-slate-200">
+                  <Layers className="w-4 h-4 text-violet-600" />
+                  <span className="text-xs font-bold text-slate-700">Kelola Semester</span>
+                  <span className="text-[10px] text-slate-400">({allSemesters.length} total)</span>
+                </div>
+                <div className="px-4 py-3 space-y-2">
+                  {/* Built-in semesters */}
+                  {BUILTIN_SEMESTERS.map((s, i) => (
+                    <div key={s} className="flex items-center gap-2 text-xs">
+                      <span className="w-5 h-5 rounded-full bg-violet-100 text-violet-700 text-[10px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+                      <span className="flex-1 text-slate-700">{s}</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 font-semibold">Bawaan</span>
+                    </div>
+                  ))}
+                  {/* Local semesters */}
+                  {localSemesters.map((s, i) => (
+                    <div key={s} className="flex items-center gap-2 text-xs">
+                      <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold flex items-center justify-center shrink-0">{BUILTIN_SEMESTERS.length + i + 1}</span>
+                      <span className="flex-1 text-slate-700">{s}</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-semibold">Lokal</span>
+                      <button onClick={() => handleDeleteLocalSemester(s)} className="p-1 text-slate-400 hover:text-rose-600"><Trash2 className="w-3 h-3" /></button>
+                    </div>
+                  ))}
+                  {/* Tambah semester baru */}
+                  <div className="flex items-center gap-2 pt-1 border-t border-slate-100">
+                    <input
+                      type="text"
+                      placeholder="cth: Semester Genap 2027/2028"
+                      value={newSemesterLabel}
+                      onChange={e => setNewSemesterLabel(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && handleAddSemester()}
+                      className="flex-1 text-[10px] border border-slate-200 rounded-lg px-2 py-1.5 outline-none focus:ring-1 focus:ring-brand-400"
+                    />
+                    <button
+                      onClick={handleAddSemester}
+                      disabled={!newSemesterLabel.trim() || allSemesters.includes(newSemesterLabel.trim())}
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold bg-violet-600 hover:bg-violet-700 text-white disabled:opacity-40 transition-colors shrink-0"
                     >
                       <Plus className="w-3 h-3" />
                       Tambah
