@@ -48,15 +48,15 @@ export default function Header({
             {/* Three institution logos */}
             <div className="flex items-center gap-3 shrink-0">
               <img
-                src="/logo-fs.jpg"
-                alt="Fakultas Sains"
-                className="h-14 w-14 rounded-xl object-cover shadow-md ring-1 ring-slate-200"
-              />
-              <div className="h-10 w-px bg-slate-200" />
-              <img
                 src="/logo-itera.jpg"
                 alt="ITERA"
                 className="h-14 w-auto rounded-xl object-contain shadow-md ring-1 ring-slate-200 bg-white px-1"
+              />
+              <div className="h-10 w-px bg-slate-200" />
+              <img
+                src="/logo-fs.jpg"
+                alt="Fakultas Sains"
+                className="h-14 w-14 rounded-xl object-cover shadow-md ring-1 ring-slate-200"
               />
               <div className="h-10 w-px bg-slate-200" />
               <img
