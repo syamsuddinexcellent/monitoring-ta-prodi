@@ -257,7 +257,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
             Riwayat Bimbingan
           </h3>
           <div className="relative pl-6 border-l-2 border-slate-200 space-y-5">
-            {weekColumns.map((week, idx) => {
+            {[...weekColumns].map((week, idx) => ({ week, idx })).reverse().map(({ week, idx }) => {
               const upd = mergedUpdates[week];
               const isReported = upd?.reported;
               const isFromApp = upd?._appReport === true;
