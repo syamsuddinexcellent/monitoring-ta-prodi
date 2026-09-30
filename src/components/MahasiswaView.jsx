@@ -52,9 +52,11 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
 
   const nim = student?.nim || loggedInUser?.nim || '';
 
-  // Reload local reports when modal closes (after save)
+  // Reload reports from Supabase when modal closes (after save)
   useEffect(() => {
-    if (nim) setLocalReports(getLocalReportsForNim(nim));
+    if (nim) {
+      getLocalReportsForNim(nim).then(setLocalReports);
+    }
   }, [nim, isLaporanOpen]);
 
   // Merged weekly data: local reports fill gaps from Google Sheets data

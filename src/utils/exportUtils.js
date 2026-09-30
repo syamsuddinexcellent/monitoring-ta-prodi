@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx';
+import { supabase } from '../lib/supabase';
 
 // ─── Excel exports ────────────────────────────────────────────────────────────
 
@@ -364,19 +365,45 @@ ${periodeSections}
 
 const VERIF_KEY = 'verifikasi_laporan';
 
-export function getVerifikasi() {
+function getLocalVerifikasi() {
   try { return JSON.parse(localStorage.getItem(VERIF_KEY) || '{}'); } catch { return {}; }
 }
 
-export function saveVerifikasi(nim, week, dosenName) {
-  const all = getVerifikasi();
+export async function getVerifikasi() {
+  if (supabase) {
+    const { data, error } = await supabase.from('verifikasi_laporan').select('*');
+    if (!error && data) {
+      const result = {};
+      data.forEach(r => {
+        if (!result[r.nim]) result[r.nim] = {};
+        result[r.nim][r.week] = { verified: true, dosenName: r.dosen_name, at: r.verified_at };
+      });
+      return result;
+    }
+  }
+  return getLocalVerifikasi();
+}
+
+export async function saveVerifikasi(nim, week, dosenName) {
+  if (supabase) {
+    await supabase.from('verifikasi_laporan').upsert(
+      { nim, week, dosen_name: dosenName, verified_at: new Date().toISOString() },
+      { onConflict: 'nim,week' }
+    );
+    return;
+  }
+  const all = getLocalVerifikasi();
   if (!all[nim]) all[nim] = {};
   all[nim][week] = { verified: true, dosenName, at: new Date().toISOString() };
   localStorage.setItem(VERIF_KEY, JSON.stringify(all));
 }
 
-export function cancelVerifikasi(nim, week) {
-  const all = getVerifikasi();
+export async function cancelVerifikasi(nim, week) {
+  if (supabase) {
+    await supabase.from('verifikasi_laporan').delete().eq('nim', nim).eq('week', week);
+    return;
+  }
+  const all = getLocalVerifikasi();
   if (all[nim]) delete all[nim][week];
   localStorage.setItem(VERIF_KEY, JSON.stringify(all));
 }

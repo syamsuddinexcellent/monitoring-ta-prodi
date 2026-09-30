@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Send, CheckCircle2, AlertCircle, FileText, Users } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 const KATEGORI = [
   'BAP Proposal/Seminar Hasil/Sidang',
@@ -17,39 +18,91 @@ function getLocalReports(nim) {
   } catch { return {}; }
 }
 
-function saveLocalReport(nim, week, data, mahasiswaName) {
+function trackReadLocally(nim, week, dosenHadir, mahasiswaName, submittedAt) {
   try {
-    const submittedAt = new Date().toISOString();
-    // Save to mahasiswa_reports
+    const inbox = JSON.parse(localStorage.getItem('dosen_laporan') || '{}');
+    (dosenHadir || []).forEach(({ name: dosenName }) => {
+      if (!dosenName) return;
+      if (!inbox[dosenName]) inbox[dosenName] = [];
+      inbox[dosenName] = inbox[dosenName].filter(r => !(r.nim === nim && r.week === week));
+      inbox[dosenName].unshift({ nim, nama: mahasiswaName || nim, week, submittedAt, read: false });
+    });
+    localStorage.setItem('dosen_laporan', JSON.stringify(inbox));
+  } catch {}
+}
+
+async function saveReport(nim, week, data, mahasiswaName) {
+  const submittedAt = new Date().toISOString();
+  if (supabase) {
+    const { error } = await supabase.from('laporan_bimbingan').upsert({
+      nim, nama: mahasiswaName || nim, week,
+      category: data.category,
+      progress: data.progress,
+      next_target: data.next,
+      dosen_hadir: data.dosenHadir || [],
+      submitted_at: submittedAt,
+    }, { onConflict: 'nim,week' });
+    if (!error) {
+      trackReadLocally(nim, week, data.dosenHadir, mahasiswaName, submittedAt);
+      return true;
+    }
+  }
+  // Fallback: localStorage
+  try {
     const all = JSON.parse(localStorage.getItem('mahasiswa_reports') || '{}');
     if (!all[nim]) all[nim] = {};
     all[nim][week] = { ...data, submittedAt, source: 'local' };
     localStorage.setItem('mahasiswa_reports', JSON.stringify(all));
-
-    // Push to each selected dosen's inbox
-    const inbox = JSON.parse(localStorage.getItem('dosen_laporan') || '{}');
-    (data.dosenHadir || []).forEach(({ name: dosenName }) => {
-      if (!dosenName) return;
-      if (!inbox[dosenName]) inbox[dosenName] = [];
-      // Remove old entry for same nim+week to avoid duplicates
-      inbox[dosenName] = inbox[dosenName].filter(r => !(r.nim === nim && r.week === week));
-      inbox[dosenName].unshift({
-        nim, nama: mahasiswaName || nim, week,
-        category: data.category, progress: data.progress,
-        next: data.next, dosenHadir: data.dosenHadir,
-        submittedAt, read: false,
-      });
-    });
-    localStorage.setItem('dosen_laporan', JSON.stringify(inbox));
+    trackReadLocally(nim, week, data.dosenHadir, mahasiswaName, submittedAt);
     return true;
   } catch { return false; }
 }
 
-export function getLocalReportsForNim(nim) {
+export async function getLocalReportsForNim(nim) {
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('laporan_bimbingan')
+      .select('*')
+      .eq('nim', nim);
+    if (!error && data) {
+      const result = {};
+      data.forEach(r => {
+        result[r.week] = {
+          reported: true,
+          progress: r.progress,
+          next: r.next_target,
+          category: r.category,
+          dosenHadir: r.dosen_hadir,
+          submittedAt: r.submitted_at,
+        };
+      });
+      return result;
+    }
+  }
   return getLocalReports(nim);
 }
 
-export function getDosenLaporan(dosenName) {
+export async function getDosenLaporan(dosenName) {
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('laporan_bimbingan')
+      .select('*')
+      .contains('dosen_hadir', [{ name: dosenName }])
+      .order('submitted_at', { ascending: false });
+    if (!error && data) {
+      const inbox = JSON.parse(localStorage.getItem('dosen_laporan') || '{}');
+      const readKeys = new Set(
+        (inbox[dosenName] || []).filter(r => r.read).map(r => `${r.nim}|${r.week}`)
+      );
+      return data.map(r => ({
+        nim: r.nim, nama: r.nama, week: r.week,
+        category: r.category, progress: r.progress,
+        next: r.next_target, dosenHadir: r.dosen_hadir,
+        submittedAt: r.submitted_at,
+        read: readKeys.has(`${r.nim}|${r.week}`),
+      }));
+    }
+  }
   try {
     const inbox = JSON.parse(localStorage.getItem('dosen_laporan') || '{}');
     return inbox[dosenName] || [];
@@ -59,16 +112,15 @@ export function getDosenLaporan(dosenName) {
 export function markDosenLaporanRead(dosenName, nim, week) {
   try {
     const inbox = JSON.parse(localStorage.getItem('dosen_laporan') || '{}');
-    if (!inbox[dosenName]) return;
-    inbox[dosenName] = inbox[dosenName].map(r =>
-      r.nim === nim && r.week === week ? { ...r, read: true } : r
-    );
+    if (!inbox[dosenName]) inbox[dosenName] = [];
+    const idx = inbox[dosenName].findIndex(r => r.nim === nim && r.week === week);
+    if (idx >= 0) {
+      inbox[dosenName][idx] = { ...inbox[dosenName][idx], read: true };
+    } else {
+      inbox[dosenName].unshift({ nim, week, read: true });
+    }
     localStorage.setItem('dosen_laporan', JSON.stringify(inbox));
   } catch {}
-}
-
-export function countUnreadLaporan(dosenName) {
-  return getDosenLaporan(dosenName).filter(r => !r.read).length;
 }
 
 const MONTH_ID = {
@@ -174,7 +226,7 @@ export default function LaporanModal({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     if (!week) { setError('Pilih periode terlebih dahulu.'); return; }
@@ -182,7 +234,7 @@ export default function LaporanModal({
     const selectedDosen = dosenList
       .filter(d => dosenHadir.has(d.key))
       .map(d => ({ label: d.label, name: d.name }));
-    const ok = saveLocalReport(nim, week, {
+    const ok = await saveReport(nim, week, {
       reported: true,
       progress: progres.trim(),
       next: next.trim(),

@@ -1,3 +1,5 @@
+import { supabase } from '../lib/supabase';
+
 export async function triggerSyncDatabase() {
   try {
     let baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3002';
@@ -428,7 +430,6 @@ export function getAllWeeksTrend(students, weekColumns) {
 }
 
 // Merge mahasiswa local reports (localStorage) into Google Sheets student data.
-// Local report fills in for a week only when Sheets has no report for that week.
 export function mergeLocalReports(students) {
   try {
     const localAll = JSON.parse(localStorage.getItem('mahasiswa_reports') || '{}');
@@ -446,4 +447,41 @@ export function mergeLocalReports(students) {
   } catch {
     return students;
   }
+}
+
+// Merge laporan dari Supabase ke data mahasiswa (async, fallback ke localStorage).
+export async function mergeSupabaseReports(students) {
+  if (supabase) {
+    try {
+      const { data: allReports, error } = await supabase
+        .from('laporan_bimbingan')
+        .select('nim, week, category, progress, next_target, dosen_hadir, submitted_at');
+      if (!error && allReports) {
+        const byNim = {};
+        allReports.forEach(r => {
+          if (!byNim[r.nim]) byNim[r.nim] = {};
+          byNim[r.nim][r.week] = {
+            reported: true,
+            category: r.category,
+            progress: r.progress,
+            next: r.next_target,
+            dosenHadir: r.dosen_hadir,
+            submittedAt: r.submitted_at,
+          };
+        });
+        return students.map(student => {
+          const reports = byNim[student.nim];
+          if (!reports) return student;
+          const mergedUpdates = { ...student.weeklyUpdates };
+          Object.entries(reports).forEach(([week, report]) => {
+            if (!mergedUpdates[week]?.reported) {
+              mergedUpdates[week] = report;
+            }
+          });
+          return { ...student, weeklyUpdates: mergedUpdates };
+        });
+      }
+    } catch {}
+  }
+  return mergeLocalReports(students);
 }

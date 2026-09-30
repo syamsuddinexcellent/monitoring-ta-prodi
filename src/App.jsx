@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Header from './components/Header';
 import MetricCards from './components/MetricCards';
 import WeekSelector from './components/WeekSelector';
@@ -14,12 +14,12 @@ import AuthModal, { validateResetToken } from './components/AuthModal';
 import MahasiswaView from './components/MahasiswaView';
 import LaporanMasukModal from './components/LaporanMasukModal';
 import AdminPanelModal from './components/AdminPanelModal';
-import { countUnreadLaporan } from './components/LaporanModal';
+import { getDosenLaporan } from './components/LaporanModal';
 import {
   loadMonitoringData,
   getWeeklyMetrics,
   getAllWeeksTrend,
-  mergeLocalReports
+  mergeSupabaseReports
 } from './services/dataService';
 import { getLocalPeriods } from './utils/exportUtils';
 import {
@@ -64,9 +64,26 @@ export default function App() {
 
   // Laporan masuk for dosen
   const [isLaporanMasukOpen, setIsLaporanMasukOpen] = useState(false);
-  const laporanMasukCount = loggedInUser?.role === 'dosen'
-    ? countUnreadLaporan(loggedInUser.lecturerName || '')
-    : 0;
+  const [laporanMasukCount, setLaporanMasukCount] = useState(0);
+
+  const refreshLaporanCount = useCallback(async () => {
+    if (loggedInUser?.role === 'dosen' && loggedInUser?.lecturerName) {
+      try {
+        const list = await getDosenLaporan(loggedInUser.lecturerName);
+        setLaporanMasukCount(list.filter(r => !r.read).length);
+      } catch {}
+    } else {
+      setLaporanMasukCount(0);
+    }
+  }, [loggedInUser]);
+
+  useEffect(() => {
+    refreshLaporanCount();
+    if (loggedInUser?.role === 'dosen') {
+      const timer = setInterval(refreshLaporanCount, 30000);
+      return () => clearInterval(timer);
+    }
+  }, [refreshLaporanCount]);
 
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
 
@@ -130,7 +147,7 @@ export default function App() {
   const fetchData = async () => {
     try {
       const result = await loadMonitoringData();
-      result.students = mergeLocalReports(result.students);
+      result.students = await mergeSupabaseReports(result.students);
       const lp = getLocalPeriods();
       if (lp.length > 0) {
         result.weekColumns = [...result.weekColumns, ...lp.filter(p => !result.weekColumns.includes(p))];
@@ -648,7 +665,7 @@ export default function App() {
       {/* Laporan Masuk Modal (dosen) */}
       <LaporanMasukModal
         isOpen={isLaporanMasukOpen}
-        onClose={() => setIsLaporanMasukOpen(false)}
+        onClose={() => { setIsLaporanMasukOpen(false); refreshLaporanCount(); }}
         dosenName={loggedInUser?.lecturerName || ''}
       />
 

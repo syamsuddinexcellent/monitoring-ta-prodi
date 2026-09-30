@@ -22,11 +22,11 @@ function LaporanCard({ item, dosenName, onRead, verifData, onVerifChange }) {
     setExpanded(v => !v);
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     if (isVerified) {
-      cancelVerifikasi(item.nim, item.week);
+      await cancelVerifikasi(item.nim, item.week);
     } else {
-      saveVerifikasi(item.nim, item.week, dosenName);
+      await saveVerifikasi(item.nim, item.week, dosenName);
     }
     onVerifChange();
   };
@@ -125,12 +125,14 @@ export default function LaporanMasukModal({ isOpen, onClose, dosenName }) {
   const [laporan, setLaporan] = useState([]);
   const [verifData, setVerifData] = useState({});
 
-  const refreshVerif = () => setVerifData(getVerifikasi());
+  const refreshVerif = async () => setVerifData(await getVerifikasi());
 
   useEffect(() => {
     if (isOpen && dosenName) {
-      setLaporan(getDosenLaporan(dosenName));
-      refreshVerif();
+      (async () => {
+        setLaporan(await getDosenLaporan(dosenName));
+        await refreshVerif();
+      })();
     }
   }, [isOpen, dosenName]);
 
