@@ -1,4 +1,10 @@
 {
+  "weeks": [
+    "07 - 11 September 26",
+    "14 - 18 September 26",
+    "21 - 25 September 26",
+    "28 - 02 Oktober 26"
+  ],
   "students": [
     {
       "nim": "120450062",
@@ -16,7 +22,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : ACC Semhas 11 September\nNext : Revisi Seminar Hasil",
         "14 - 18 September 26": "Progres : sedang revisi laporan\nNext : bimbingan dengan dosen pembimbing dan dosen penguji",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : revisi bab 4\nNext : bimbingan dengan dosen pembimbing 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -56,7 +62,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Next : Proposal sudah ACC, daftar sempro.\nNext : sudah ada tanggal sempronya",
         "14 - 18 September 26": "Progres : pengajuan daftar sempro\nNext : sempro di tanggal 23 september jika tidak ada kendala",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : sudah sempro\nNext : melanjutkan revisi setelah sempro",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -96,7 +102,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Cari tanggal + daftar\nNext : -",
         "14 - 18 September 26": "Progres : Semhas",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Masih mencari Jadwal/Tanggal seminar Hasil\nNext : Daftar Seminar Hasil",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -116,7 +122,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Perbaikan Draft Semhas\nNext : Selesai draft Semhas, daftar semhas",
         "14 - 18 September 26": "Progres : Daftar Semhas",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Sedikit Perbaikan dari P1\nNext : Acc dari dua pembimbing",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -196,7 +202,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Revisi ke Pak Luky, Coding Selesai, Bab 1-3 kurang sempurna\nNext : Pelajari Teori atau Isi TA belum Paham",
         "14 - 18 September 26": "Progres : tidak ada ( bimbingan pindah jadwal hari senin depan) \nNext : fiksasi laporan bab 1-3 dan bahas codingan",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres :membandingkan dengan metode lain \nNext : fukasasi laporan 1-3 dan bahas codingan",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -216,7 +222,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Sempro terakhir di januari, sudah bimbingan dengan pak tamaro sudah 5 kali, 2 kali bimbingan lagi akan ke pembimbing 2 \nNext : Semhas (bulan oktober)",
         "14 - 18 September 26": "Progres : Sudah fiksasi kodingan dan penulisan bab 4&5\nNext : Menemui dosen pembimbing 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi dan merapihkan penulisan bab 4&5 oleh dosen pembimbing 2\nNext : fiksasi Revisi Penulisan bab 4&5 oleh dosen pembimbing 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -236,7 +242,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : 14 Sempro\nNext : BAP Revisi Sempro",
         "14 - 18 September 26": "Progres : Senin kemarin seminar proposal dan hari ini bimbingan ke dosbing 1 untuk penambahan metode dari dosen penguji\nNext : Menyelesaikan Revisi penulisan & menyicil Codingan hasil",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres: Sudah menyelesaikan revisi BAP proposal, menambahkan metode sesuai arahan penguji dan sudah melakukan bimbingan dengan dosen pembimbing 1\nNext : Besok akan bimbingan ke dosen pembimbing ke 2 dan bertemu dosen penguji untuk BAP revisi proposal",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -296,7 +302,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : mhs nya malas bimbingan, sudah ketemu P1 menentukan topik, \nNext : ada draft proposal",
         "14 - 18 September 26": "Progres : pengerjaan bab 1-3\nNext : fiksasi laporan bab 1-3",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres: bimbingan terkait penyusunan bab 1-3.\nNext : fiksasi bab 1-3 dan bimbingan ke pembimbing 2.",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -332,7 +338,7 @@
       "statusTA": "",
       "target": "Belum Sempro",
       "keterangan": "No. HP ortu : '083167150415",
-      "dokumenPendukung": "",
+      "dokumenPendukung": "No. HP ortu : '083167150415",
       "rawUpdates": {
         "07 - 11 September 26": "Progress : Draft nya sudah selesai sampai bab 2\nNext : Sempro, (rencana sebelum UTS)",
         "14 - 18 September 26": "Progres : konfirmasi/arahan beberapa hal untuk laporan dengan dosen pembimbing 1\nNext : menyelesaikan laporan hingga bab 3",
@@ -356,7 +362,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Coding, Penulisan\nNext : Laporan Penulisan",
         "14 - 18 September 26": "Progres : Revisi penulisan draft bab 4\nNext : Fiksasi draft dari pembimbing 1",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Konfirmasi arah penelitian ke dosen pembimbing 1, diminta sedikit perubahan rancangan metode\nNext : Dapet konfirmasi fix terkait rancangan",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -376,7 +382,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progress: Mencari referensi Judul, \nNext : Ketemu dengan Pembimbing 1",
         "14 - 18 September 26": "Progres : judul dan data\nNext : Mencari data",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : mencari dataset \nNext : codingan dan pengerjaan bab 1-3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -396,7 +402,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Acc terakhir \nNext : Daftar SemHas kepastian tanggal",
         "14 - 18 September 26": "Progres : Kemarin mau jumpaa pembimbing 2 untuk finalisasi dan nentuin jadwal seminar tapi dari pembimbing 2 bisanya ditemuin di Selasa depan\nNext : nentuin jadwal dan daftar",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Selasa kemarin tidak jadi bertemu pembimbing karna sakit\nNext : lagi mengatur ulang jadwal dosen pembimbing yang kosong untuk membicarakan jadwal seminar",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -416,7 +422,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "",
         "14 - 18 September 26": "Progres : Melakukan bimbingan Bab 1 dan mendapatkan arahan untuk mengganti model penelitian.\nNext : Sesuai dengan arahan dosen pembimbing, penyelesaian revisi Bab 1 serta penyusunan Bab 2 dan Bab 3.",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Menyelesaikan penyusunan Bab 1–3 sesuai dengan arahan yang diberikan oleh dosen pada bimbingan sebelumnya.\nNext : Melakukan bimbingan bab 1-3.",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -476,7 +482,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : BAB 4, Coding Selesai\nNext : Bimbingan Finalisasi 2x Pertemuan Lagi",
         "14 - 18 September 26": "Progres : Bimbingan ke pembimbing 1 sudah selesai\nNext : Akan bimbingan ke pembimbing 2 untuk finalisasi penulisan/draft",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan ke pembimbing 2 terkait penulisan \nNext : Akan bimbingan lagi ke pembimbing 2 untuk revisi format & perapihan penulisan",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -496,7 +502,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Penyelesaian BAB 4, tinggal ke P2\nNext : Selesaikan ke P1 dan P2",
         "14 - 18 September 26": "Progres : Revisi draft Bab4\nNext : finalisasi Draft Seminar Hasil",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Sudah revisi draft dari pembimbing 2 dan memastikan penyusunan bab 4 dan 5 terhadap pembimbing satu \nNext : Konfirmasi kembali draft ke pembimbing satu",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -516,7 +522,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progress : Proposal sudah selesai, tapi ada revisi, \nNext : Sempro (bulan september )",
         "14 - 18 September 26": "Progres : Masih ada sedikit revisi\nNext : Pendaftaran seminar proposal",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Pendaftaran Seminar Proposal\nNext : Seminar Proposal",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -536,7 +542,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Sudah daftar Sempro\nNext : Seminar Proposal 14 Sept",
         "14 - 18 September 26": "Progres : SemPro 14\nNext : Revisi Sempro",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres: Revisi BAP seminar proposal ke pembimbing 1 membahas penulisan \nNext : Melanjutkan Revisi BAP dan Revisi Flowchart",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -576,7 +582,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progress : Draft nya sudah sampai bab 3 , mau ketemu dosen P2\nNext : Sempro (bulan Septemaber)",
         "14 - 18 September 26": "Progres : Bertemu dengan dosen pembimbing 2\nNext : Menyelesaikan revisi penulisan/draft dari pembimbing 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan ke dosen pembimbing 2 terkait penulisan \nNext : Akan bimbingan lagi ke dosen pembimbing 2 untuk revisi & merapihkan penulisan",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -616,7 +622,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Kuliah 17 SKS\nNext : Bimbingan SemPro",
         "14 - 18 September 26": "Progres : Mencari jurnal acuan\nNext : Draft Bab 1",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Draft Bab 1\nNext : Hasil Revisi Bab 1",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -636,7 +642,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : BAP Sempro dan Progres Coding ke P1\nNext : BAP Sempro Selesai dan fokus ke P1 dan P2",
         "14 - 18 September 26": "Progres : selesai BAP dan progres codingan \nNext : Progres hasil codingan",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : progres codingan\nNext : diskusi hasil codingan & nyicil penulisan bab 4",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -676,7 +682,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Sempro bulan Juli, kendala di model karena kurang bagus, sudah bimbingan dengan Pbb 1 kali, BAP masih ke Pbb 1, belum mulai nulis\nNext: Bimbingan ke Pbb 1 terkait model dan BAP ke Pbb 2 dan Penguji",
         "14 - 18 September 26": "Progres : bap dengan pembimbing 1 dan 2\nNext : bap dengan dosen penguji",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan pelabelan data\nNext : fixasi pelabelan dan mencoba ke model",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -696,7 +702,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: data sudah di acc (ada pergantian data), finalisasi BAB 1,  bimbingan denga pbbb 1 >6 kali\nNext: bimbingan untuk penulisan bab 1 dan 2",
         "14 - 18 September 26": "Progres : Telah bimbingan ke dosen pembimbing 1\nNext :",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : draf bab 1-3\nNext : selesai revisi dan fiksasi draf Bab 1-3",
         "28 - 02 Oktober 26": "Progres : bimbingan ke pembimbing 2 terkait bab 1\nNext : menyelesaikan bab 1-3 fix"
       }
     },
@@ -716,7 +722,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Revisi dengan pembimbing 2\nNext : Selesaikan dengan pembimbing 2",
         "14 - 18 September 26": "Progres : Daftar Semhas\nNext : Seminat Hasil",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan ppt dengan dospem 2\nNext : persiapan seminar",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -736,7 +742,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Finalisasi Metode\nNext : Sudah Final Data dan Metode",
         "14 - 18 September 26": "Progres : bimbingan untuk merevisi terkait bab 1 dan bab 2\nNext : menyelesaikan bab 2 dan 3 secara penuh",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : revisi bab 2\nNext : bimbingan bab 3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -756,7 +762,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Finalisasi coding, hampir selesai bab 4\nNext : BAP Sempro dan finalisasi BAB 4",
         "14 - 18 September 26": "Progres : Menyelesaikan BAP sempro\nNext : Bimbingan Bab 4 dan 5",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan ke pembimbing 1 mengenai penulisan bab 4,5 dan lampiran\nNext : bimbingan ke pembimbing 2 mengenai penulisan bab 4,5 dan lampiran",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -776,7 +782,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : dataset masih banyak yg korupt, solusi data menggunakan sedikit,  komputasi menggunakan collab memakan waktu yang lama beralih ke kaglle, hasil training tidak ada, BAP fiksasi, baru 1 kali bimbingan\nNext: fokus ke BAP dan Pbb 1, nyoba komputasi ke lab",
         "14 - 18 September 26": "Progres : Pembahasan BAP, bahas hasil pelatihan dan perbandingan lima varian model, penetapan area ROI di lajur kiri dan kanan jalan, tambah library ByteTrack untuk tracking dan hitung kecepatan masing-masing kendaraan, implementasi best weight model yolo26s-seg.pt untuk uji pemantauan kemacetan, buat dashboard sementara untuk lihat hasil uji pemantauan kemacetan.\nNext : Penulisan hasil dan analisis.",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : pembahasan BAP dengan dosen pembimbing 2, pembahasan penulisan hasil dengan dosen pembimbing 1\nNext : BAP dengan dosen penguji 1, melanjutkan penulisan bab 4, 5, dan lampiran",
         "28 - 02 Oktober 26": "Progres : BAP dengan penguji, saran revisi penulisan dengan pembimbing 1\nNext : bimbingan dengan pembimbing 2"
       }
     },
@@ -796,7 +802,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: revisi bab 1-3 ke Pbb 1, bimbingan sudah 7 kali (Pbb1) \nNext: Bimbingan revisi bab 1-3",
         "14 - 18 September 26": "Progres : Revisi BAB 1-3\nNext : Menyelesaikan revisi BAB 1-3",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi BAB 2 dan 3\nNext : Finalisasi bab 2 dan 3 ke pembimbing 1",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -816,7 +822,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Sudah acc untuk semhas ke pembimbing\nNext : Daftar Semhas",
         "14 - 18 September 26": "Progres : Melakukan pendaftaran dan mempersiapkan seminar hasil\nNext : Seminar hasil dan Revisi hasil BAP.",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan dan diskusi BAP dengan dosen pembimbing 1\nNext : BAP ke dosen pembimbing 2 dan penguji",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -836,7 +842,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: BAP ke dosen pbb, kendala di data belum jelas untuk project Insecta, paling buruknya menggunakan data sintesis, belum bimbingan ke Pbb 1 dan Pbb 2 karena jadwal belum ketemu, sudah mulai nulis\nNext : BAP dan konfirmasi data",
         "14 - 18 September 26": "Progres :  Bimbingan BAP  dengan dospem 1 dan finalisasi data\nNext : Bimbingan BAP ke Penguji dan progres bab 4",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Penjelasan prototipe hasil dan perbaikan pipeline, Penyelesaian Revisi bab 1-3 dengan dosen pembimbing 2\n\nNext : Pipeline selesai, BAP penguji lanjut penulisan bab 4-5",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -916,7 +922,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Coding sudah selesai\nNext : BAP Proposal selesai, finalisasi BAB 1,2,3",
         "14 - 18 September 26": "Progres : BAP dengan dosen pembimbing 1 & 2\nNext : BAP dengan dosen penguji",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : Revisi bab 2-3 & Code\nNext : BAP ke Penguji & penulisan bab 4",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -936,7 +942,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Sudah daftar Semhas\nNext : Semhas",
         "14 - 18 September 26": "Progres : Proses Semhas\nNext : Hasil Revisi",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : BAP dengan dosen pembimbing dan dosen penguji\nNext : persiapan untuk daftar sidang",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -956,7 +962,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Ganti topik dan finalisasi topik dan dataset\nNext : Penulisan BAB 1,2,3",
         "14 - 18 September 26": "Progres : Progres penulisan bab 1-3\nNext : Fiksasi penulisan bab 1-3",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : Revisi bab 1-3\nNext : Fiksasi bab 1-3 dan lanjut bimbingan ke dospem 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -996,7 +1002,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Belum bimbingan\nNext : Bimbingan terkait jurnal",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : Penentuan topik dan Metode\nNext : Fixsasi metode dan data",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1016,7 +1022,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Penyelesaian code dan penulisan\nNext : Penulisan BAB 4 selesai dan review coding",
         "14 - 18 September 26": "Progres : Penyusunan dan revisi BAB 4, Bimbingan membahas terkait penulisan dan code hasil di bab 4\nNext : menyelesaikan BAB 4 & 5 secara keseluruhan, revisi Bab 4 hingga 5",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan ke Pembimbing 1 terkait penulisan dan hasil bab 4. Bimbingan ke Pembimbing 2 terkait bab 3 dan penulisan bab 4\nNext : Revisi dari bab 3 & 4",
         "28 - 02 Oktober 26": "Progres : Revisi Penulisan dengan Dosen pembimbing 2\nNext : Menyelesaikan BAB 4-5 secara keseluruhan"
       }
     },
@@ -1036,7 +1042,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: fiksasi topik, data, dan metode, penulisan bab 1, bimbingan sudah 3 kali ke Pbb 1, bulan lalu laptop rusak sekarang aman, kendala ganti topik sebelumnya\nNext: Bimbingan pengumpulan draft kasar 1-3",
         "14 - 18 September 26": "Progres : progress penulisan bab 1 sampai bab 3\nNext : revisi terkait bab 1-3 dan fiksasi",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi terkait flowchart\nNext : fiksasi BAB 1-3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1096,7 +1102,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: masih ada 3 MK yg harus diambil karena IPK belum memenuhi, Pbb 1 sudah > 6 pada smt sebelumnya, Pbb 2 baru 2 kali bimbingan, pemahaman materi, proposal masih revisi\nNext: Menjelaskan terkait rumus dan revisi Bab 2 ke Pbb 2",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : revisi flowchart \nNext : flowchart final",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1116,7 +1122,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Penyusunan Draft Sempro tinggal hasil sementara\nNext : Daftar Sempro",
         "14 - 18 September 26": "Progres : penambahan padding pada data yang sudah di anotasi dan perbaikan minor dari bab 2\nNext : di review kembali oleh dosen pembimbing ke-2 untuk proses acc",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi minor untuk Bab 2\nNext : Fixsasi revisi dengan pembimbing ke-2 untuk mendapatkan acc",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1136,7 +1142,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : BAP Selesai\nNext : Laporan progres codingan",
         "14 - 18 September 26": "Progres : bimbingan terkait  hasil anotasi gambar \nNext : anotasi gambar",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan terkait  hasil anotasi gambar \nNext : penulisan bab 4-5",
         "28 - 02 Oktober 26": "Progres : diskusi hasil & bab 4-5\nNext : penulisan bab 4-5 ke pembimbing 2"
       }
     },
@@ -1176,7 +1182,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Data, Metode sudah Fix, tinggal ke P2\nNext : Minggu depan Daftar SemPro",
         "14 - 18 September 26": "Progres : Bimbingan terkait revisi bab 1 dan 2, mengajukan jadwal serta daftar seminar proposal.\nNext : mempersiapkan untuk seminar proposal dan diskusi terkait PPT seminar",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan ppt dengan dospem 1 dan 2 \nNext : persiapan seminar",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1196,7 +1202,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Sempro bulan Juni, masih ngerjain BAP ada revisi di BAB 3, codingan selesai, laptop sedang rusak, (gantian dengan teman) \nNext: BAP ke Pbb 1",
         "14 - 18 September 26": "Progres : BAP dengan dosen pembimbing 1\nNext : BAP dengan dosen pembimbing 2,  fiksasi codingan dan menyusun BAB 4",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : BAP dengan dosen pembimbing 2\nNext: Fiksasi kode dan bimbingan BAB 4 ke dosen pembimbing 1",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1216,7 +1222,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: belum bimbingan, topik  dan data sudah, kendala di metode, total 147 sudah dengan TA\nNext: Bimbingan ke Pbb 1, bahas topik",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : pengarahan + penyusunan  timeline target\nNext : fiksasi data + metode",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1236,7 +1242,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Revisi persiapan sempro\nNext : Finalisasi draft sempro",
         "14 - 18 September 26": "Progres : Bimbingan terkait fikasi bab 1-3, melakukan pendaftaran seminar proposal \nNext : Mempersiapkan untuk seminar proposal",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Persiapan pelaksanaan sempro\nNext : Pelaksanaan sempro",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1256,7 +1262,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Finalisasi penulisan coding dan mulai BAB 4\nNext : Selesaikan BAP Sempro",
         "14 - 18 September 26": "Progres : Menyelesaikan BAP Sempro ke Pembimbing 2 dan Penguji.\nNext : Bimbingan bab 4.",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres: Bimbingan Bab 4\nNext: Revisi penulisan dan menyelesaikan Bab 4",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1276,7 +1282,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Sempro sudah diambil si smt sebelumnya, penulisan Bab 2, Bab 1 sudah, ganti data dan metode, bimbingan 4 kali dengan Pbb1, masih ngambil MK smt ini, \nNext: Bimbingan bab 2",
         "14 - 18 September 26": "Progres : Bimbingan terkait revisi Bab 1 dan Pengubahan Data\nNext : Penulisan Bab 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : menyusun bab 2\nNext : finalisasi bab 2 dan pengerjaan bab 3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1296,7 +1302,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Final pembimbing 1 dan 2\nNext : Daftar Sempro",
         "14 - 18 September 26": "Progres : Sudah melakukan pendaftaran seminar proposal\nNext : Mempersiapkan untuk seminar proposal serta  diskusi dengan pembimbing terkait PPT seminar",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Diskusi terkait PPT seminar proposal ke PB 1\nNext : Pelaksanaan seminar",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1376,7 +1382,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Sudah bimbingan ke Pbb 1, sebanyak 4 kali,, data masih ada sedikit problem, ada tambahan di metode dari Pbb 1, komparasi metode\nNext: Penulisan proposal",
         "14 - 18 September 26": "Progres : sudah menyelesaikan bab 1-2 dan telah membuat janji temu hari Jumat ini, tetapi perlu digeser ke hari Senin \nNext : menyelesaikan draft TA",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan mengenai bab1 dan 2\nNext : menyelesaikan bab2 dan bab 3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1416,7 +1422,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: sempro sudah diambil smt sebelumnya, metode, topik dan dataset sudah ada, penulisan bab 1-3, \nNext: Bimbingan Bab 1-3",
         "14 - 18 September 26": "Progres : progress penulisan bab 1 sampai bab 3\nNext : revisi terkait bab 1-3 dan fiksasi",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : Revisi pada draft bab 1-3\nNext : Finalisasi bab 1-3 dan bimbingan ke Pembimbing dua",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1436,7 +1442,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: kendala berubah terus metodenya, penulisan sudah sampai bab 3 tapi masih ada revisi, sudah bimbingan 6 klai (pbb 1) dan 1 kali (Pbb 2)\nNext: Bimbingan revisi bab 1-3 ke Pbb 1 dan 2",
         "14 - 18 September 26": "Progres : pergantian metode penelitian dan data\nNext : menyelesaikan bab 1",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : menyusun bab 1 & 2\nNext : menyelesaikan bab 1 & 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1456,7 +1462,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Tinggal menunggu acc pembimbing 2\nNext : Bimbingan dengan pembimbing 2",
         "14 - 18 September 26": "Progres : Bimbingan  dengan dospem 2 \nNext : Menyelesaikan perbaikan dan melakukan bimbingan lagi ke dospem 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : telah bimbingan dengan Pak Tirta mengenai dataset yang digunakan \nNext : Melakukan bimbingan ke Dospem 2 mengenai hasil diskusi dataset dari Pak Tirta",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1476,7 +1482,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Bab 1-3 sudah selesai, sudah 6 kali ke Pbb 1, Pbb 2 baru 1 kali,\nNext: Revisi drfat dari Pbb 2",
         "14 - 18 September 26": "Progres : bimbingan terkait penulisan bab 1-3 dosen pembimbing 2\nNext : review kembali dosen pembimbing 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : revisi bab 1-3 oleh dosen pembimbing 2\nNext : Fiksasi bab 1-3  oleh dosen pembimbing 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1496,7 +1502,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: sudah pernah ngambil sempro di smt sebelumnya, Pbb 1 (3 kali), bab 3 belum selesai penulisannya, kendala udah ngekos PP dari Lamteng (2 jam) orang tua sebelumnya sakit, perhitungan dan kodingan sudah selesai\nNext: Bimbingan ke Pbb 1 finalisasi Bab 1,2,3",
         "14 - 18 September 26": "Progres : Bimbingan terkait revisi bab 1 dan 2 \nNext : Penyelesaian penulisan bab 3",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan penulisan bab 1,2,3 dengan dosen pembimbing 2\nNext : Revisi penulisan bab 1,2,3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1516,7 +1522,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Sempro bulan Juni, kemarin sakit, stuck di bagian kodingan, BAP sudah, penulisan baru sedikit\nNext : minggu ini selesain kodingan, nemuin Pbb 1",
         "14 - 18 September 26": "Progres : Bimbingan terkait agregasi data, codingan, dan penyusunan subab pada bab 4, Bimbingan membahas terkait penulisan dan code hasil di bab 4 pada metode 1\nNext : menyelesaikan BAB 4 & 5 secara keseluruhan, Bimbingan membahas terkait penulisan dan code hasil  bab 4 lanjutan ke metode 2 hingga bab 5",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan ke pemb1 terkait penulisan dan code hasil bab 4 pada metode 2 hingga bab 5, pemb2 terkait bab 3 dan penulisan bab 4\nNext : Revisian dari bab 2/3/4/lampiran",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1536,7 +1542,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: sudah menulis bab 4 dan 5, minggu ini perbaikan bab 4 dan 5, baru 1 kali bimbingan, BAP sudah\nNext: bimbingan ke Pbb 1",
         "14 - 18 September 26": "Progres : bimbingan bab 4 & 5 ke pembimbing 1\nNext : Selesai revisi bab 4 & 5 serta menemui pembimbing 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan draf skripsi ke dosen pembimbing 1 dan 2\nNext : bimbingan draf skripsi ke dosen pembimbing 1 dan 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1596,7 +1602,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Selesai ke Pembimbing 1 dan sudah mulai ke Pembimbing 2\nNext : Hasil revisi dari Pembimbing 2",
         "14 - 18 September 26": "Progres : Dosen Pembimbing 2 sudah review dan mengomentari draft bab 1-3 \nNext : Menyelesaikan dan merapihkan revisi draft bab 1-3 sesuai arahan lalu melakukan bimbingan kembali hingga mencapai target bimbingan yang ditentukan",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan mengenai perubahan flowchart dan revisi penulisan Minor\nNext : Penyelesaian Revisi penulisan bab 1-3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1616,7 +1622,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Penulisan BAB 4 dan 5\nNext : Selesai BAP SemPro  dan Draft Semhas",
         "14 - 18 September 26": "Progres : Bimbingan dengan dospem 2 \nNext : Menyelesaikan perbaikan dan melakukan bimbingan lagi ke dospem 1 & 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan dengan dospem 1&2 dan bap dengan dosen penguji 1 terkait bab 4\nNext : penyesuaian metode, revisi draft, pendalaman pemahaman",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1656,7 +1662,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Sudah daftar Semhas\nNext : Semhas",
         "14 - 18 September 26": "Progres : SemHas\nNext : Revisi",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : diskusi revisi draft bap \nNext : BAP ke dosen pemb dan penguji",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1696,7 +1702,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Fix penelitian\nNext : Penulisan Sempro",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi bab 1-3\nNext : fiksasi bab 1-3 dan lanjut bimbingan ke dosen pembimbing 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1716,7 +1722,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : BAP Sempro selesai, bab 4 dan coding selesai, bimbingan belum\nNext : Laporan bimbingan dengan Pembimbing 1 dan 2",
         "14 - 18 September 26": "Progres : Perbaikan dan penambahan pada bab 4\nNext : Hasil perbaikan bab 4",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi bab 3,4,5\nNext : fiksasi bab 3,4,5 dan lanjut bimbingan ke dosen pembimbing 2",
         "28 - 02 Oktober 26": "Progres : ACC pembimbing 1, ada revisi minor dibagian kesimpulan dan saran\nNext : Menyelesaikan revisi bab 5, bimbingan ke pembimbing 2 dihari kamis"
       }
     },
@@ -1776,7 +1782,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Draft Sempro sudah selesai\nNext : Finalisasi ke pembimbing 2",
         "14 - 18 September 26": "Progres : Revisi flowchart, penambahan subbab, perbaikan paragraf\nNext : Pemangkasan halaman, revisi penulisan, formating gambar dan tabel",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : revisi penulisan dan formating bab 2 dan 3\nNext : bimbingan ke dosen pembimbing 1 dan 2",
         "28 - 02 Oktober 26": "Progres : bimbingan dengan pembimbing 1\nNext : revisi flowchart, penulisan, bimbingan dengan pembimbing 2"
       }
     },
@@ -1796,7 +1802,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : BAP Sempro selesai\nNext : Laporan proses coding dan Penulisan BAB 4",
         "14 - 18 September 26": "Progres : bimbingan terkait  ekstraksi frame & pemilihan gambar yang akan dianotasi\nNext : Perbaikan anotasi gambar",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan terkait data yg telah dianotasi\nNext : augmentasi data, ROI, dan training model.",
         "28 - 02 Oktober 26": "Progres : revisi hasil\nNext : penulisan bab 4&5"
       }
     },
@@ -1856,7 +1862,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: sempro bulan April, BAP sudah, Penulisan dan hasil sudah, terdapat revisi di evaluasi, Pbb sudah >6, ke Pbb 2 baru 1 kali bimbingan\nNext: ke Pbb 1 menampilkan revisi dan ke Pbb 2 untuk penulisan",
         "14 - 18 September 26": "Progres : Melakukan revisi evaluasi model bersama Dosen Pembimbing 1 dan Melakukan perbaikan draft khususnya pada bagian flowchart dengan Dosen Pembimbing 2\nNext : Melakukan perbaikan dan penyempurnaan draft bersama Dosen Pembimbing 1",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi draft Tugas Akhir secara keseluruhan sesuai arahan Pembimbing 1\nNext: Fiksasi draft Tugas Akhir",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1876,7 +1882,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Sempro bulan Juni, BAP sudah selesai, dari Pbb 2 masih ada revisi, penulisan lampiran\nNext: Revisi ke Pbb 2 penulisan Bab 4, daftar semhas",
         "14 - 18 September 26": "Progres : Revisi penulisan dan mencari jadwal untuk semhas\nNext : mendaftar semhas",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Pendaftaran dan persiapan seminar hasil\nNext: Seminar hasil dan revisian bap",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1927,8 +1933,8 @@
       "phone": "6289505121002",
       "pembimbing1": "M. Syamsuddin Wisnubroto, S.Si., M.Si.",
       "pembimbing2": "Fitri Nurjanah, S.Si., M.Mat.",
-      "penguji1": "",
-      "penguji2": "",
+      "penguji1": "Mika Alvionita S, S.Si., M.Si.",
+      "penguji2": "Tirta Setiawan, S.Pd., M.Si.",
       "statusTA": "",
       "target": "Belum Sempro",
       "keterangan": "",
@@ -1936,7 +1942,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Penulisan Draft SemPro\nNext : Finalisasi Draft Sempro",
         "14 - 18 September 26": "Progres : Progres penulisan bab 1-3\nNext : Fiksasi Kode & Penulisan Bab 1-3",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Mengerjakan draft Bab 3\nNext : Revisi Penulisan Bab 1-3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -1976,7 +1982,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : semhas tgl 16 sep, sks kurang, ngambil sistensi\nNext:  Fokus ke menuhin sks, menunggu nilai, revisi semhas",
         "14 - 18 September 26": "Progres : Diskusi BAP Pembimbing 1\nNext : Bimbingan BAP Penguji dan Revisi Draf",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : Konsultasi BAP dengan pembimbing 2 dan penguji 1\nNext: Menyelesaikan BAP dengan penguji 2, revisi draf, mempersiapkan pendaftaran sidang",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2036,7 +2042,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Sudah final metode dan data\nNext : Draft penulisan BAB 1,2,3",
         "14 - 18 September 26": "Progres : Pengumpulan Draft Bab 1-3\nNext : Revisi & Fiksasi Bab 1-3",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi pada draft bab 1- 3\nNext :Finalisasi Bab 1-3 dan bimbingan ke Pembimbing dua",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2056,7 +2062,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Rapihkan penulisan\nNext : Selesaikan penulisan dan BAP Penguji",
         "14 - 18 September 26": "Progres : revisi bab 4 dan 5\nNext : menyusun lampiran dan menyelesaikan revisi minggu ini",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan ke pembimbing 1 dan 2 mengenai penulisan bab 4,5 dan lampiran\nNext : menyelesaikan revisi penulisan bab 4,5 dan lampiran",
         "28 - 02 Oktober 26": "Progres : BAP penguji dan finalisasi draft bab 4, 5, dan lampiran\nNext : daftar semhas"
       }
     },
@@ -2076,7 +2082,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Diskusi terkait metode, uji coba coding dahulu ke pembimbing 1\nNext : Bimbingan ke Pembimbing 1 dan Pembimbing 2",
         "14 - 18 September 26": "Progres : Konsultasi pilihan metode yang cocok\nNext : Penentuan metode yang akan digunakan",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : fiksasi metode \n\nNext : pembuatan draf proposal dan code",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2096,7 +2102,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Bimbingan ke Pembimbing 1\nNext : Laporan Hasil bimbingan ke Pembimbing 1",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan pendalaman alur topik dan dataset\nNext : menyusun draft bab 1, dan 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2136,7 +2142,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : pemahaman kembali teori ke pembimbing 2\nNext : Bimbingan dengan pembimbing 2 serta finalisasi draft sempro",
         "14 - 18 September 26": "Progres : Mendaftar sempro\nNext : Persiapan untuk ssmpro",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Persiapan pelaksanaan sempro\nNext : Pelaksanaan sempro",
         "28 - 02 Oktober 26": "Progres : Pelaksanaan sempro\nNext : melakukan revisi"
       }
     },
@@ -2156,7 +2162,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : project Insectera, hasil sudah tinggal penulisan, minggu ini sampai minggu depan masih persentasi, bimbingan pak ardika 3 kali lebih \nNext: senin hubungi llpm untuk presentasi, daftar semhas minggu depan",
         "14 - 18 September 26": "Progres : Persentasi ke Sekretaris LPPM\nNext : Bimbingan bab 4-5 & mendaftar semhas",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : Bimbingan Lampiran ke dosen 2\nNext : Bimbingan ke dosen 1",
         "28 - 02 Oktober 26": "Progres : bimbingan pembimbing kedua terkait final\nNext : daftar seminar hasil"
       }
     },
@@ -2176,7 +2182,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: sudah pernah mengambil sempro, sudah bimbingan 5 kali ke Pbb 1, ada kendala di pemahaman, ke Pbb 2 baru 1 kali, masih mencari topik\nNext: Nentuin topik, cari data, kerangka penelitian",
         "14 - 18 September 26": "Progres : Bimbingan dan finalisasi rancangan penelitian\nNext : Menyusun draft Bab 1 dan Bab 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres: Bimbingan Bab 1\nNext: Revisi Bab 1 dan melanjutkan Bab 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2196,7 +2202,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: MK ADS mengulang padahal sudah tidak, besok bimbingan ke Pbb 1, sudah mulai penulisan Bab 1 dan 2\nNext: Bimbingan ke Pbb 1",
         "14 - 18 September 26": "Progres : Bimbingan terkait jurnal dan dataset\nNext : prepocesing data menggunakan 2 metode,fiksasi metode yg mau dipakai",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Membahas metode dan data yg akan digunakan \nNext : Penulisan Bab 1-3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2256,7 +2262,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Draft SemPro selesaikan\nNext : Draft Sempro Selesai",
         "14 - 18 September 26": "Progres : Bimbingan dengan dospem 2. \nNext : Melakukan perbaikan Bab 2 dan Bab 3.",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bab 1 - Bab 3\nNext : Perbaikan penulisan di Bab 2 dan 3 , Dosen Pembimbing 2.",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2276,7 +2282,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Progres penulisan sempro\nNext : Finalisasi jurnal dan BAB 1",
         "14 - 18 September 26": "Progres : Penyusunan draft bab 1 dan hasil penelitian sementara\nNext : Menambahkan perbandingan n-gram dalam penelitian.",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan mengenai revisi bab 1\nNext : Lanjut mengerjakan bab 2 dan bab 3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2336,7 +2342,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan penentuan topik tugas akhir\nNext : menetukan data dan jurnal untuk tugas akhir",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2356,7 +2362,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Menyelesaikan coding dan bab 4\nNext : BAP Sempro, bimbingan ke pembimbing 1",
         "14 - 18 September 26": "Progres : BAP sempro\nNext : Bimbingan bab 4",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan code\nNext : bimbingan penulisan  bab 4",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2376,7 +2382,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan penentuan topik TA, diarahkan untuk fiksasi data terlebih dahulu\nNext : Fiksasi ketersediaan data untuk topik TA",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2396,7 +2402,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : ACC Semhas 11 September\nNext : Revisi Seminar Hasil",
         "14 - 18 September 26": "Progres : sedang revisi laporan\nNext : bimbingan dengan dosen pembimbing dan dosen penguji",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : revisi bab 4\nNext : bimbingan dengan dosen pembimbing 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2436,7 +2442,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Next : Proposal sudah ACC, daftar sempro.\nNext : sudah ada tanggal sempronya",
         "14 - 18 September 26": "Progres : pengajuan daftar sempro\nNext : sempro di tanggal 23 september jika tidak ada kendala",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : sudah sempro\nNext : melanjutkan revisi setelah sempro",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2476,7 +2482,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Cari tanggal + daftar\nNext : -",
         "14 - 18 September 26": "Progres : Semhas",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Masih mencari Jadwal/Tanggal seminar Hasil\nNext : Daftar Seminar Hasil",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2496,7 +2502,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Perbaikan Draft Semhas\nNext : Selesai draft Semhas, daftar semhas",
         "14 - 18 September 26": "Progres : Daftar Semhas",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Sedikit Perbaikan dari P1\nNext : Acc dari dua pembimbing",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2576,7 +2582,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Revisi ke Pak Luky, Coding Selesai, Bab 1-3 kurang sempurna\nNext : Pelajari Teori atau Isi TA belum Paham",
         "14 - 18 September 26": "Progres : tidak ada ( bimbingan pindah jadwal hari senin depan) \nNext : fiksasi laporan bab 1-3 dan bahas codingan",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres :membandingkan dengan metode lain \nNext : fukasasi laporan 1-3 dan bahas codingan",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2596,7 +2602,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Sempro terakhir di januari, sudah bimbingan dengan pak tamaro sudah 5 kali, 2 kali bimbingan lagi akan ke pembimbing 2 \nNext : Semhas (bulan oktober)",
         "14 - 18 September 26": "Progres : Sudah fiksasi kodingan dan penulisan bab 4&5\nNext : Menemui dosen pembimbing 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi dan merapihkan penulisan bab 4&5 oleh dosen pembimbing 2\nNext : fiksasi Revisi Penulisan bab 4&5 oleh dosen pembimbing 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2616,7 +2622,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : 14 Sempro\nNext : BAP Revisi Sempro",
         "14 - 18 September 26": "Progres : Senin kemarin seminar proposal dan hari ini bimbingan ke dosbing 1 untuk penambahan metode dari dosen penguji\nNext : Menyelesaikan Revisi penulisan & menyicil Codingan hasil",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres: Sudah menyelesaikan revisi BAP proposal, menambahkan metode sesuai arahan penguji dan sudah melakukan bimbingan dengan dosen pembimbing 1\nNext : Besok akan bimbingan ke dosen pembimbing ke 2 dan bertemu dosen penguji untuk BAP revisi proposal",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2676,7 +2682,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : mhs nya malas bimbingan, sudah ketemu P1 menentukan topik, \nNext : ada draft proposal",
         "14 - 18 September 26": "Progres : pengerjaan bab 1-3\nNext : fiksasi laporan bab 1-3",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres: bimbingan terkait penyusunan bab 1-3.\nNext : fiksasi bab 1-3 dan bimbingan ke pembimbing 2.",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2712,7 +2718,7 @@
       "statusTA": "",
       "target": "Belum Sempro",
       "keterangan": "No. HP ortu : '083167150415",
-      "dokumenPendukung": "",
+      "dokumenPendukung": "No. HP ortu : '083167150415",
       "rawUpdates": {
         "07 - 11 September 26": "Progress : Draft nya sudah selesai sampai bab 2\nNext : Sempro, (rencana sebelum UTS)",
         "14 - 18 September 26": "Progres : konfirmasi/arahan beberapa hal untuk laporan dengan dosen pembimbing 1\nNext : menyelesaikan laporan hingga bab 3",
@@ -2736,7 +2742,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Coding, Penulisan\nNext : Laporan Penulisan",
         "14 - 18 September 26": "Progres : Revisi penulisan draft bab 4\nNext : Fiksasi draft dari pembimbing 1",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Konfirmasi arah penelitian ke dosen pembimbing 1, diminta sedikit perubahan rancangan metode\nNext : Dapet konfirmasi fix terkait rancangan",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2756,7 +2762,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progress: Mencari referensi Judul, \nNext : Ketemu dengan Pembimbing 1",
         "14 - 18 September 26": "Progres : judul dan data\nNext : Mencari data",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : mencari dataset \nNext : codingan dan pengerjaan bab 1-3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2776,7 +2782,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Acc terakhir \nNext : Daftar SemHas kepastian tanggal",
         "14 - 18 September 26": "Progres : Kemarin mau jumpaa pembimbing 2 untuk finalisasi dan nentuin jadwal seminar tapi dari pembimbing 2 bisanya ditemuin di Selasa depan\nNext : nentuin jadwal dan daftar",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Selasa kemarin tidak jadi bertemu pembimbing karna sakit\nNext : lagi mengatur ulang jadwal dosen pembimbing yang kosong untuk membicarakan jadwal seminar",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2796,7 +2802,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "",
         "14 - 18 September 26": "Progres : Melakukan bimbingan Bab 1 dan mendapatkan arahan untuk mengganti model penelitian.\nNext : Sesuai dengan arahan dosen pembimbing, penyelesaian revisi Bab 1 serta penyusunan Bab 2 dan Bab 3.",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Menyelesaikan penyusunan Bab 1–3 sesuai dengan arahan yang diberikan oleh dosen pada bimbingan sebelumnya.\nNext : Melakukan bimbingan bab 1-3.",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2856,7 +2862,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : BAB 4, Coding Selesai\nNext : Bimbingan Finalisasi 2x Pertemuan Lagi",
         "14 - 18 September 26": "Progres : Bimbingan ke pembimbing 1 sudah selesai\nNext : Akan bimbingan ke pembimbing 2 untuk finalisasi penulisan/draft",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan ke pembimbing 2 terkait penulisan \nNext : Akan bimbingan lagi ke pembimbing 2 untuk revisi format & perapihan penulisan",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2876,7 +2882,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Penyelesaian BAB 4, tinggal ke P2\nNext : Selesaikan ke P1 dan P2",
         "14 - 18 September 26": "Progres : Revisi draft Bab4\nNext : finalisasi Draft Seminar Hasil",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Sudah revisi draft dari pembimbing 2 dan memastikan penyusunan bab 4 dan 5 terhadap pembimbing satu \nNext : Konfirmasi kembali draft ke pembimbing satu",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2896,7 +2902,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progress : Proposal sudah selesai, tapi ada revisi, \nNext : Sempro (bulan september )",
         "14 - 18 September 26": "Progres : Masih ada sedikit revisi\nNext : Pendaftaran seminar proposal",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Pendaftaran Seminar Proposal\nNext : Seminar Proposal",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2916,7 +2922,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Sudah daftar Sempro\nNext : Seminar Proposal 14 Sept",
         "14 - 18 September 26": "Progres : SemPro 14\nNext : Revisi Sempro",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres: Revisi BAP seminar proposal ke pembimbing 1 membahas penulisan \nNext : Melanjutkan Revisi BAP dan Revisi Flowchart",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2956,7 +2962,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progress : Draft nya sudah sampai bab 3 , mau ketemu dosen P2\nNext : Sempro (bulan Septemaber)",
         "14 - 18 September 26": "Progres : Bertemu dengan dosen pembimbing 2\nNext : Menyelesaikan revisi penulisan/draft dari pembimbing 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan ke dosen pembimbing 2 terkait penulisan \nNext : Akan bimbingan lagi ke dosen pembimbing 2 untuk revisi & merapihkan penulisan",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -2996,7 +3002,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Kuliah 17 SKS\nNext : Bimbingan SemPro",
         "14 - 18 September 26": "Progres : Mencari jurnal acuan\nNext : Draft Bab 1",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Draft Bab 1\nNext : Hasil Revisi Bab 1",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3016,7 +3022,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : BAP Sempro dan Progres Coding ke P1\nNext : BAP Sempro Selesai dan fokus ke P1 dan P2",
         "14 - 18 September 26": "Progres : selesai BAP dan progres codingan \nNext : Progres hasil codingan",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : progres codingan\nNext : diskusi hasil codingan & nyicil penulisan bab 4",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3056,7 +3062,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Sempro bulan Juli, kendala di model karena kurang bagus, sudah bimbingan dengan Pbb 1 kali, BAP masih ke Pbb 1, belum mulai nulis\nNext: Bimbingan ke Pbb 1 terkait model dan BAP ke Pbb 2 dan Penguji",
         "14 - 18 September 26": "Progres : bap dengan pembimbing 1 dan 2\nNext : bap dengan dosen penguji",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan pelabelan data\nNext : fixasi pelabelan dan mencoba ke model",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3076,7 +3082,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: data sudah di acc (ada pergantian data), finalisasi BAB 1,  bimbingan denga pbbb 1 >6 kali\nNext: bimbingan untuk penulisan bab 1 dan 2",
         "14 - 18 September 26": "Progres : Telah bimbingan ke dosen pembimbing 1\nNext :",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : draf bab 1-3\nNext : selesai revisi dan fiksasi draf Bab 1-3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3096,7 +3102,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Revisi dengan pembimbing 2\nNext : Selesaikan dengan pembimbing 2",
         "14 - 18 September 26": "Progres : Daftar Semhas\nNext : Seminat Hasil",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan ppt dengan dospem 2\nNext : persiapan seminar",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3116,7 +3122,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Finalisasi Metode\nNext : Sudah Final Data dan Metode",
         "14 - 18 September 26": "Progres : bimbingan untuk merevisi terkait bab 1 dan bab 2\nNext : menyelesaikan bab 2 dan 3 secara penuh",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : revisi bab 2\nNext : bimbingan bab 3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3136,7 +3142,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Finalisasi coding, hampir selesai bab 4\nNext : BAP Sempro dan finalisasi BAB 4",
         "14 - 18 September 26": "Progres : Menyelesaikan BAP sempro\nNext : Bimbingan Bab 4 dan 5",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan ke pembimbing 1 mengenai penulisan bab 4,5 dan lampiran\nNext : bimbingan ke pembimbing 2 mengenai penulisan bab 4,5 dan lampiran",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3156,7 +3162,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : dataset masih banyak yg korupt, solusi data menggunakan sedikit,  komputasi menggunakan collab memakan waktu yang lama beralih ke kaglle, hasil training tidak ada, BAP fiksasi, baru 1 kali bimbingan\nNext: fokus ke BAP dan Pbb 1, nyoba komputasi ke lab",
         "14 - 18 September 26": "Progres : Pembahasan BAP, bahas hasil pelatihan dan perbandingan lima varian model, penetapan area ROI di lajur kiri dan kanan jalan, tambah library ByteTrack untuk tracking dan hitung kecepatan masing-masing kendaraan, implementasi best weight model yolo26s-seg.pt untuk uji pemantauan kemacetan, buat dashboard sementara untuk lihat hasil uji pemantauan kemacetan.\nNext : Penulisan hasil dan analisis.",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : pembahasan BAP dengan dosen pembimbing 2, pembahasan penulisan hasil dengan dosen pembimbing 1\nNext : BAP dengan dosen penguji 1, melanjutkan penulisan bab 4, 5, dan lampiran",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3176,7 +3182,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: revisi bab 1-3 ke Pbb 1, bimbingan sudah 7 kali (Pbb1) \nNext: Bimbingan revisi bab 1-3",
         "14 - 18 September 26": "Progres : Revisi BAB 1-3\nNext : Menyelesaikan revisi BAB 1-3",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi BAB 2 dan 3\nNext : Finalisasi bab 2 dan 3 ke pembimbing 1",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3196,7 +3202,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Sudah acc untuk semhas ke pembimbing\nNext : Daftar Semhas",
         "14 - 18 September 26": "Progres : Melakukan pendaftaran dan mempersiapkan seminar hasil\nNext : Seminar hasil dan Revisi hasil BAP.",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan dan diskusi BAP dengan dosen pembimbing 1\nNext : BAP ke dosen pembimbing 2 dan penguji",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3216,7 +3222,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: BAP ke dosen pbb, kendala di data belum jelas untuk project Insecta, paling buruknya menggunakan data sintesis, belum bimbingan ke Pbb 1 dan Pbb 2 karena jadwal belum ketemu, sudah mulai nulis\nNext : BAP dan konfirmasi data",
         "14 - 18 September 26": "Progres :  Bimbingan BAP  dengan dospem 1 dan finalisasi data\nNext : Bimbingan BAP ke Penguji dan progres bab 4",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Penjelasan prototipe hasil dan perbaikan pipeline, Penyelesaian Revisi bab 1-3 dengan dosen pembimbing 2\n\nNext : Pipeline selesai, BAP penguji lanjut penulisan bab 4-5",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3296,7 +3302,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Coding sudah selesai\nNext : BAP Proposal selesai, finalisasi BAB 1,2,3",
         "14 - 18 September 26": "Progres : BAP dengan dosen pembimbing 1 & 2\nNext : BAP dengan dosen penguji",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : Revisi bab 2-3 & Code\nNext : BAP ke Penguji & penulisan bab 4",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3316,7 +3322,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Sudah daftar Semhas\nNext : Semhas",
         "14 - 18 September 26": "Progres : Proses Semhas\nNext : Hasil Revisi",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : BAP dengan dosen pembimbing dan dosen penguji\nNext : persiapan untuk daftar sidang",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3336,7 +3342,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Ganti topik dan finalisasi topik dan dataset\nNext : Penulisan BAB 1,2,3",
         "14 - 18 September 26": "Progres : Progres penulisan bab 1-3\nNext : Fiksasi penulisan bab 1-3",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : Revisi bab 1-3\nNext : Fiksasi bab 1-3 dan lanjut bimbingan ke dospem 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3376,7 +3382,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Belum bimbingan\nNext : Bimbingan terkait jurnal",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : Penentuan topik dan Metode\nNext : Fixsasi metode dan data",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3396,7 +3402,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Penyelesaian code dan penulisan\nNext : Penulisan BAB 4 selesai dan review coding",
         "14 - 18 September 26": "Progres : Penyusunan dan revisi BAB 4, Bimbingan membahas terkait penulisan dan code hasil di bab 4\nNext : menyelesaikan BAB 4 & 5 secara keseluruhan, revisi Bab 4 hingga 5",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan ke Pembimbing 1 terkait penulisan dan hasil bab 4. Bimbingan ke Pembimbing 2 terkait bab 3 dan penulisan bab 4\nNext : Revisi dari bab 3 & 4",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3416,7 +3422,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: fiksasi topik, data, dan metode, penulisan bab 1, bimbingan sudah 3 kali ke Pbb 1, bulan lalu laptop rusak sekarang aman, kendala ganti topik sebelumnya\nNext: Bimbingan pengumpulan draft kasar 1-3",
         "14 - 18 September 26": "Progres : progress penulisan bab 1 sampai bab 3\nNext : revisi terkait bab 1-3 dan fiksasi",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi terkait flowchart\nNext : fiksasi BAB 1-3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3476,7 +3482,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: masih ada 3 MK yg harus diambil karena IPK belum memenuhi, Pbb 1 sudah > 6 pada smt sebelumnya, Pbb 2 baru 2 kali bimbingan, pemahaman materi, proposal masih revisi\nNext: Menjelaskan terkait rumus dan revisi Bab 2 ke Pbb 2",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : revisi flowchart \nNext : flowchart final",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3496,7 +3502,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Penyusunan Draft Sempro tinggal hasil sementara\nNext : Daftar Sempro",
         "14 - 18 September 26": "Progres : penambahan padding pada data yang sudah di anotasi dan perbaikan minor dari bab 2\nNext : di review kembali oleh dosen pembimbing ke-2 untuk proses acc",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi minor untuk Bab 2\nNext : Fixsasi revisi dengan pembimbing ke-2 untuk mendapatkan acc",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3516,7 +3522,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : BAP Selesai\nNext : Laporan progres codingan",
         "14 - 18 September 26": "Progres : bimbingan terkait  hasil anotasi gambar \nNext : anotasi gambar",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan terkait  hasil anotasi gambar \nNext : penulisan bab 4-5",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3556,7 +3562,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Data, Metode sudah Fix, tinggal ke P2\nNext : Minggu depan Daftar SemPro",
         "14 - 18 September 26": "Progres : Bimbingan terkait revisi bab 1 dan 2, mengajukan jadwal serta daftar seminar proposal.\nNext : mempersiapkan untuk seminar proposal dan diskusi terkait PPT seminar",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan ppt dengan dospem 1 dan 2 \nNext : persiapan seminar",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3576,7 +3582,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Sempro bulan Juni, masih ngerjain BAP ada revisi di BAB 3, codingan selesai, laptop sedang rusak, (gantian dengan teman) \nNext: BAP ke Pbb 1",
         "14 - 18 September 26": "Progres : BAP dengan dosen pembimbing 1\nNext : BAP dengan dosen pembimbing 2,  fiksasi codingan dan menyusun BAB 4",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : BAP dengan dosen pembimbing 2\nNext: Fiksasi kode dan bimbingan BAB 4 ke dosen pembimbing 1",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3596,7 +3602,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: belum bimbingan, topik  dan data sudah, kendala di metode, total 147 sudah dengan TA\nNext: Bimbingan ke Pbb 1, bahas topik",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : pengarahan + penyusunan  timeline target\nNext : fiksasi data + metode",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3616,7 +3622,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Revisi persiapan sempro\nNext : Finalisasi draft sempro",
         "14 - 18 September 26": "Progres : Bimbingan terkait fikasi bab 1-3, melakukan pendaftaran seminar proposal \nNext : Mempersiapkan untuk seminar proposal",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Persiapan pelaksanaan sempro\nNext : Pelaksanaan sempro",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3636,7 +3642,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Finalisasi penulisan coding dan mulai BAB 4\nNext : Selesaikan BAP Sempro",
         "14 - 18 September 26": "Progres : Menyelesaikan BAP Sempro ke Pembimbing 2 dan Penguji.\nNext : Bimbingan bab 4.",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres: Bimbingan Bab 4\nNext: Revisi penulisan dan menyelesaikan Bab 4",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3656,7 +3662,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Sempro sudah diambil si smt sebelumnya, penulisan Bab 2, Bab 1 sudah, ganti data dan metode, bimbingan 4 kali dengan Pbb1, masih ngambil MK smt ini, \nNext: Bimbingan bab 2",
         "14 - 18 September 26": "Progres : Bimbingan terkait revisi Bab 1 dan Pengubahan Data\nNext : Penulisan Bab 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : menyusun bab 2\nNext : finalisasi bab 2 dan pengerjaan bab 3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3676,7 +3682,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Final pembimbing 1 dan 2\nNext : Daftar Sempro",
         "14 - 18 September 26": "Progres : Sudah melakukan pendaftaran seminar proposal\nNext : Mempersiapkan untuk seminar proposal serta  diskusi dengan pembimbing terkait PPT seminar",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Diskusi terkait PPT seminar proposal ke PB 1\nNext : Pelaksanaan seminar",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3756,7 +3762,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Sudah bimbingan ke Pbb 1, sebanyak 4 kali,, data masih ada sedikit problem, ada tambahan di metode dari Pbb 1, komparasi metode\nNext: Penulisan proposal",
         "14 - 18 September 26": "Progres : sudah menyelesaikan bab 1-2 dan telah membuat janji temu hari Jumat ini, tetapi perlu digeser ke hari Senin \nNext : menyelesaikan draft TA",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan mengenai bab1 dan 2\nNext : menyelesaikan bab2 dan bab 3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3796,7 +3802,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: sempro sudah diambil smt sebelumnya, metode, topik dan dataset sudah ada, penulisan bab 1-3, \nNext: Bimbingan Bab 1-3",
         "14 - 18 September 26": "Progres : progress penulisan bab 1 sampai bab 3\nNext : revisi terkait bab 1-3 dan fiksasi",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : Revisi pada draft bab 1-3\nNext : Finalisasi bab 1-3 dan bimbingan ke Pembimbing dua",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3816,7 +3822,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: kendala berubah terus metodenya, penulisan sudah sampai bab 3 tapi masih ada revisi, sudah bimbingan 6 klai (pbb 1) dan 1 kali (Pbb 2)\nNext: Bimbingan revisi bab 1-3 ke Pbb 1 dan 2",
         "14 - 18 September 26": "Progres : pergantian metode penelitian dan data\nNext : menyelesaikan bab 1",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : menyusun bab 1 & 2\nNext : menyelesaikan bab 1 & 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3836,7 +3842,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Tinggal menunggu acc pembimbing 2\nNext : Bimbingan dengan pembimbing 2",
         "14 - 18 September 26": "Progres : Bimbingan  dengan dospem 2 \nNext : Menyelesaikan perbaikan dan melakukan bimbingan lagi ke dospem 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : telah bimbingan dengan Pak Tirta mengenai dataset yang digunakan \nNext : Melakukan bimbingan ke Dospem 2 mengenai hasil diskusi dataset dari Pak Tirta",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3856,7 +3862,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Bab 1-3 sudah selesai, sudah 6 kali ke Pbb 1, Pbb 2 baru 1 kali,\nNext: Revisi drfat dari Pbb 2",
         "14 - 18 September 26": "Progres : bimbingan terkait penulisan bab 1-3 dosen pembimbing 2\nNext : review kembali dosen pembimbing 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : revisi bab 1-3 oleh dosen pembimbing 2\nNext : Fiksasi bab 1-3  oleh dosen pembimbing 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3876,7 +3882,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: sudah pernah ngambil sempro di smt sebelumnya, Pbb 1 (3 kali), bab 3 belum selesai penulisannya, kendala udah ngekos PP dari Lamteng (2 jam) orang tua sebelumnya sakit, perhitungan dan kodingan sudah selesai\nNext: Bimbingan ke Pbb 1 finalisasi Bab 1,2,3",
         "14 - 18 September 26": "Progres : Bimbingan terkait revisi bab 1 dan 2 \nNext : Penyelesaian penulisan bab 3",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan penulisan bab 1,2,3 dengan dosen pembimbing 2\nNext : Revisi penulisan bab 1,2,3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3896,7 +3902,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Sempro bulan Juni, kemarin sakit, stuck di bagian kodingan, BAP sudah, penulisan baru sedikit\nNext : minggu ini selesain kodingan, nemuin Pbb 1",
         "14 - 18 September 26": "Progres : Bimbingan terkait agregasi data, codingan, dan penyusunan subab pada bab 4, Bimbingan membahas terkait penulisan dan code hasil di bab 4 pada metode 1\nNext : menyelesaikan BAB 4 & 5 secara keseluruhan, Bimbingan membahas terkait penulisan dan code hasil  bab 4 lanjutan ke metode 2 hingga bab 5",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan ke pemb1 terkait penulisan dan code hasil bab 4 pada metode 2 hingga bab 5, pemb2 terkait bab 3 dan penulisan bab 4\nNext : Revisian dari bab 2/3/4/lampiran",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3916,7 +3922,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: sudah menulis bab 4 dan 5, minggu ini perbaikan bab 4 dan 5, baru 1 kali bimbingan, BAP sudah\nNext: bimbingan ke Pbb 1",
         "14 - 18 September 26": "Progres : bimbingan bab 4 & 5 ke pembimbing 1\nNext : Selesai revisi bab 4 & 5 serta menemui pembimbing 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan draf skripsi ke dosen pembimbing 1 dan 2\nNext : bimbingan draf skripsi ke dosen pembimbing 1 dan 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3976,7 +3982,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Selesai ke Pembimbing 1 dan sudah mulai ke Pembimbing 2\nNext : Hasil revisi dari Pembimbing 2",
         "14 - 18 September 26": "Progres : Dosen Pembimbing 2 sudah review dan mengomentari draft bab 1-3 \nNext : Menyelesaikan dan merapihkan revisi draft bab 1-3 sesuai arahan lalu melakukan bimbingan kembali hingga mencapai target bimbingan yang ditentukan",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan mengenai perubahan flowchart dan revisi penulisan Minor\nNext : Penyelesaian Revisi penulisan bab 1-3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -3996,7 +4002,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Penulisan BAB 4 dan 5\nNext : Selesai BAP SemPro  dan Draft Semhas",
         "14 - 18 September 26": "Progres : Bimbingan dengan dospem 2 \nNext : Menyelesaikan perbaikan dan melakukan bimbingan lagi ke dospem 1 & 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan dengan dospem 1&2 dan bap dengan dosen penguji 1 terkait bab 4\nNext : penyesuaian metode, revisi draft, pendalaman pemahaman",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4036,7 +4042,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Sudah daftar Semhas\nNext : Semhas",
         "14 - 18 September 26": "Progres : SemHas\nNext : Revisi",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : diskusi revisi draft bap \nNext : BAP ke dosen pemb dan penguji",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4076,7 +4082,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Fix penelitian\nNext : Penulisan Sempro",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi bab 1-3\nNext : fiksasi bab 1-3 dan lanjut bimbingan ke dosen pembimbing 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4096,7 +4102,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : BAP Sempro selesai, bab 4 dan coding selesai, bimbingan belum\nNext : Laporan bimbingan dengan Pembimbing 1 dan 2",
         "14 - 18 September 26": "Progres : Perbaikan dan penambahan pada bab 4\nNext : Hasil perbaikan bab 4",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi bab 3,4,5\nNext : fiksasi bab 3,4,5 dan lanjut bimbingan ke dosen pembimbing 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4156,7 +4162,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Draft Sempro sudah selesai\nNext : Finalisasi ke pembimbing 2",
         "14 - 18 September 26": "Progres : Revisi flowchart, penambahan subbab, perbaikan paragraf\nNext : Pemangkasan halaman, revisi penulisan, formating gambar dan tabel",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : revisi penulisan dan formating bab 2 dan 3\nNext : bimbingan ke dosen pembimbing 1 dan 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4176,7 +4182,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : BAP Sempro selesai\nNext : Laporan proses coding dan Penulisan BAB 4",
         "14 - 18 September 26": "Progres : bimbingan terkait  ekstraksi frame & pemilihan gambar yang akan dianotasi\nNext : Perbaikan anotasi gambar",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan terkait data yg telah dianotasi\nNext : augmentasi data, ROI, dan training model.",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4236,7 +4242,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: sempro bulan April, BAP sudah, Penulisan dan hasil sudah, terdapat revisi di evaluasi, Pbb sudah >6, ke Pbb 2 baru 1 kali bimbingan\nNext: ke Pbb 1 menampilkan revisi dan ke Pbb 2 untuk penulisan",
         "14 - 18 September 26": "Progres : Melakukan revisi evaluasi model bersama Dosen Pembimbing 1 dan Melakukan perbaikan draft khususnya pada bagian flowchart dengan Dosen Pembimbing 2\nNext : Melakukan perbaikan dan penyempurnaan draft bersama Dosen Pembimbing 1",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi draft Tugas Akhir secara keseluruhan sesuai arahan Pembimbing 1\nNext: Fiksasi draft Tugas Akhir",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4256,7 +4262,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Sempro bulan Juni, BAP sudah selesai, dari Pbb 2 masih ada revisi, penulisan lampiran\nNext: Revisi ke Pbb 2 penulisan Bab 4, daftar semhas",
         "14 - 18 September 26": "Progres : Revisi penulisan dan mencari jadwal untuk semhas\nNext : mendaftar semhas",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Pendaftaran dan persiapan seminar hasil\nNext: Seminar hasil dan revisian bap",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4307,8 +4313,8 @@
       "phone": "6289505121002",
       "pembimbing1": "M. Syamsuddin Wisnubroto, S.Si., M.Si.",
       "pembimbing2": "Fitri Nurjanah, S.Si., M.Mat.",
-      "penguji1": "",
-      "penguji2": "",
+      "penguji1": "Mika Alvionita S, S.Si., M.Si.",
+      "penguji2": "Tirta Setiawan, S.Pd., M.Si.",
       "statusTA": "",
       "target": "Belum Sempro",
       "keterangan": "",
@@ -4316,7 +4322,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Penulisan Draft SemPro\nNext : Finalisasi Draft Sempro",
         "14 - 18 September 26": "Progres : Progres penulisan bab 1-3\nNext : Fiksasi Kode & Penulisan Bab 1-3",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Mengerjakan draft Bab 3\nNext : Revisi Penulisan Bab 1-3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4356,7 +4362,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : semhas tgl 16 sep, sks kurang, ngambil sistensi\nNext:  Fokus ke menuhin sks, menunggu nilai, revisi semhas",
         "14 - 18 September 26": "Progres : Diskusi BAP Pembimbing 1\nNext : Bimbingan BAP Penguji dan Revisi Draf",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : Konsultasi BAP dengan pembimbing 2 dan penguji 1\nNext: Menyelesaikan BAP dengan penguji 2, revisi draf, mempersiapkan pendaftaran sidang",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4416,7 +4422,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Sudah final metode dan data\nNext : Draft penulisan BAB 1,2,3",
         "14 - 18 September 26": "Progres : Pengumpulan Draft Bab 1-3\nNext : Revisi & Fiksasi Bab 1-3",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi pada draft bab 1- 3\nNext :Finalisasi Bab 1-3 dan bimbingan ke Pembimbing dua",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4436,7 +4442,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Rapihkan penulisan\nNext : Selesaikan penulisan dan BAP Penguji",
         "14 - 18 September 26": "Progres : revisi bab 4 dan 5\nNext : menyusun lampiran dan menyelesaikan revisi minggu ini",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan ke pembimbing 1 dan 2 mengenai penulisan bab 4,5 dan lampiran\nNext : menyelesaikan revisi penulisan bab 4,5 dan lampiran",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4456,7 +4462,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Diskusi terkait metode, uji coba coding dahulu ke pembimbing 1\nNext : Bimbingan ke Pembimbing 1 dan Pembimbing 2",
         "14 - 18 September 26": "Progres : Konsultasi pilihan metode yang cocok\nNext : Penentuan metode yang akan digunakan",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : fiksasi metode \n\nNext : pembuatan draf proposal dan code",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4476,7 +4482,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Bimbingan ke Pembimbing 1\nNext : Laporan Hasil bimbingan ke Pembimbing 1",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan pendalaman alur topik dan dataset\nNext : menyusun draft bab 1, dan 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4516,7 +4522,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : pemahaman kembali teori ke pembimbing 2\nNext : Bimbingan dengan pembimbing 2 serta finalisasi draft sempro",
         "14 - 18 September 26": "Progres : Mendaftar sempro\nNext : Persiapan untuk ssmpro",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Persiapan pelaksanaan sempro\nNext : Pelaksanaan sempro",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4536,7 +4542,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : project Insectera, hasil sudah tinggal penulisan, minggu ini sampai minggu depan masih persentasi, bimbingan pak ardika 3 kali lebih \nNext: senin hubungi llpm untuk presentasi, daftar semhas minggu depan",
         "14 - 18 September 26": "Progres : Persentasi ke Sekretaris LPPM\nNext : Bimbingan bab 4-5 & mendaftar semhas",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : Bimbingan Lampiran ke dosen 2\nNext : Bimbingan ke dosen 1",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4556,7 +4562,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: sudah pernah mengambil sempro, sudah bimbingan 5 kali ke Pbb 1, ada kendala di pemahaman, ke Pbb 2 baru 1 kali, masih mencari topik\nNext: Nentuin topik, cari data, kerangka penelitian",
         "14 - 18 September 26": "Progres : Bimbingan dan finalisasi rancangan penelitian\nNext : Menyusun draft Bab 1 dan Bab 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres: Bimbingan Bab 1\nNext: Revisi Bab 1 dan melanjutkan Bab 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4576,7 +4582,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: MK ADS mengulang padahal sudah tidak, besok bimbingan ke Pbb 1, sudah mulai penulisan Bab 1 dan 2\nNext: Bimbingan ke Pbb 1",
         "14 - 18 September 26": "Progres : Bimbingan terkait jurnal dan dataset\nNext : prepocesing data menggunakan 2 metode,fiksasi metode yg mau dipakai",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Membahas metode dan data yg akan digunakan \nNext : Penulisan Bab 1-3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4636,7 +4642,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Draft SemPro selesaikan\nNext : Draft Sempro Selesai",
         "14 - 18 September 26": "Progres : Bimbingan dengan dospem 2. \nNext : Melakukan perbaikan Bab 2 dan Bab 3.",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bab 1 - Bab 3\nNext : Perbaikan penulisan di Bab 2 dan 3 , Dosen Pembimbing 2.",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4656,7 +4662,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Progres penulisan sempro\nNext : Finalisasi jurnal dan BAB 1",
         "14 - 18 September 26": "Progres : Penyusunan draft bab 1 dan hasil penelitian sementara\nNext : Menambahkan perbandingan n-gram dalam penelitian.",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan mengenai revisi bab 1\nNext : Lanjut mengerjakan bab 2 dan bab 3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4716,7 +4722,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan penentuan topik tugas akhir\nNext : menetukan data dan jurnal untuk tugas akhir",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4736,7 +4742,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Menyelesaikan coding dan bab 4\nNext : BAP Sempro, bimbingan ke pembimbing 1",
         "14 - 18 September 26": "Progres : BAP sempro\nNext : Bimbingan bab 4",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan code\nNext : bimbingan penulisan  bab 4",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4756,7 +4762,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan penentuan topik TA, diarahkan untuk fiksasi data terlebih dahulu\nNext : Fiksasi ketersediaan data untuk topik TA",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4776,7 +4782,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : ACC Semhas 11 September\nNext : Revisi Seminar Hasil",
         "14 - 18 September 26": "Progres : sedang revisi laporan\nNext : bimbingan dengan dosen pembimbing dan dosen penguji",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : revisi bab 4\nNext : bimbingan dengan dosen pembimbing 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4816,7 +4822,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Next : Proposal sudah ACC, daftar sempro.\nNext : sudah ada tanggal sempronya",
         "14 - 18 September 26": "Progres : pengajuan daftar sempro\nNext : sempro di tanggal 23 september jika tidak ada kendala",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : sudah sempro\nNext : melanjutkan revisi setelah sempro",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4856,7 +4862,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Cari tanggal + daftar\nNext : -",
         "14 - 18 September 26": "Progres : Semhas",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Masih mencari Jadwal/Tanggal seminar Hasil\nNext : Daftar Seminar Hasil",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4876,7 +4882,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Perbaikan Draft Semhas\nNext : Selesai draft Semhas, daftar semhas",
         "14 - 18 September 26": "Progres : Daftar Semhas",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Sedikit Perbaikan dari P1\nNext : Acc dari dua pembimbing",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4956,7 +4962,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Revisi ke Pak Luky, Coding Selesai, Bab 1-3 kurang sempurna\nNext : Pelajari Teori atau Isi TA belum Paham",
         "14 - 18 September 26": "Progres : tidak ada ( bimbingan pindah jadwal hari senin depan) \nNext : fiksasi laporan bab 1-3 dan bahas codingan",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres :membandingkan dengan metode lain \nNext : fukasasi laporan 1-3 dan bahas codingan",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4976,7 +4982,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Sempro terakhir di januari, sudah bimbingan dengan pak tamaro sudah 5 kali, 2 kali bimbingan lagi akan ke pembimbing 2 \nNext : Semhas (bulan oktober)",
         "14 - 18 September 26": "Progres : Sudah fiksasi kodingan dan penulisan bab 4&5\nNext : Menemui dosen pembimbing 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi dan merapihkan penulisan bab 4&5 oleh dosen pembimbing 2\nNext : fiksasi Revisi Penulisan bab 4&5 oleh dosen pembimbing 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -4996,7 +5002,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : 14 Sempro\nNext : BAP Revisi Sempro",
         "14 - 18 September 26": "Progres : Senin kemarin seminar proposal dan hari ini bimbingan ke dosbing 1 untuk penambahan metode dari dosen penguji\nNext : Menyelesaikan Revisi penulisan & menyicil Codingan hasil",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres: Sudah menyelesaikan revisi BAP proposal, menambahkan metode sesuai arahan penguji dan sudah melakukan bimbingan dengan dosen pembimbing 1\nNext : Besok akan bimbingan ke dosen pembimbing ke 2 dan bertemu dosen penguji untuk BAP revisi proposal",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5056,7 +5062,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : mhs nya malas bimbingan, sudah ketemu P1 menentukan topik, \nNext : ada draft proposal",
         "14 - 18 September 26": "Progres : pengerjaan bab 1-3\nNext : fiksasi laporan bab 1-3",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres: bimbingan terkait penyusunan bab 1-3.\nNext : fiksasi bab 1-3 dan bimbingan ke pembimbing 2.",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5092,7 +5098,7 @@
       "statusTA": "",
       "target": "Belum Sempro",
       "keterangan": "No. HP ortu : '083167150415",
-      "dokumenPendukung": "",
+      "dokumenPendukung": "No. HP ortu : '083167150415",
       "rawUpdates": {
         "07 - 11 September 26": "Progress : Draft nya sudah selesai sampai bab 2\nNext : Sempro, (rencana sebelum UTS)",
         "14 - 18 September 26": "Progres : konfirmasi/arahan beberapa hal untuk laporan dengan dosen pembimbing 1\nNext : menyelesaikan laporan hingga bab 3",
@@ -5116,7 +5122,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Coding, Penulisan\nNext : Laporan Penulisan",
         "14 - 18 September 26": "Progres : Revisi penulisan draft bab 4\nNext : Fiksasi draft dari pembimbing 1",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Konfirmasi arah penelitian ke dosen pembimbing 1, diminta sedikit perubahan rancangan metode\nNext : Dapet konfirmasi fix terkait rancangan",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5136,7 +5142,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progress: Mencari referensi Judul, \nNext : Ketemu dengan Pembimbing 1",
         "14 - 18 September 26": "Progres : judul dan data\nNext : Mencari data",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : mencari dataset \nNext : codingan dan pengerjaan bab 1-3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5156,7 +5162,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Acc terakhir \nNext : Daftar SemHas kepastian tanggal",
         "14 - 18 September 26": "Progres : Kemarin mau jumpaa pembimbing 2 untuk finalisasi dan nentuin jadwal seminar tapi dari pembimbing 2 bisanya ditemuin di Selasa depan\nNext : nentuin jadwal dan daftar",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Selasa kemarin tidak jadi bertemu pembimbing karna sakit\nNext : lagi mengatur ulang jadwal dosen pembimbing yang kosong untuk membicarakan jadwal seminar",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5176,7 +5182,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "",
         "14 - 18 September 26": "Progres : Melakukan bimbingan Bab 1 dan mendapatkan arahan untuk mengganti model penelitian.\nNext : Sesuai dengan arahan dosen pembimbing, penyelesaian revisi Bab 1 serta penyusunan Bab 2 dan Bab 3.",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Menyelesaikan penyusunan Bab 1–3 sesuai dengan arahan yang diberikan oleh dosen pada bimbingan sebelumnya.\nNext : Melakukan bimbingan bab 1-3.",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5236,7 +5242,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : BAB 4, Coding Selesai\nNext : Bimbingan Finalisasi 2x Pertemuan Lagi",
         "14 - 18 September 26": "Progres : Bimbingan ke pembimbing 1 sudah selesai\nNext : Akan bimbingan ke pembimbing 2 untuk finalisasi penulisan/draft",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan ke pembimbing 2 terkait penulisan \nNext : Akan bimbingan lagi ke pembimbing 2 untuk revisi format & perapihan penulisan",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5256,7 +5262,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Penyelesaian BAB 4, tinggal ke P2\nNext : Selesaikan ke P1 dan P2",
         "14 - 18 September 26": "Progres : Revisi draft Bab4\nNext : finalisasi Draft Seminar Hasil",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Sudah revisi draft dari pembimbing 2 dan memastikan penyusunan bab 4 dan 5 terhadap pembimbing satu \nNext : Konfirmasi kembali draft ke pembimbing satu",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5276,7 +5282,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progress : Proposal sudah selesai, tapi ada revisi, \nNext : Sempro (bulan september )",
         "14 - 18 September 26": "Progres : Masih ada sedikit revisi\nNext : Pendaftaran seminar proposal",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Pendaftaran Seminar Proposal\nNext : Seminar Proposal",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5296,7 +5302,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Sudah daftar Sempro\nNext : Seminar Proposal 14 Sept",
         "14 - 18 September 26": "Progres : SemPro 14\nNext : Revisi Sempro",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres: Revisi BAP seminar proposal ke pembimbing 1 membahas penulisan \nNext : Melanjutkan Revisi BAP dan Revisi Flowchart",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5336,7 +5342,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progress : Draft nya sudah sampai bab 3 , mau ketemu dosen P2\nNext : Sempro (bulan Septemaber)",
         "14 - 18 September 26": "Progres : Bertemu dengan dosen pembimbing 2\nNext : Menyelesaikan revisi penulisan/draft dari pembimbing 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan ke dosen pembimbing 2 terkait penulisan \nNext : Akan bimbingan lagi ke dosen pembimbing 2 untuk revisi & merapihkan penulisan",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5376,7 +5382,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Kuliah 17 SKS\nNext : Bimbingan SemPro",
         "14 - 18 September 26": "Progres : Mencari jurnal acuan\nNext : Draft Bab 1",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Draft Bab 1\nNext : Hasil Revisi Bab 1",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5396,7 +5402,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : BAP Sempro dan Progres Coding ke P1\nNext : BAP Sempro Selesai dan fokus ke P1 dan P2",
         "14 - 18 September 26": "Progres : selesai BAP dan progres codingan \nNext : Progres hasil codingan",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : progres codingan\nNext : diskusi hasil codingan & nyicil penulisan bab 4",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5436,7 +5442,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Sempro bulan Juli, kendala di model karena kurang bagus, sudah bimbingan dengan Pbb 1 kali, BAP masih ke Pbb 1, belum mulai nulis\nNext: Bimbingan ke Pbb 1 terkait model dan BAP ke Pbb 2 dan Penguji",
         "14 - 18 September 26": "Progres : bap dengan pembimbing 1 dan 2\nNext : bap dengan dosen penguji",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan pelabelan data\nNext : fixasi pelabelan dan mencoba ke model",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5456,7 +5462,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: data sudah di acc (ada pergantian data), finalisasi BAB 1,  bimbingan denga pbbb 1 >6 kali\nNext: bimbingan untuk penulisan bab 1 dan 2",
         "14 - 18 September 26": "Progres : Telah bimbingan ke dosen pembimbing 1\nNext :",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : draf bab 1-3\nNext : selesai revisi dan fiksasi draf Bab 1-3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5476,7 +5482,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Revisi dengan pembimbing 2\nNext : Selesaikan dengan pembimbing 2",
         "14 - 18 September 26": "Progres : Daftar Semhas\nNext : Seminat Hasil",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan ppt dengan dospem 2\nNext : persiapan seminar",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5496,7 +5502,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Finalisasi Metode\nNext : Sudah Final Data dan Metode",
         "14 - 18 September 26": "Progres : bimbingan untuk merevisi terkait bab 1 dan bab 2\nNext : menyelesaikan bab 2 dan 3 secara penuh",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : revisi bab 2\nNext : bimbingan bab 3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5516,7 +5522,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Finalisasi coding, hampir selesai bab 4\nNext : BAP Sempro dan finalisasi BAB 4",
         "14 - 18 September 26": "Progres : Menyelesaikan BAP sempro\nNext : Bimbingan Bab 4 dan 5",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan ke pembimbing 1 mengenai penulisan bab 4,5 dan lampiran\nNext : bimbingan ke pembimbing 2 mengenai penulisan bab 4,5 dan lampiran",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5536,7 +5542,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : dataset masih banyak yg korupt, solusi data menggunakan sedikit,  komputasi menggunakan collab memakan waktu yang lama beralih ke kaglle, hasil training tidak ada, BAP fiksasi, baru 1 kali bimbingan\nNext: fokus ke BAP dan Pbb 1, nyoba komputasi ke lab",
         "14 - 18 September 26": "Progres : Pembahasan BAP, bahas hasil pelatihan dan perbandingan lima varian model, penetapan area ROI di lajur kiri dan kanan jalan, tambah library ByteTrack untuk tracking dan hitung kecepatan masing-masing kendaraan, implementasi best weight model yolo26s-seg.pt untuk uji pemantauan kemacetan, buat dashboard sementara untuk lihat hasil uji pemantauan kemacetan.\nNext : Penulisan hasil dan analisis.",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : pembahasan BAP dengan dosen pembimbing 2, pembahasan penulisan hasil dengan dosen pembimbing 1\nNext : BAP dengan dosen penguji 1, melanjutkan penulisan bab 4, 5, dan lampiran",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5556,7 +5562,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: revisi bab 1-3 ke Pbb 1, bimbingan sudah 7 kali (Pbb1) \nNext: Bimbingan revisi bab 1-3",
         "14 - 18 September 26": "Progres : Revisi BAB 1-3\nNext : Menyelesaikan revisi BAB 1-3",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi BAB 2 dan 3\nNext : Finalisasi bab 2 dan 3 ke pembimbing 1",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5576,7 +5582,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Sudah acc untuk semhas ke pembimbing\nNext : Daftar Semhas",
         "14 - 18 September 26": "Progres : Melakukan pendaftaran dan mempersiapkan seminar hasil\nNext : Seminar hasil dan Revisi hasil BAP.",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan dan diskusi BAP dengan dosen pembimbing 1\nNext : BAP ke dosen pembimbing 2 dan penguji",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5596,7 +5602,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: BAP ke dosen pbb, kendala di data belum jelas untuk project Insecta, paling buruknya menggunakan data sintesis, belum bimbingan ke Pbb 1 dan Pbb 2 karena jadwal belum ketemu, sudah mulai nulis\nNext : BAP dan konfirmasi data",
         "14 - 18 September 26": "Progres :  Bimbingan BAP  dengan dospem 1 dan finalisasi data\nNext : Bimbingan BAP ke Penguji dan progres bab 4",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Penjelasan prototipe hasil dan perbaikan pipeline, Penyelesaian Revisi bab 1-3 dengan dosen pembimbing 2\n\nNext : Pipeline selesai, BAP penguji lanjut penulisan bab 4-5",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5676,7 +5682,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Coding sudah selesai\nNext : BAP Proposal selesai, finalisasi BAB 1,2,3",
         "14 - 18 September 26": "Progres : BAP dengan dosen pembimbing 1 & 2\nNext : BAP dengan dosen penguji",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : Revisi bab 2-3 & Code\nNext : BAP ke Penguji & penulisan bab 4",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5696,7 +5702,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Sudah daftar Semhas\nNext : Semhas",
         "14 - 18 September 26": "Progres : Proses Semhas\nNext : Hasil Revisi",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : BAP dengan dosen pembimbing dan dosen penguji\nNext : persiapan untuk daftar sidang",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5716,7 +5722,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Ganti topik dan finalisasi topik dan dataset\nNext : Penulisan BAB 1,2,3",
         "14 - 18 September 26": "Progres : Progres penulisan bab 1-3\nNext : Fiksasi penulisan bab 1-3",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : Revisi bab 1-3\nNext : Fiksasi bab 1-3 dan lanjut bimbingan ke dospem 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5756,7 +5762,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Belum bimbingan\nNext : Bimbingan terkait jurnal",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : Penentuan topik dan Metode\nNext : Fixsasi metode dan data",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5776,7 +5782,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Penyelesaian code dan penulisan\nNext : Penulisan BAB 4 selesai dan review coding",
         "14 - 18 September 26": "Progres : Penyusunan dan revisi BAB 4, Bimbingan membahas terkait penulisan dan code hasil di bab 4\nNext : menyelesaikan BAB 4 & 5 secara keseluruhan, revisi Bab 4 hingga 5",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan ke Pembimbing 1 terkait penulisan dan hasil bab 4. Bimbingan ke Pembimbing 2 terkait bab 3 dan penulisan bab 4\nNext : Revisi dari bab 3 & 4",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5796,7 +5802,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: fiksasi topik, data, dan metode, penulisan bab 1, bimbingan sudah 3 kali ke Pbb 1, bulan lalu laptop rusak sekarang aman, kendala ganti topik sebelumnya\nNext: Bimbingan pengumpulan draft kasar 1-3",
         "14 - 18 September 26": "Progres : progress penulisan bab 1 sampai bab 3\nNext : revisi terkait bab 1-3 dan fiksasi",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi terkait flowchart\nNext : fiksasi BAB 1-3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5856,7 +5862,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: masih ada 3 MK yg harus diambil karena IPK belum memenuhi, Pbb 1 sudah > 6 pada smt sebelumnya, Pbb 2 baru 2 kali bimbingan, pemahaman materi, proposal masih revisi\nNext: Menjelaskan terkait rumus dan revisi Bab 2 ke Pbb 2",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : revisi flowchart \nNext : flowchart final",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5876,7 +5882,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Penyusunan Draft Sempro tinggal hasil sementara\nNext : Daftar Sempro",
         "14 - 18 September 26": "Progres : penambahan padding pada data yang sudah di anotasi dan perbaikan minor dari bab 2\nNext : di review kembali oleh dosen pembimbing ke-2 untuk proses acc",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi minor untuk Bab 2\nNext : Fixsasi revisi dengan pembimbing ke-2 untuk mendapatkan acc",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5896,7 +5902,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : BAP Selesai\nNext : Laporan progres codingan",
         "14 - 18 September 26": "Progres : bimbingan terkait  hasil anotasi gambar \nNext : anotasi gambar",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan terkait  hasil anotasi gambar \nNext : penulisan bab 4-5",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5936,7 +5942,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Data, Metode sudah Fix, tinggal ke P2\nNext : Minggu depan Daftar SemPro",
         "14 - 18 September 26": "Progres : Bimbingan terkait revisi bab 1 dan 2, mengajukan jadwal serta daftar seminar proposal.\nNext : mempersiapkan untuk seminar proposal dan diskusi terkait PPT seminar",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan ppt dengan dospem 1 dan 2 \nNext : persiapan seminar",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5956,7 +5962,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Sempro bulan Juni, masih ngerjain BAP ada revisi di BAB 3, codingan selesai, laptop sedang rusak, (gantian dengan teman) \nNext: BAP ke Pbb 1",
         "14 - 18 September 26": "Progres : BAP dengan dosen pembimbing 1\nNext : BAP dengan dosen pembimbing 2,  fiksasi codingan dan menyusun BAB 4",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : BAP dengan dosen pembimbing 2\nNext: Fiksasi kode dan bimbingan BAB 4 ke dosen pembimbing 1",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5976,7 +5982,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: belum bimbingan, topik  dan data sudah, kendala di metode, total 147 sudah dengan TA\nNext: Bimbingan ke Pbb 1, bahas topik",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : pengarahan + penyusunan  timeline target\nNext : fiksasi data + metode",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -5996,7 +6002,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Revisi persiapan sempro\nNext : Finalisasi draft sempro",
         "14 - 18 September 26": "Progres : Bimbingan terkait fikasi bab 1-3, melakukan pendaftaran seminar proposal \nNext : Mempersiapkan untuk seminar proposal",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Persiapan pelaksanaan sempro\nNext : Pelaksanaan sempro",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6016,7 +6022,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Finalisasi penulisan coding dan mulai BAB 4\nNext : Selesaikan BAP Sempro",
         "14 - 18 September 26": "Progres : Menyelesaikan BAP Sempro ke Pembimbing 2 dan Penguji.\nNext : Bimbingan bab 4.",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres: Bimbingan Bab 4\nNext: Revisi penulisan dan menyelesaikan Bab 4",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6036,7 +6042,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Sempro sudah diambil si smt sebelumnya, penulisan Bab 2, Bab 1 sudah, ganti data dan metode, bimbingan 4 kali dengan Pbb1, masih ngambil MK smt ini, \nNext: Bimbingan bab 2",
         "14 - 18 September 26": "Progres : Bimbingan terkait revisi Bab 1 dan Pengubahan Data\nNext : Penulisan Bab 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : menyusun bab 2\nNext : finalisasi bab 2 dan pengerjaan bab 3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6056,7 +6062,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Final pembimbing 1 dan 2\nNext : Daftar Sempro",
         "14 - 18 September 26": "Progres : Sudah melakukan pendaftaran seminar proposal\nNext : Mempersiapkan untuk seminar proposal serta  diskusi dengan pembimbing terkait PPT seminar",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Diskusi terkait PPT seminar proposal ke PB 1\nNext : Pelaksanaan seminar",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6136,7 +6142,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Sudah bimbingan ke Pbb 1, sebanyak 4 kali,, data masih ada sedikit problem, ada tambahan di metode dari Pbb 1, komparasi metode\nNext: Penulisan proposal",
         "14 - 18 September 26": "Progres : sudah menyelesaikan bab 1-2 dan telah membuat janji temu hari Jumat ini, tetapi perlu digeser ke hari Senin \nNext : menyelesaikan draft TA",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan mengenai bab1 dan 2\nNext : menyelesaikan bab2 dan bab 3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6176,7 +6182,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: sempro sudah diambil smt sebelumnya, metode, topik dan dataset sudah ada, penulisan bab 1-3, \nNext: Bimbingan Bab 1-3",
         "14 - 18 September 26": "Progres : progress penulisan bab 1 sampai bab 3\nNext : revisi terkait bab 1-3 dan fiksasi",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : Revisi pada draft bab 1-3\nNext : Finalisasi bab 1-3 dan bimbingan ke Pembimbing dua",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6196,7 +6202,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: kendala berubah terus metodenya, penulisan sudah sampai bab 3 tapi masih ada revisi, sudah bimbingan 6 klai (pbb 1) dan 1 kali (Pbb 2)\nNext: Bimbingan revisi bab 1-3 ke Pbb 1 dan 2",
         "14 - 18 September 26": "Progres : pergantian metode penelitian dan data\nNext : menyelesaikan bab 1",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : menyusun bab 1 & 2\nNext : menyelesaikan bab 1 & 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6216,7 +6222,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Tinggal menunggu acc pembimbing 2\nNext : Bimbingan dengan pembimbing 2",
         "14 - 18 September 26": "Progres : Bimbingan  dengan dospem 2 \nNext : Menyelesaikan perbaikan dan melakukan bimbingan lagi ke dospem 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : telah bimbingan dengan Pak Tirta mengenai dataset yang digunakan \nNext : Melakukan bimbingan ke Dospem 2 mengenai hasil diskusi dataset dari Pak Tirta",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6236,7 +6242,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Bab 1-3 sudah selesai, sudah 6 kali ke Pbb 1, Pbb 2 baru 1 kali,\nNext: Revisi drfat dari Pbb 2",
         "14 - 18 September 26": "Progres : bimbingan terkait penulisan bab 1-3 dosen pembimbing 2\nNext : review kembali dosen pembimbing 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : revisi bab 1-3 oleh dosen pembimbing 2\nNext : Fiksasi bab 1-3  oleh dosen pembimbing 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6256,7 +6262,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: sudah pernah ngambil sempro di smt sebelumnya, Pbb 1 (3 kali), bab 3 belum selesai penulisannya, kendala udah ngekos PP dari Lamteng (2 jam) orang tua sebelumnya sakit, perhitungan dan kodingan sudah selesai\nNext: Bimbingan ke Pbb 1 finalisasi Bab 1,2,3",
         "14 - 18 September 26": "Progres : Bimbingan terkait revisi bab 1 dan 2 \nNext : Penyelesaian penulisan bab 3",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan penulisan bab 1,2,3 dengan dosen pembimbing 2\nNext : Revisi penulisan bab 1,2,3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6276,7 +6282,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Sempro bulan Juni, kemarin sakit, stuck di bagian kodingan, BAP sudah, penulisan baru sedikit\nNext : minggu ini selesain kodingan, nemuin Pbb 1",
         "14 - 18 September 26": "Progres : Bimbingan terkait agregasi data, codingan, dan penyusunan subab pada bab 4, Bimbingan membahas terkait penulisan dan code hasil di bab 4 pada metode 1\nNext : menyelesaikan BAB 4 & 5 secara keseluruhan, Bimbingan membahas terkait penulisan dan code hasil  bab 4 lanjutan ke metode 2 hingga bab 5",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan ke pemb1 terkait penulisan dan code hasil bab 4 pada metode 2 hingga bab 5, pemb2 terkait bab 3 dan penulisan bab 4\nNext : Revisian dari bab 2/3/4/lampiran",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6296,7 +6302,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: sudah menulis bab 4 dan 5, minggu ini perbaikan bab 4 dan 5, baru 1 kali bimbingan, BAP sudah\nNext: bimbingan ke Pbb 1",
         "14 - 18 September 26": "Progres : bimbingan bab 4 & 5 ke pembimbing 1\nNext : Selesai revisi bab 4 & 5 serta menemui pembimbing 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan draf skripsi ke dosen pembimbing 1 dan 2\nNext : bimbingan draf skripsi ke dosen pembimbing 1 dan 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6356,7 +6362,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Selesai ke Pembimbing 1 dan sudah mulai ke Pembimbing 2\nNext : Hasil revisi dari Pembimbing 2",
         "14 - 18 September 26": "Progres : Dosen Pembimbing 2 sudah review dan mengomentari draft bab 1-3 \nNext : Menyelesaikan dan merapihkan revisi draft bab 1-3 sesuai arahan lalu melakukan bimbingan kembali hingga mencapai target bimbingan yang ditentukan",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan mengenai perubahan flowchart dan revisi penulisan Minor\nNext : Penyelesaian Revisi penulisan bab 1-3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6376,7 +6382,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Penulisan BAB 4 dan 5\nNext : Selesai BAP SemPro  dan Draft Semhas",
         "14 - 18 September 26": "Progres : Bimbingan dengan dospem 2 \nNext : Menyelesaikan perbaikan dan melakukan bimbingan lagi ke dospem 1 & 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan dengan dospem 1&2 dan bap dengan dosen penguji 1 terkait bab 4\nNext : penyesuaian metode, revisi draft, pendalaman pemahaman",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6416,7 +6422,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Sudah daftar Semhas\nNext : Semhas",
         "14 - 18 September 26": "Progres : SemHas\nNext : Revisi",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : diskusi revisi draft bap \nNext : BAP ke dosen pemb dan penguji",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6456,7 +6462,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Fix penelitian\nNext : Penulisan Sempro",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi bab 1-3\nNext : fiksasi bab 1-3 dan lanjut bimbingan ke dosen pembimbing 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6476,7 +6482,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : BAP Sempro selesai, bab 4 dan coding selesai, bimbingan belum\nNext : Laporan bimbingan dengan Pembimbing 1 dan 2",
         "14 - 18 September 26": "Progres : Perbaikan dan penambahan pada bab 4\nNext : Hasil perbaikan bab 4",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi bab 3,4,5\nNext : fiksasi bab 3,4,5 dan lanjut bimbingan ke dosen pembimbing 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6536,7 +6542,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Draft Sempro sudah selesai\nNext : Finalisasi ke pembimbing 2",
         "14 - 18 September 26": "Progres : Revisi flowchart, penambahan subbab, perbaikan paragraf\nNext : Pemangkasan halaman, revisi penulisan, formating gambar dan tabel",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : revisi penulisan dan formating bab 2 dan 3\nNext : bimbingan ke dosen pembimbing 1 dan 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6556,7 +6562,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : BAP Sempro selesai\nNext : Laporan proses coding dan Penulisan BAB 4",
         "14 - 18 September 26": "Progres : bimbingan terkait  ekstraksi frame & pemilihan gambar yang akan dianotasi\nNext : Perbaikan anotasi gambar",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan terkait data yg telah dianotasi\nNext : augmentasi data, ROI, dan training model.",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6616,7 +6622,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: sempro bulan April, BAP sudah, Penulisan dan hasil sudah, terdapat revisi di evaluasi, Pbb sudah >6, ke Pbb 2 baru 1 kali bimbingan\nNext: ke Pbb 1 menampilkan revisi dan ke Pbb 2 untuk penulisan",
         "14 - 18 September 26": "Progres : Melakukan revisi evaluasi model bersama Dosen Pembimbing 1 dan Melakukan perbaikan draft khususnya pada bagian flowchart dengan Dosen Pembimbing 2\nNext : Melakukan perbaikan dan penyempurnaan draft bersama Dosen Pembimbing 1",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi draft Tugas Akhir secara keseluruhan sesuai arahan Pembimbing 1\nNext: Fiksasi draft Tugas Akhir",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6636,7 +6642,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: Sempro bulan Juni, BAP sudah selesai, dari Pbb 2 masih ada revisi, penulisan lampiran\nNext: Revisi ke Pbb 2 penulisan Bab 4, daftar semhas",
         "14 - 18 September 26": "Progres : Revisi penulisan dan mencari jadwal untuk semhas\nNext : mendaftar semhas",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Pendaftaran dan persiapan seminar hasil\nNext: Seminar hasil dan revisian bap",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6687,8 +6693,8 @@
       "phone": "6289505121002",
       "pembimbing1": "M. Syamsuddin Wisnubroto, S.Si., M.Si.",
       "pembimbing2": "Fitri Nurjanah, S.Si., M.Mat.",
-      "penguji1": "",
-      "penguji2": "",
+      "penguji1": "Mika Alvionita S, S.Si., M.Si.",
+      "penguji2": "Tirta Setiawan, S.Pd., M.Si.",
       "statusTA": "",
       "target": "Belum Sempro",
       "keterangan": "",
@@ -6696,7 +6702,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Penulisan Draft SemPro\nNext : Finalisasi Draft Sempro",
         "14 - 18 September 26": "Progres : Progres penulisan bab 1-3\nNext : Fiksasi Kode & Penulisan Bab 1-3",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Mengerjakan draft Bab 3\nNext : Revisi Penulisan Bab 1-3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6736,7 +6742,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : semhas tgl 16 sep, sks kurang, ngambil sistensi\nNext:  Fokus ke menuhin sks, menunggu nilai, revisi semhas",
         "14 - 18 September 26": "Progres : Diskusi BAP Pembimbing 1\nNext : Bimbingan BAP Penguji dan Revisi Draf",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : Konsultasi BAP dengan pembimbing 2 dan penguji 1\nNext: Menyelesaikan BAP dengan penguji 2, revisi draf, mempersiapkan pendaftaran sidang",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6796,7 +6802,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Sudah final metode dan data\nNext : Draft penulisan BAB 1,2,3",
         "14 - 18 September 26": "Progres : Pengumpulan Draft Bab 1-3\nNext : Revisi & Fiksasi Bab 1-3",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Revisi pada draft bab 1- 3\nNext :Finalisasi Bab 1-3 dan bimbingan ke Pembimbing dua",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6816,7 +6822,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Rapihkan penulisan\nNext : Selesaikan penulisan dan BAP Penguji",
         "14 - 18 September 26": "Progres : revisi bab 4 dan 5\nNext : menyusun lampiran dan menyelesaikan revisi minggu ini",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan ke pembimbing 1 dan 2 mengenai penulisan bab 4,5 dan lampiran\nNext : menyelesaikan revisi penulisan bab 4,5 dan lampiran",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6836,7 +6842,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Diskusi terkait metode, uji coba coding dahulu ke pembimbing 1\nNext : Bimbingan ke Pembimbing 1 dan Pembimbing 2",
         "14 - 18 September 26": "Progres : Konsultasi pilihan metode yang cocok\nNext : Penentuan metode yang akan digunakan",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : fiksasi metode \n\nNext : pembuatan draf proposal dan code",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6856,7 +6862,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Bimbingan ke Pembimbing 1\nNext : Laporan Hasil bimbingan ke Pembimbing 1",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan pendalaman alur topik dan dataset\nNext : menyusun draft bab 1, dan 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6896,7 +6902,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : pemahaman kembali teori ke pembimbing 2\nNext : Bimbingan dengan pembimbing 2 serta finalisasi draft sempro",
         "14 - 18 September 26": "Progres : Mendaftar sempro\nNext : Persiapan untuk ssmpro",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Persiapan pelaksanaan sempro\nNext : Pelaksanaan sempro",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6916,7 +6922,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : project Insectera, hasil sudah tinggal penulisan, minggu ini sampai minggu depan masih persentasi, bimbingan pak ardika 3 kali lebih \nNext: senin hubungi llpm untuk presentasi, daftar semhas minggu depan",
         "14 - 18 September 26": "Progres : Persentasi ke Sekretaris LPPM\nNext : Bimbingan bab 4-5 & mendaftar semhas",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progress : Bimbingan Lampiran ke dosen 2\nNext : Bimbingan ke dosen 1",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6936,7 +6942,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: sudah pernah mengambil sempro, sudah bimbingan 5 kali ke Pbb 1, ada kendala di pemahaman, ke Pbb 2 baru 1 kali, masih mencari topik\nNext: Nentuin topik, cari data, kerangka penelitian",
         "14 - 18 September 26": "Progres : Bimbingan dan finalisasi rancangan penelitian\nNext : Menyusun draft Bab 1 dan Bab 2",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres: Bimbingan Bab 1\nNext: Revisi Bab 1 dan melanjutkan Bab 2",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -6956,7 +6962,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres: MK ADS mengulang padahal sudah tidak, besok bimbingan ke Pbb 1, sudah mulai penulisan Bab 1 dan 2\nNext: Bimbingan ke Pbb 1",
         "14 - 18 September 26": "Progres : Bimbingan terkait jurnal dan dataset\nNext : prepocesing data menggunakan 2 metode,fiksasi metode yg mau dipakai",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Membahas metode dan data yg akan digunakan \nNext : Penulisan Bab 1-3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -7016,7 +7022,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Draft SemPro selesaikan\nNext : Draft Sempro Selesai",
         "14 - 18 September 26": "Progres : Bimbingan dengan dospem 2. \nNext : Melakukan perbaikan Bab 2 dan Bab 3.",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bab 1 - Bab 3\nNext : Perbaikan penulisan di Bab 2 dan 3 , Dosen Pembimbing 2.",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -7036,7 +7042,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Progres penulisan sempro\nNext : Finalisasi jurnal dan BAB 1",
         "14 - 18 September 26": "Progres : Penyusunan draft bab 1 dan hasil penelitian sementara\nNext : Menambahkan perbandingan n-gram dalam penelitian.",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan mengenai revisi bab 1\nNext : Lanjut mengerjakan bab 2 dan bab 3",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -7096,7 +7102,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan penentuan topik tugas akhir\nNext : menetukan data dan jurnal untuk tugas akhir",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -7116,7 +7122,7 @@
       "rawUpdates": {
         "07 - 11 September 26": "Progres : Menyelesaikan coding dan bab 4\nNext : BAP Sempro, bimbingan ke pembimbing 1",
         "14 - 18 September 26": "Progres : BAP sempro\nNext : Bimbingan bab 4",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : bimbingan code\nNext : bimbingan penulisan  bab 4",
         "28 - 02 Oktober 26": ""
       }
     },
@@ -7136,15 +7142,9 @@
       "rawUpdates": {
         "07 - 11 September 26": "",
         "14 - 18 September 26": "",
-        "21 - 25 September 26": "",
+        "21 - 25 September 26": "Progres : Bimbingan penentuan topik TA, diarahkan untuk fiksasi data terlebih dahulu\nNext : Fiksasi ketersediaan data untuk topik TA",
         "28 - 02 Oktober 26": ""
       }
     }
-  ],
-  "weeks": [
-    "07 - 11 September 26",
-    "14 - 18 September 26",
-    "21 - 25 September 26",
-    "28 - 02 Oktober 26"
   ]
 }
