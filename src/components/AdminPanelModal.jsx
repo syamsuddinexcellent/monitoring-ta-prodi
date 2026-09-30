@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   X, Users, Database, ShieldCheck, GraduationCap, User,
   Trash2, RefreshCw, AlertTriangle, CheckCircle2, Inbox,
@@ -154,6 +154,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   const [studentOverrides, setStudentOverrides] = useState({});
   const [editingCell, setEditingCell] = useState(null); // { nim, field }
   const [editingValue, setEditingValue] = useState('');
+  const _cancelEditRef = useRef(false);
   // password show/hide & reset per user (keyed by email)
   const [showPass, setShowPass] = useState({});
   const [resetForm, setResetForm] = useState({}); // { [email]: { open, value, error } }
@@ -223,11 +224,11 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
       const ov = studentOverrides[s.nim] || {};
       return {
         ...s,
-        pembimbing1: ov.pembimbing1 !== undefined ? ov.pembimbing1 : s.pembimbing1,
-        pembimbing2: ov.pembimbing2 !== undefined ? ov.pembimbing2 : s.pembimbing2,
-        penguji1:    ov.penguji1    !== undefined ? ov.penguji1    : s.penguji1,
-        penguji2:    ov.penguji2    !== undefined ? ov.penguji2    : s.penguji2,
-        statusTA:    ov.status_ta   !== undefined ? ov.status_ta   : s.statusTA,
+        pembimbing1: ov.pembimbing1 ?? s.pembimbing1,
+        pembimbing2: ov.pembimbing2 ?? s.pembimbing2,
+        penguji1:    ov.penguji1    ?? s.penguji1,
+        penguji2:    ov.penguji2    ?? s.penguji2,
+        statusTA:    ov.status_ta   ?? s.statusTA,
       };
     });
   }, [sheetsData, studentOverrides]);
@@ -392,19 +393,26 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   };
 
   const startEdit = (nim, field, currentValue) => {
+    _cancelEditRef.current = false;
     setEditingCell({ nim, field });
     setEditingValue(currentValue || '');
   };
 
   const saveEdit = async () => {
+    if (_cancelEditRef.current) { _cancelEditRef.current = false; return; }
     if (!editingCell) return;
     const { nim, field } = editingCell;
     setEditingCell(null);
-    await upsertStudentOverride(nim, { [field]: editingValue.trim() });
+    const val = editingValue.trim() || null;
+    await upsertStudentOverride(nim, { [field]: val });
     await _refreshStudentOverrides();
   };
 
-  const cancelEdit = () => { setEditingCell(null); setEditingValue(''); };
+  const cancelEdit = () => {
+    _cancelEditRef.current = true;
+    setEditingCell(null);
+    setEditingValue('');
+  };
 
   if (!isOpen) return null;
 
