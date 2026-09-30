@@ -10,7 +10,7 @@ import MatrixView from './components/MatrixView';
 import StudentDetailModal from './components/StudentDetailModal';
 import WhatsAppModal from './components/WhatsAppModal';
 import WhatsAppConnectModal from './components/WhatsAppConnectModal';
-import AuthModal, { validateResetToken, seedDefaultAccounts } from './components/AuthModal';
+import AuthModal, { validateResetToken } from './components/AuthModal';
 import MahasiswaView from './components/MahasiswaView';
 import LaporanMasukModal from './components/LaporanMasukModal';
 import AdminPanelModal from './components/AdminPanelModal';
@@ -78,6 +78,16 @@ export default function App() {
     student: null
   });
 
+  // One-time cleanup: remove auto-seeded mahasiswa accounts from localStorage
+  useEffect(() => {
+    if (localStorage.getItem('seeded_cleanup_v1')) return;
+    try {
+      const users = JSON.parse(localStorage.getItem('app_users') || '[]');
+      localStorage.setItem('app_users', JSON.stringify(users.filter(u => !u.isSeeded)));
+    } catch {}
+    localStorage.setItem('seeded_cleanup_v1', '1');
+  }, []);
+
   // Initial Data Fetch
   useEffect(() => {
     fetchData();
@@ -125,7 +135,6 @@ export default function App() {
       if (lp.length > 0) {
         result.weekColumns = [...result.weekColumns, ...lp.filter(p => !result.weekColumns.includes(p))];
       }
-      await seedDefaultAccounts(result.students);
       setData(result);
       if (!selectedWeek && result.weekColumns.length > 0) {
         const lastWithData = [...result.weekColumns].reverse().find(w =>
