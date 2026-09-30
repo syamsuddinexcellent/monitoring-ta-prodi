@@ -155,6 +155,10 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   const [editingCell, setEditingCell] = useState(null); // { nim, field }
   const [editingValue, setEditingValue] = useState('');
   const _cancelEditRef = useRef(false);
+  // Add student form
+  const [addStudentOpen, setAddStudentOpen] = useState(false);
+  const [addStudentForm, setAddStudentForm] = useState({ nim: '', nama: '', angkatan: '', pembimbing1: '', pembimbing2: '', penguji1: '', penguji2: '', phone: '', status_ta: '' });
+  const [addStudentError, setAddStudentError] = useState('');
   // password show/hide & reset per user (keyed by email)
   const [showPass, setShowPass] = useState({});
   const [resetForm, setResetForm] = useState({}); // { [email]: { open, value, error } }
@@ -219,8 +223,8 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
 
   // sheetsData students merged with admin overrides
   const mergedStudents = useMemo(() => {
-    if (!sheetsData?.students) return [];
-    return sheetsData.students.map(s => {
+    const sheetNims = new Set(sheetsData?.students?.map(s => s.nim) ?? []);
+    const fromSheets = (sheetsData?.students ?? []).map(s => {
       const ov = studentOverrides[s.nim] || {};
       return {
         ...s,
@@ -231,6 +235,22 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
         statusTA:    ov.status_ta   ?? s.statusTA,
       };
     });
+    const customStudents = Object.values(studentOverrides)
+      .filter(ov => ov.is_custom && !sheetNims.has(ov.nim))
+      .map(ov => ({
+        nim: ov.nim,
+        nama: ov.nama || '',
+        angkatan: ov.angkatan || '',
+        pembimbing1: ov.pembimbing1 || null,
+        pembimbing2: ov.pembimbing2 || null,
+        penguji1:    ov.penguji1    || null,
+        penguji2:    ov.penguji2    || null,
+        phone:       ov.phone       || null,
+        statusTA:    ov.status_ta   || null,
+        weeklyUpdates: {},
+        _isCustom: true,
+      }));
+    return [...fromSheets, ...customStudents];
   }, [sheetsData, studentOverrides]);
 
   const _refreshCustomPeriods = async () => {
@@ -425,6 +445,32 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     _cancelEditRef.current = true;
     setEditingCell(null);
     setEditingValue('');
+  };
+
+  const handleAddStudent = async () => {
+    const { nim, nama, angkatan } = addStudentForm;
+    if (!nim.trim()) { setAddStudentError('NIM wajib diisi.'); return; }
+    if (!nama.trim()) { setAddStudentError('Nama wajib diisi.'); return; }
+    if (!angkatan.trim()) { setAddStudentError('Angkatan wajib diisi.'); return; }
+    const existing = Object.values(studentOverrides).find(ov => ov.nim === nim.trim());
+    const sheetsHas = sheetsData?.students?.some(s => s.nim === nim.trim());
+    if (existing || sheetsHas) { setAddStudentError('NIM sudah terdaftar.'); return; }
+    setAddStudentError('');
+    await upsertStudentOverride(nim.trim(), {
+      nama: nama.trim(),
+      angkatan: angkatan.trim(),
+      pembimbing1: addStudentForm.pembimbing1 || null,
+      pembimbing2: addStudentForm.pembimbing2 || null,
+      penguji1:    addStudentForm.penguji1    || null,
+      penguji2:    addStudentForm.penguji2    || null,
+      phone:       addStudentForm.phone       || null,
+      status_ta:   addStudentForm.status_ta   || null,
+      is_custom:   true,
+    });
+    await _refreshStudentOverrides();
+    setAddStudentOpen(false);
+    setAddStudentForm({ nim: '', nama: '', angkatan: '', pembimbing1: '', pembimbing2: '', penguji1: '', penguji2: '', phone: '', status_ta: '' });
+    showFlash('Mahasiswa berhasil ditambahkan.');
   };
 
   if (!isOpen) return null;
@@ -735,6 +781,12 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                     <span className="text-[10px] text-slate-400">({filteredStudents.length} ditampilkan)</span>
                   </div>
                   <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => { setAddStudentOpen(true); setAddStudentError(''); }}
+                      className="flex items-center gap-1 text-[10px] font-semibold bg-brand-600 hover:bg-brand-700 text-white px-2.5 py-1 rounded-lg transition-colors"
+                    >
+                      <Plus className="w-3 h-3" /> Mahasiswa
+                    </button>
                     {/* Angkatan filter */}
                     <select
                       value={filterAngkatan}
@@ -1438,5 +1490,77 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
         </div>
       </div>
     </div>
+
+    {/* ── Add Student Modal ── */}
+    {addStudentOpen && (
+      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setAddStudentOpen(false)} />
+        <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 p-6" onClick={e => e.stopPropagation()}>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold text-slate-800">Tambah Mahasiswa</h3>
+            <button onClick={() => setAddStudentOpen(false)} className="text-slate-400 hover:text-slate-600">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { key: 'nim',     label: 'NIM *',      placeholder: 'cth. 120450001' },
+              { key: 'nama',    label: 'Nama *',     placeholder: 'Nama lengkap' },
+              { key: 'angkatan',label: 'Angkatan *', placeholder: 'cth. 2022' },
+              { key: 'phone',   label: 'No. WA',     placeholder: '628xxx' },
+            ].map(({ key, label, placeholder }) => (
+              <div key={key}>
+                <label className="block text-[10px] font-semibold text-slate-600 mb-1">{label}</label>
+                <input
+                  type="text"
+                  value={addStudentForm[key]}
+                  onChange={e => setAddStudentForm(f => ({ ...f, [key]: e.target.value }))}
+                  placeholder={placeholder}
+                  className="w-full text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 outline-none focus:ring-1 focus:ring-brand-400 text-slate-700 placeholder-slate-300"
+                />
+              </div>
+            ))}
+            {[
+              { key: 'pembimbing1', label: 'Pembimbing 1 (P1)' },
+              { key: 'pembimbing2', label: 'Pembimbing 2 (P2)' },
+              { key: 'penguji1',    label: 'Penguji 1 (Pj1)' },
+              { key: 'penguji2',    label: 'Penguji 2 (Pj2)' },
+            ].map(({ key, label }) => (
+              <div key={key}>
+                <label className="block text-[10px] font-semibold text-slate-600 mb-1">{label}</label>
+                <select
+                  value={addStudentForm[key]}
+                  onChange={e => setAddStudentForm(f => ({ ...f, [key]: e.target.value }))}
+                  className="w-full text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 outline-none focus:ring-1 focus:ring-brand-400 text-slate-700 bg-white"
+                >
+                  <option value="">— pilih dosen —</option>
+                  {allDosenOptions.map(name => (
+                    <option key={name} value={name}>{name}</option>
+                  ))}
+                </select>
+              </div>
+            ))}
+            <div className="col-span-2">
+              <label className="block text-[10px] font-semibold text-slate-600 mb-1">Status TA</label>
+              <select
+                value={addStudentForm.status_ta}
+                onChange={e => setAddStudentForm(f => ({ ...f, status_ta: e.target.value }))}
+                className="w-full text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 outline-none focus:ring-1 focus:ring-brand-400 text-slate-700 bg-white"
+              >
+                <option value="">— pilih status —</option>
+                {STATUS_TA_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+              </select>
+            </div>
+          </div>
+          {addStudentError && (
+            <p className="mt-2 text-[10px] text-rose-600 font-medium">{addStudentError}</p>
+          )}
+          <div className="flex justify-end gap-2 mt-4">
+            <button onClick={() => setAddStudentOpen(false)} className="text-xs px-4 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">Batal</button>
+            <button onClick={handleAddStudent} className="text-xs px-4 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-semibold transition-colors">Simpan</button>
+          </div>
+        </div>
+      </div>
+    )}
   );
 }

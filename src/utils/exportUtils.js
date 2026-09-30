@@ -581,15 +581,15 @@ export async function getStudentOverrides() {
 
 export async function upsertStudentOverride(nim, fields) {
   if (supabase) {
-    await supabase.from('student_overrides').upsert(
-      { nim, ...fields, updated_at: new Date().toISOString() },
-      { onConflict: 'nim' }
-    );
+    const payload = { nim, ...fields, updated_at: new Date().toISOString() };
+    // is_custom must be stored as boolean
+    if ('is_custom' in payload) payload.is_custom = Boolean(payload.is_custom);
+    await supabase.from('student_overrides').upsert(payload, { onConflict: 'nim' });
     return;
   }
   try {
     const all = JSON.parse(localStorage.getItem(STUDENT_OV_KEY) || '{}');
-    all[nim] = { ...(all[nim] || {}), ...fields };
+    all[nim] = { ...(all[nim] || {}), nim, ...fields };
     localStorage.setItem(STUDENT_OV_KEY, JSON.stringify(all));
   } catch {}
 }
