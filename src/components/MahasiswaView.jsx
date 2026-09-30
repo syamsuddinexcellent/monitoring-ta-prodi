@@ -2,10 +2,11 @@ import React, { useMemo, useState, useEffect } from 'react';
 import {
   GraduationCap, BookOpen, CheckCircle2, AlertCircle,
   ArrowRight, UserCheck, Calendar, TrendingUp, Clock,
-  PlusCircle, CloudOff
+  PlusCircle, ShieldCheck, PencilLine
 } from 'lucide-react';
 import { getCategoryBadgeStyle } from '../utils/helpers';
 import LaporanModal, { getLocalReportsForNim, parseWeekRange } from './LaporanModal';
+import { getVerifikasi } from '../utils/exportUtils';
 
 function ProgressRing({ pct }) {
   const r = 36, circ = 2 * Math.PI * r;
@@ -31,14 +32,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
   const [isLaporanOpen, setIsLaporanOpen] = useState(false);
   const [editWeek, setEditWeek] = useState('');
   const [localReports, setLocalReports] = useState({});
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const isWeekEditable = (weekStr) => {
-    const range = parseWeekRange(weekStr);
-    return range && range.end >= today;
-  };
+  const [verifData, setVerifData] = useState({});
 
   const openEdit = (weekStr) => {
     setEditWeek(weekStr);
@@ -52,12 +46,15 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
 
   const nim = student?.nim || loggedInUser?.nim || '';
 
-  // Reload reports from Supabase when modal closes (after save)
+  // Reload reports & verifikasi from Supabase when modal closes (after save)
   useEffect(() => {
     if (nim) {
       getLocalReportsForNim(nim).then(setLocalReports);
+      getVerifikasi().then(all => setVerifData(all[nim] || {}));
     }
   }, [nim, isLaporanOpen]);
+
+  const isVerifiedByDosen = (week) => verifData[week]?.verified === true;
 
   // Merged weekly data: local reports fill gaps from Google Sheets data
   const mergedUpdates = useMemo(() => {
@@ -216,10 +213,10 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
                 <BookOpen className="w-3.5 h-3.5" />
                 Update Terbaru — {latestWeek}
               </h3>
-              {latestUpdate._source === 'local' && (
-                <span className="flex items-center gap-1 text-[10px] font-medium text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
-                  <CloudOff className="w-3 h-3" />
-                  Laporan lokal
+              {isVerifiedByDosen(latestWeek) && (
+                <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                  <ShieldCheck className="w-3 h-3" />
+                  Terverifikasi
                 </span>
               )}
             </div>
@@ -251,12 +248,13 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
             {weekColumns.map((week, idx) => {
               const upd = mergedUpdates[week];
               const isReported = upd?.reported;
-              const isLocal = upd?._source === 'local';
+              const isFromApp = upd?._source === 'local';
+              const isVerified = isVerifiedByDosen(week);
               const badge = getCategoryBadgeStyle(upd?.category);
               return (
                 <div key={week} className="relative group">
                   <div className={`absolute -left-[31px] top-1 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center ${
-                    isReported ? (isLocal ? 'bg-amber-400 ring-4 ring-amber-100' : 'bg-emerald-500 ring-4 ring-emerald-100') : 'bg-slate-200'
+                    isReported ? (isVerified ? 'bg-emerald-500 ring-4 ring-emerald-100' : 'bg-brand-500 ring-4 ring-brand-100') : 'bg-slate-200'
                   }`} />
                   <div className={`rounded-xl p-4 border transition-colors ${
                     isReported
@@ -267,10 +265,10 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-bold text-slate-900">Periode {idx + 1}</span>
                         <span className="text-xs text-slate-400">({week})</span>
-                        {isLocal && (
-                          <span className="flex items-center gap-0.5 text-[10px] font-medium text-amber-600 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full">
-                            <CloudOff className="w-2.5 h-2.5" />
-                            Lokal
+                        {isVerified && (
+                          <span className="flex items-center gap-0.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
+                            <ShieldCheck className="w-2.5 h-2.5" />
+                            Terverifikasi
                           </span>
                         )}
                       </div>
@@ -298,17 +296,22 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
                             <p className="text-slate-800 font-semibold">{upd.next}</p>
                           </div>
                         )}
-                        {/* Edit button — only for local reports on non-past weeks */}
-                        {isLocal && isWeekEditable(week) && (
-                          <div className="flex justify-end">
+                        <div className="flex justify-end">
+                          {isVerified ? (
+                            <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
+                              <ShieldCheck className="w-3.5 h-3.5" />
+                              Sudah diverifikasi dosen · tidak dapat diedit
+                            </span>
+                          ) : isFromApp ? (
                             <button
                               onClick={() => openEdit(week)}
-                              className="text-[11px] font-semibold text-brand-600 hover:text-brand-700 hover:underline"
+                              className="flex items-center gap-1 text-[11px] font-semibold text-brand-600 hover:text-brand-700 hover:underline"
                             >
-                              ✏️ Edit Laporan
+                              <PencilLine className="w-3.5 h-3.5" />
+                              Edit Laporan
                             </button>
-                          </div>
-                        )}
+                          ) : null}
+                        </div>
                       </div>
                     ) : (
                       <div className="flex items-center justify-between mt-1">
