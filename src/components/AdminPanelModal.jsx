@@ -764,9 +764,6 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                   };
                   return (
                     <div className="overflow-x-auto max-h-[480px] overflow-y-auto">
-                      <datalist id="dosen-autocomplete">
-                        {dosenUsers.map(u => <option key={u.email} value={u.lecturerName || u.name} />)}
-                      </datalist>
                       <table className="w-full text-[10px] border-collapse">
                         <thead className="sticky top-0 z-10 bg-slate-100">
                           <tr>
@@ -827,20 +824,26 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                                   { field: 'penguji2',    val: s.penguji2 },
                                 ].map(({ field, val }) => {
                                   const isEditing = editingCell?.nim === s.nim && editingCell?.field === field;
+                                  const dosenOptions = dosenUsers.map(u => u.lecturerName || u.name).filter(Boolean);
                                   return (
                                     <td key={field} className="px-2 py-2 border-r border-slate-100 max-w-[112px]">
                                       {isEditing ? (
-                                        <input
-                                          type="text"
+                                        <select
                                           value={editingValue}
                                           onChange={e => setEditingValue(e.target.value)}
-                                          onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
+                                          onKeyDown={e => { if (e.key === 'Escape') cancelEdit(); }}
                                           onBlur={saveEdit}
                                           autoFocus
-                                          list="dosen-autocomplete"
                                           className="w-full text-[10px] border border-brand-300 rounded px-1 py-0.5 outline-none focus:ring-1 focus:ring-brand-400 bg-white"
-                                          placeholder="Nama dosen…"
-                                        />
+                                        >
+                                          <option value="">— pilih dosen —</option>
+                                          {dosenOptions.map(name => (
+                                            <option key={name} value={name}>{name}</option>
+                                          ))}
+                                          {val && !dosenOptions.includes(val) && (
+                                            <option value={val}>{val} (sheets)</option>
+                                          )}
+                                        </select>
                                       ) : (
                                         <div className="flex items-center gap-0.5 group cursor-pointer" onClick={() => startEdit(s.nim, field, val)}>
                                           <span className="line-clamp-2 text-[10px] text-slate-600 flex-1">{val || <span className="text-slate-300 group-hover:text-brand-400">+ dosen</span>}</span>
