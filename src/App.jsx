@@ -27,6 +27,7 @@ import {
   logoutGateway
 } from './services/whatsappService';
 import { RefreshCw, FilterX } from 'lucide-react';
+import { supabase } from './lib/supabase';
 
 export default function App() {
   const [data, setData] = useState(null);
@@ -86,6 +87,25 @@ export default function App() {
   }, [refreshLaporanCount]);
 
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
+
+  // Online visitors count via Supabase Realtime Presence
+  const [onlineCount, setOnlineCount] = useState(1);
+  useEffect(() => {
+    if (!supabase) return;
+    const channel = supabase.channel('online-visitors', {
+      config: { presence: { key: crypto.randomUUID() } },
+    });
+    channel
+      .on('presence', { event: 'sync' }, () => {
+        setOnlineCount(Object.keys(channel.presenceState()).length);
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await channel.track({ at: Date.now() });
+        }
+      });
+    return () => { supabase.removeChannel(channel); };
+  }, []);
 
   // Modals
   const [detailStudent, setDetailStudent] = useState(null);
@@ -392,6 +412,7 @@ export default function App() {
             try { sessionStorage.removeItem('auth_session'); } catch {}
             setLoggedInUser(null);
           }}
+          onlineCount={onlineCount}
         />
         <main className="flex-1">
           <MahasiswaView
@@ -430,6 +451,7 @@ export default function App() {
         laporanMasukCount={laporanMasukCount}
         onOpenLaporanMasuk={() => setIsLaporanMasukOpen(true)}
         onOpenAdminPanel={() => setIsAdminPanelOpen(true)}
+        onlineCount={onlineCount}
         bottomRow={
           <WeekSelector
             weekColumns={data?.weekColumns || []}

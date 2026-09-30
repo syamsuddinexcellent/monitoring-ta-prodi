@@ -24,6 +24,7 @@ export default function Header({
   onOpenLaporanMasuk,
   onOpenAdminPanel,
   bottomRow,
+  onlineCount = 1,
 }) {
   const formatTime = (date) => {
     if (!date) return '-';
@@ -101,6 +102,13 @@ export default function Header({
               <span className="text-slate-300">|</span>
               <span className="text-slate-500">{formatTime(lastUpdated)}</span>
             </div>}
+
+            {/* Online visitors badge */}
+            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-700 select-none" title="Jumlah pengguna yang sedang membuka halaman ini">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <span className="font-semibold tabular-nums">{onlineCount}</span>
+              <span className="text-emerald-600">online</span>
+            </div>
 
             {/* Auth: Login / User badge / Logout */}
             {loggedInUser ? (
