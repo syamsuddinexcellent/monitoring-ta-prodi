@@ -56,17 +56,19 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
 
   const isVerifiedByDosen = (week) => verifData[week]?.verified === true;
 
-  // Merged weekly data: local reports fill gaps from Google Sheets data
+  // Merged weekly data: app reports (Supabase/_appReport) take priority over sheet data
   const mergedUpdates = useMemo(() => {
     if (!student) return {};
     const merged = {};
     weekColumns.forEach(w => {
       const sheet = student.weeklyUpdates?.[w];
       const local = localReports[w];
-      if (sheet?.reported) {
-        merged[w] = { ...sheet, _source: 'sheet' };
-      } else if (local?.reported) {
-        merged[w] = { ...local, _source: 'local' };
+      // Prefer local (Supabase) report if it exists
+      if (local?.reported) {
+        merged[w] = { ...local, _appReport: true };
+      } else if (sheet?.reported) {
+        // Sheet data that came from mergeSupabaseReports also has _appReport
+        merged[w] = { ...sheet };
       } else {
         merged[w] = sheet || {};
       }
@@ -248,7 +250,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
             {weekColumns.map((week, idx) => {
               const upd = mergedUpdates[week];
               const isReported = upd?.reported;
-              const isFromApp = upd?._source === 'local';
+              const isFromApp = upd?._appReport === true;
               const isVerified = isVerifiedByDosen(week);
               const badge = getCategoryBadgeStyle(upd?.category);
               return (

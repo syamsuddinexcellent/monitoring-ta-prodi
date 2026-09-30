@@ -439,7 +439,7 @@ export function mergeLocalReports(students) {
       const mergedUpdates = { ...student.weeklyUpdates };
       Object.entries(localReports).forEach(([week, report]) => {
         if (!mergedUpdates[week]?.reported) {
-          mergedUpdates[week] = { ...report };
+          mergedUpdates[week] = { ...report, _appReport: true };
         }
       });
       return { ...student, weeklyUpdates: mergedUpdates };
@@ -475,7 +475,7 @@ export async function mergeSupabaseReports(students) {
           const mergedUpdates = { ...student.weeklyUpdates };
           Object.entries(reports).forEach(([week, report]) => {
             if (!mergedUpdates[week]?.reported) {
-              mergedUpdates[week] = report;
+              mergedUpdates[week] = { ...report, _appReport: true };
             }
           });
           return { ...student, weeklyUpdates: mergedUpdates };
