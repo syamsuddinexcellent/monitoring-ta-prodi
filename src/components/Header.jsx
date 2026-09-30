@@ -80,13 +80,13 @@ export default function Header({
               </button>
             )}
 
-            {/* Data source badge */}
-            <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600">
+            {/* Data source badge — admin only */}
+            {isAdmin && <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600">
               <Database className="w-3.5 h-3.5 text-brand-600" />
               <span className="font-medium text-brand-700">Data Lokal</span>
               <span className="text-slate-300">|</span>
               <span className="text-slate-500">{formatTime(lastUpdated)}</span>
-            </div>
+            </div>}
 
             {/* Auth: Login / User badge / Logout */}
             {loggedInUser ? (
