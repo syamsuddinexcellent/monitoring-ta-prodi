@@ -247,10 +247,24 @@ export default function LaporanModal({
     }
   }, [isOpen]);
 
-  // Clear form when week changes in new-report mode
+  // When week changes in new-report mode, pre-fill if existing data is available
   useEffect(() => {
-    if (!forceWeek) {
-      setProgres(''); setNext(''); setKategori(KATEGORI[0]);
+    if (!forceWeek && week) {
+      const existing = existingData?.[week];
+      if (existing?.reported) {
+        setProgres(existing.progress || '');
+        setNext(existing.next || '');
+        setKategori(existing.category && KATEGORI.includes(existing.category) ? existing.category : KATEGORI[0]);
+        const existingDosen = new Set(
+          (existing.dosenHadir || []).map(d =>
+            d.label === 'P1' ? 'p1' : d.label === 'P2' ? 'p2' : d.label === 'Pj1' ? 'pj1' : d.label === 'Pj2' ? 'pj2' : null
+          ).filter(Boolean)
+        );
+        setDosenHadir(existingDosen);
+      } else {
+        setProgres(''); setNext(''); setKategori(KATEGORI[0]);
+        setDosenHadir(new Set());
+      }
     }
   }, [week]);
 
