@@ -50,7 +50,7 @@ export default function Header({
               <img
                 src="/logo-itera.jpg"
                 alt="ITERA"
-                className="h-14 w-auto rounded-xl object-contain shadow-md ring-1 ring-slate-200 bg-white px-1"
+                className="h-14 w-14 rounded-xl object-contain shadow-md ring-1 ring-slate-200 bg-white"
               />
               <div className="h-10 w-px bg-slate-200" />
               <img
