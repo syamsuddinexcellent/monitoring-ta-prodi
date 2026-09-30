@@ -114,6 +114,9 @@ export async function registerUser(email, password, overrideName = null, overrid
   const role = overrideRole || classifyEmail(emailLower);
   if (!role) return { error: 'Hanya email ITERA yang diizinkan (@sd.itera.ac.id, @student.itera.ac.id, dll.).' };
   if (password.length < 6) return { error: 'Password minimal 6 karakter.' };
+  if (role === 'dosen' && emailLower.split('@')[1] !== 'sd.itera.ac.id') {
+    return { error: 'Akun dosen hanya dapat didaftarkan dengan email @sd.itera.ac.id.' };
+  }
   const lecturerName = LECTURER_EMAIL_MAP[emailLower] || '';
   const name = overrideName || emailLower.split('@')[0];
   if (supabase) {
@@ -687,31 +690,28 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
                     className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 placeholder:text-slate-400"
                   />
                 </div>
-                {regEmailLower.includes('@') && detectedRole && (
-                  <div className={`mt-2 px-3 py-2 rounded-lg text-xs flex items-start gap-2 ${
-                    detectedName
-                      ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-                      : 'bg-indigo-50 border border-indigo-100 text-indigo-700'
-                  }`}>
-                    <ShieldCheck className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                    <div>
-                      {detectedName ? (
-                        <>
-                          <span className="font-semibold">Dosen terdeteksi:</span>{' '}
-                          <span>{detectedName}</span>
-                          <div className="text-emerald-600 mt-0.5 text-[11px]">
-                            Filter mahasiswa bimbingan akan aktif otomatis saat login
-                          </div>
-                        </>
-                      ) : (
-                        <span className="font-medium capitalize">{detectedRole} ITERA terdeteksi</span>
-                      )}
-                    </div>
-                  </div>
-                )}
-                {regEmailLower.includes('@') && !detectedRole && (
-                  <p className="mt-1.5 text-[11px] text-red-500">Hanya email ITERA yang diterima</p>
-                )}
+                {regEmailLower.includes('@') && (() => {
+                  const domain = regEmailLower.split('@')[1] || '';
+                  if (domain === 'sd.itera.ac.id') {
+                    return (
+                      <div className={`mt-2 px-3 py-2 rounded-lg text-xs flex items-start gap-2 ${detectedName ? 'bg-emerald-50 border border-emerald-200 text-emerald-800' : 'bg-indigo-50 border border-indigo-100 text-indigo-700'}`}>
+                        <ShieldCheck className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                        <div>
+                          {detectedName ? (
+                            <>
+                              <span className="font-semibold">Dosen terdeteksi:</span>{' '}
+                              <span>{detectedName}</span>
+                              <div className="text-emerald-600 mt-0.5 text-[11px]">Filter mahasiswa bimbingan akan aktif otomatis saat login</div>
+                            </>
+                          ) : (
+                            <span className="font-medium">Email @sd.itera.ac.id terdeteksi</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  }
+                  return <p className="mt-1.5 text-[11px] text-red-500">Akun dosen hanya dapat didaftarkan dengan email @sd.itera.ac.id</p>;
+                })()}
               </div>
             )}
 
