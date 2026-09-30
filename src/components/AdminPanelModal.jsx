@@ -13,6 +13,16 @@ import {
   BUILTIN_SEMESTERS, getLocalSemesters, saveLocalSemesters
 } from '../utils/exportUtils';
 
+const _PM = {
+  Januari: 0, Februari: 1, Maret: 2, April: 3, Mei: 4, Juni: 5,
+  Juli: 6, Agustus: 7, September: 8, Oktober: 9, November: 10, Desember: 11,
+};
+function parsePeriodEnd(label) {
+  const m = label.match(/\d+\s*-\s*(\d+)\s+(\w+)\s+(\d+)/);
+  if (!m) return new Date(0);
+  return new Date(2000 + parseInt(m[3]), _PM[m[2]] ?? 0, parseInt(m[1]));
+}
+
 function getRoleLabel(role) {
   if (role === 'dosen') return { label: 'Dosen', cls: 'bg-indigo-50 text-indigo-700 border-indigo-200' };
   if (role === 'mahasiswa') return { label: 'Mahasiswa', cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
@@ -75,7 +85,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   const allWeekColumns = useMemo(() => {
     const sheets = sheetsData?.weekColumns || [];
     const local = localPeriods.filter(p => !sheets.includes(p));
-    return [...sheets, ...local];
+    return [...sheets, ...local].sort((a, b) => parsePeriodEnd(a) - parsePeriodEnd(b));
   }, [sheetsData, localPeriods]);
 
   const handleAddPeriod = () => {
@@ -749,40 +759,39 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                   </div>
                 </div>
                 <div className="px-4 py-3 space-y-3">
-                  {/* Dari Google Sheets */}
-                  {(sheetsData?.weekColumns || []).map((w, i) => (
-                    <div key={w} className="flex items-center gap-2 text-xs">
-                      <span className="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
-                      <span className="flex-1 text-slate-700">{w}</span>
-                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 font-semibold">Sheets</span>
-                    </div>
-                  ))}
-                  {/* Periode lokal */}
-                  {localPeriods.map((p, i) => {
-                    const isEditing = editPeriodIdx === i;
-                    const globalIdx = (sheetsData?.weekColumns?.length || 0) + i;
+                  {/* Semua periode terurut kronologis */}
+                  {allWeekColumns.map((w, i) => {
+                    const isLocal = localPeriods.includes(w);
+                    const localIdx = localPeriods.indexOf(w);
+                    const isEditing = isLocal && editPeriodIdx === localIdx;
                     return (
-                      <div key={p} className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold flex items-center justify-center shrink-0">{globalIdx + 1}</span>
+                      <div key={w} className="flex items-center gap-2">
+                        <span className={`w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center shrink-0 ${isLocal ? 'bg-amber-100 text-amber-700' : 'bg-indigo-100 text-indigo-700'}`}>{i + 1}</span>
                         {isEditing ? (
                           <>
                             <input
                               type="text"
                               value={editPeriodVal}
                               onChange={e => setEditPeriodVal(e.target.value)}
-                              onKeyDown={e => e.key === 'Enter' && handleSaveEditPeriod(p)}
+                              onKeyDown={e => e.key === 'Enter' && handleSaveEditPeriod(w)}
                               className="flex-1 text-xs border border-brand-300 rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-brand-400"
                               autoFocus
                             />
-                            <button onClick={() => handleSaveEditPeriod(p)} className="text-[10px] font-bold text-emerald-700 hover:text-emerald-900">Simpan</button>
+                            <button onClick={() => handleSaveEditPeriod(w)} className="text-[10px] font-bold text-emerald-700 hover:text-emerald-900">Simpan</button>
                             <button onClick={() => setEditPeriodIdx(null)} className="text-[10px] text-slate-400 hover:text-slate-600">Batal</button>
                           </>
                         ) : (
                           <>
-                            <span className="flex-1 text-xs text-slate-700">{p}</span>
-                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-semibold">Lokal</span>
-                            <button onClick={() => { setEditPeriodIdx(i); setEditPeriodVal(p); }} className="p-1 text-slate-400 hover:text-brand-600"><Pencil className="w-3 h-3" /></button>
-                            <button onClick={() => handleDeleteLocalPeriod(p)} className="p-1 text-slate-400 hover:text-rose-600"><Trash2 className="w-3 h-3" /></button>
+                            <span className="flex-1 text-xs text-slate-700">{w}</span>
+                            {isLocal ? (
+                              <>
+                                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-semibold">Lokal</span>
+                                <button onClick={() => { setEditPeriodIdx(localIdx); setEditPeriodVal(w); }} className="p-1 text-slate-400 hover:text-brand-600"><Pencil className="w-3 h-3" /></button>
+                                <button onClick={() => handleDeleteLocalPeriod(w)} className="p-1 text-slate-400 hover:text-rose-600"><Trash2 className="w-3 h-3" /></button>
+                              </>
+                            ) : (
+                              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 font-semibold">Sheets</span>
+                            )}
                           </>
                         )}
                       </div>

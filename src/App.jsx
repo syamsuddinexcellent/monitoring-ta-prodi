@@ -29,6 +29,17 @@ import {
 import { RefreshCw, FilterX } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
+// Parse end-date from period label "DD - DD Month YY" for chronological sorting
+const PERIOD_MONTHS = {
+  Januari: 0, Februari: 1, Maret: 2, April: 3, Mei: 4, Juni: 5,
+  Juli: 6, Agustus: 7, September: 8, Oktober: 9, November: 10, Desember: 11,
+};
+function parsePeriodEnd(label) {
+  const m = label.match(/\d+\s*-\s*(\d+)\s+(\w+)\s+(\d+)/);
+  if (!m) return new Date(0);
+  return new Date(2000 + parseInt(m[3]), PERIOD_MONTHS[m[2]] ?? 0, parseInt(m[1]));
+}
+
 export default function App() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -175,7 +186,9 @@ export default function App() {
       result.students = await mergeSupabaseReports(result.students);
       const lp = getLocalPeriods();
       if (lp.length > 0) {
-        result.weekColumns = [...result.weekColumns, ...lp.filter(p => !result.weekColumns.includes(p))];
+        const merged = [...result.weekColumns, ...lp.filter(p => !result.weekColumns.includes(p))];
+        merged.sort((a, b) => parsePeriodEnd(a) - parsePeriodEnd(b));
+        result.weekColumns = merged;
       }
       setData(result);
       if (!selectedWeek && result.weekColumns.length > 0) {
