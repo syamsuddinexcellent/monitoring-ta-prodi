@@ -48,7 +48,7 @@ function LecturerDropdown({ lecturerFilter, onLecturerFilterChange, availableLec
       </button>
 
       {open && (
-        <div className="absolute z-50 top-full mt-1.5 left-0 w-72 bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden">
+        <div className="absolute z-50 bottom-full mb-1.5 left-0 w-72 bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden">
           {/* Search inside dropdown */}
           <div className="p-2 border-b border-slate-100">
             <div className="relative">
@@ -149,21 +149,14 @@ export default function FilterBar({
         )}
       </div>
 
-      {/* Right side: all filters in a scrollable row */}
-      <div className="flex items-center gap-2 shrink-0 overflow-x-auto">
-        {/* Dosen Bimbingan — locked badge for dosen role, dropdown for others */}
-        {isDosen ? (
-          <div className="inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg border bg-indigo-600 text-white border-indigo-700 shadow-xs shrink-0">
-            <UserCheck className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate max-w-[160px] text-left">{lecturerFilter !== 'all' ? lecturerFilter.split(',')[0] : 'Mahasiswa Bimbingan'}</span>
-          </div>
-        ) : (
-          <LecturerDropdown
-            lecturerFilter={lecturerFilter}
-            onLecturerFilterChange={onLecturerFilterChange}
-            availableLecturers={availableLecturers}
-          />
-        )}
+      {/* Right side: all filters in a row */}
+      <div className="flex items-center gap-2 shrink-0">
+        {/* Dosen Bimbingan dropdown — all roles */}
+        <LecturerDropdown
+          lecturerFilter={lecturerFilter}
+          onLecturerFilterChange={onLecturerFilterChange}
+          availableLecturers={availableLecturers}
+        />
 
         {/* Status Filter */}
         <select
