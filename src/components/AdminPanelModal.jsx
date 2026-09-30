@@ -36,6 +36,22 @@ function formatPeriodLabel(startIso, endIso) {
   return `${startDay} - ${endDay} ${_MONTHS_ID[ed.getMonth()]} ${String(ed.getFullYear()).slice(-2)}`;
 }
 
+// Display "DD - DD Month YY" as "DD Month YY - DD Month YY" (full date both sides)
+function displayLabel(label) {
+  const m = label.match(/(\d+)\s*-\s*(\d+)\s+(\w+)\s+(\d+)/);
+  if (!m) return label;
+  const startDay = parseInt(m[1]), endDay = parseInt(m[2]);
+  const endMonthIdx = _PM[m[3]] ?? 0;
+  const endYear = 2000 + parseInt(m[4]);
+  let startMonthIdx = endMonthIdx, startYear = endYear;
+  if (startDay > endDay) {
+    startMonthIdx--;
+    if (startMonthIdx < 0) { startMonthIdx = 11; startYear--; }
+  }
+  const fmt = (d, mi, y) => `${String(d).padStart(2, '0')} ${_MONTHS_ID[mi]} ${String(y).slice(-2)}`;
+  return `${fmt(startDay, startMonthIdx, startYear)} - ${fmt(endDay, endMonthIdx, endYear)}`;
+}
+
 // Parse existing "DD - DD Month YY" label back to {start, end} ISO dates
 function parseLabelToDates(label) {
   const m = label.match(/(\d+)\s*-\s*(\d+)\s+(\w+)\s+(\d+)/);
@@ -908,7 +924,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                                         </div>
                                         {editPeriodDates.start && editPeriodDates.end && (
                                           <span className="text-[9px] text-brand-600 font-mono bg-brand-50 px-1.5 py-0.5 rounded shrink-0">
-                                            {formatPeriodLabel(editPeriodDates.start, editPeriodDates.end)}
+                                            {displayLabel(formatPeriodLabel(editPeriodDates.start, editPeriodDates.end))}
                                           </span>
                                         )}
                                         <button onClick={() => handleSaveEditPeriod(p.label)} className="text-[10px] font-bold text-emerald-700 hover:text-emerald-900 shrink-0">Simpan</button>
@@ -916,7 +932,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                                       </>
                                     ) : (
                                       <>
-                                        <span className="flex-1 text-xs text-slate-700">{p.label}</span>
+                                        <span className="flex-1 text-xs text-slate-700">{displayLabel(p.label)}</span>
                                         {isLocked && (
                                           <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 font-semibold flex items-center gap-0.5">
                                             <Lock className="w-2.5 h-2.5" />Dikunci
@@ -966,7 +982,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                                 <div className="flex flex-col gap-0.5 shrink-0">
                                   {(newPeriodDatesBySemester[sem] || {}).start && (newPeriodDatesBySemester[sem] || {}).end && (
                                     <span className="text-[9px] text-brand-600 font-mono bg-brand-50 px-1.5 py-0.5 rounded text-center">
-                                      {formatPeriodLabel((newPeriodDatesBySemester[sem] || {}).start, (newPeriodDatesBySemester[sem] || {}).end)}
+                                      {displayLabel(formatPeriodLabel((newPeriodDatesBySemester[sem] || {}).start, (newPeriodDatesBySemester[sem] || {}).end))}
                                     </span>
                                   )}
                                   <button
