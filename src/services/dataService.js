@@ -450,15 +450,19 @@ export function mergeLocalReports(students) {
 }
 
 // Merge laporan dari Supabase ke data mahasiswa (async, fallback ke localStorage).
+// Hanya laporan yang sudah diverifikasi dosen yang masuk ke tampilan utama.
 export async function mergeSupabaseReports(students) {
   if (supabase) {
     try {
-      const { data: allReports, error } = await supabase
-        .from('laporan_bimbingan')
-        .select('nim, week, category, progress, next_target, dosen_hadir, submitted_at');
-      if (!error && allReports) {
+      const [{ data: allReports, error: rErr }, { data: allVerif, error: vErr }] = await Promise.all([
+        supabase.from('laporan_bimbingan').select('nim, week, category, progress, next_target, dosen_hadir, submitted_at'),
+        supabase.from('verifikasi_laporan').select('nim, week'),
+      ]);
+      if (!rErr && allReports && !vErr && allVerif) {
+        const verifiedSet = new Set(allVerif.map(v => `${v.nim}:${v.week}`));
         const byNim = {};
         allReports.forEach(r => {
+          if (!verifiedSet.has(`${r.nim}:${r.week}`)) return;
           if (!byNim[r.nim]) byNim[r.nim] = {};
           byNim[r.nim][r.week] = {
             reported: true,
