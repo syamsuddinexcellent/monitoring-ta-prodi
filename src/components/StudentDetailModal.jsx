@@ -8,6 +8,8 @@ import {
   ShieldCheck,
   FileSpreadsheet,
   Printer,
+  CalendarDays,
+  UserCheck,
 } from 'lucide-react';
 import {
   getCategoryBadgeStyle,
@@ -128,7 +130,8 @@ export default function StudentDetailModal({
         {/* Timeline Content */}
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
           <div className="relative pl-6 border-l-2 border-slate-200 space-y-6">
-            {weekColumns.map((week, idx) => {
+            {[...weekColumns].reverse().map((week) => {
+              const idx = weekColumns.indexOf(week);
               const update = student.weeklyUpdates[week];
               const reported = update?.reported;
               const badgeStyle = getCategoryBadgeStyle(update?.category);
@@ -198,6 +201,23 @@ export default function StudentDetailModal({
                                 {update.next}
                               </p>
                             </div>
+                          </div>
+                        )}
+                        {update.tanggalBimbingan && (
+                          <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                            <CalendarDays className="w-3.5 h-3.5 text-slate-400" />
+                            <span>Tanggal bimbingan: <span className="font-semibold text-slate-700">{new Date(update.tanggalBimbingan + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></span>
+                          </div>
+                        )}
+                        {update.dosenHadir?.length > 0 && (
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <UserCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span className="text-[11px] text-slate-500">Bimbingan dengan:</span>
+                            {update.dosenHadir.map(d => (
+                              <span key={d.label} className="text-[11px] bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
+                                {d.label} · {d.name.split(',')[0]}
+                              </span>
+                            ))}
                           </div>
                         )}
                       </div>

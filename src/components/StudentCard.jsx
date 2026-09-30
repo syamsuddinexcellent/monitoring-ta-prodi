@@ -11,7 +11,8 @@ import {
   Zap,
   RefreshCw,
   User,
-  ShieldCheck
+  ShieldCheck,
+  UserCheck,
 } from 'lucide-react';
 import {
   getCategoryBadgeStyle,
@@ -276,6 +277,19 @@ export default function StudentCard({
               <span className="italic">
                 Belum menetapkan target spesifik periode depan
               </span>
+            </div>
+          )}
+
+          {/* Dosen hadir */}
+          {update.reported && update.dosenHadir?.length > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+              <UserCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <span className="text-[11px] text-slate-500">Bimbingan dengan:</span>
+              {update.dosenHadir.map(d => (
+                <span key={d.label} className="text-[11px] bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
+                  {d.label} · {d.name.split(',')[0]}
+                </span>
+              ))}
             </div>
           )}
         </div>

@@ -37,7 +37,6 @@ export const TABS_CONFIG = [
 ];
 
 export const ORDERED_DEFAULT_WEEKS = [
-  '31 - 04 September 26',
   '07 - 11 September 26',
   '14 - 18 September 26',
   '21 - 25 September 26',
@@ -204,12 +203,9 @@ export function processTabsData(tabs, source = 'google_sheets') {
   });
   const dedupedStudents = Array.from(nimMap.values());
 
-  // Organize weeks: Priority to current semester active weeks, then past updates
-  const activeWeeks = ORDERED_DEFAULT_WEEKS.filter(w => weekSet.has(w));
+  // Always include all ORDERED_DEFAULT_WEEKS (even if no reports yet), then extra weeks from data
   const otherWeeks = Array.from(weekSet).filter(w => !ORDERED_DEFAULT_WEEKS.includes(w));
-  
-  // Sort other weeks by dates or keep original order
-  const weekColumns = [...activeWeeks, ...otherWeeks];
+  const weekColumns = [...ORDERED_DEFAULT_WEEKS, ...otherWeeks];
 
   // Fill empty weekly updates for weeks not present in student's tab
   dedupedStudents.forEach(st => {
@@ -280,10 +276,8 @@ function processFallbackJson(json, source = 'fallback_json') {
   });
   const students = Array.from(nimMap.values());
 
-  const weekSet = new Set(json.weeks || []);
-  const activeWeeks = ORDERED_DEFAULT_WEEKS.filter(w => weekSet.has(w));
   const otherWeeks = (json.weeks || []).filter(w => !ORDERED_DEFAULT_WEEKS.includes(w));
-  const weekColumns = [...activeWeeks, ...otherWeeks];
+  const weekColumns = [...ORDERED_DEFAULT_WEEKS, ...otherWeeks];
 
   students.forEach(st => {
     weekColumns.forEach(w => {
@@ -470,7 +464,8 @@ export async function mergeSupabaseReports(students) {
             category: r.category,
             progress: r.progress,
             next: r.next_target,
-            dosenHadir: r.dosen_hadir,
+            dosenHadir: Array.isArray(r.dosen_hadir) ? r.dosen_hadir : (r.dosen_hadir?.list || []),
+            tanggalBimbingan: Array.isArray(r.dosen_hadir) ? null : (r.dosen_hadir?.tanggal || null),
             submittedAt: r.submitted_at,
           };
         });

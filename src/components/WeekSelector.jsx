@@ -72,20 +72,6 @@ export default function WeekSelector({
           <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-300" />
         </div>
 
-        {/* Laporan count badge for selected periode */}
-        {selectedWeek && viewMode !== 'matrix' && (() => {
-          const count = countMap[selectedWeek] ?? 0;
-          const hasData = count > 0;
-          return (
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-              hasData
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                : 'bg-slate-100 text-slate-500 border-slate-200'
-            }`}>
-              {count}/{students.length} laporan
-            </span>
-          );
-        })()}
       </div>
 
       {/* Right: View Mode Toggle */}

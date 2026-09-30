@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Send, CheckCircle2, AlertCircle, FileText, Users } from 'lucide-react';
+import { X, Send, CheckCircle2, AlertCircle, FileText, Users, CalendarDays } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const KATEGORI = [
@@ -16,6 +16,13 @@ function getLocalReports(nim) {
     const all = JSON.parse(localStorage.getItem('mahasiswa_reports') || '{}');
     return all[nim] || {};
   } catch { return {}; }
+}
+
+// Handle both old (array) and new ({tanggal, list}) dosen_hadir formats
+function normalizeDosenHadir(dh) {
+  if (Array.isArray(dh)) return { list: dh, tanggal: null };
+  if (dh && typeof dh === 'object') return { list: dh.list || [], tanggal: dh.tanggal || null };
+  return { list: [], tanggal: null };
 }
 
 function trackReadLocally(nim, week, dosenHadir, mahasiswaName, submittedAt) {
@@ -39,7 +46,7 @@ async function saveReport(nim, week, data, mahasiswaName) {
       category: data.category,
       progress: data.progress,
       next_target: data.next,
-      dosen_hadir: data.dosenHadir || [],
+      dosen_hadir: { tanggal: data.tanggalBimbingan || null, list: data.dosenHadir || [] },
       submitted_at: submittedAt,
     }, { onConflict: 'nim,week' });
     if (!error) {
@@ -72,7 +79,8 @@ export async function getLocalReportsForNim(nim) {
           progress: r.progress,
           next: r.next_target,
           category: r.category,
-          dosenHadir: r.dosen_hadir,
+          dosenHadir: normalizeDosenHadir(r.dosen_hadir).list,
+          tanggalBimbingan: normalizeDosenHadir(r.dosen_hadir).tanggal,
           submittedAt: r.submitted_at,
         };
       });
@@ -94,11 +102,13 @@ export async function getDosenLaporan(dosenName) {
         (inbox[dosenName] || []).filter(r => r.read).map(r => `${r.nim}|${r.week}`)
       );
       return data
-        .filter(r => (r.dosen_hadir || []).some(d => d.name === dosenName))
+        .filter(r => normalizeDosenHadir(r.dosen_hadir).list.some(d => d.name === dosenName))
         .map(r => ({
           nim: r.nim, nama: r.nama, week: r.week,
           category: r.category, progress: r.progress,
-          next: r.next_target, dosenHadir: r.dosen_hadir,
+          next: r.next_target,
+          dosenHadir: normalizeDosenHadir(r.dosen_hadir).list,
+          tanggalBimbingan: normalizeDosenHadir(r.dosen_hadir).tanggal,
           submittedAt: r.submitted_at,
           read: readKeys.has(`${r.nim}|${r.week}`),
         }));
@@ -205,13 +215,16 @@ export default function LaporanModal({
     { key: 'pj2', label: 'Pj2', name: penguji2 },
   ].filter(d => d.name);
 
-  const [week, setWeek]           = useState(() => getDefaultWeek(weekColumns, existingData));
-  const [kategori, setKategori]   = useState(KATEGORI[0]);
-  const [progres, setProgres]     = useState('');
-  const [next, setNext]           = useState('');
-  const [dosenHadir, setDosenHadir] = useState(new Set());
-  const [error, setError]         = useState('');
-  const [success, setSuccess]     = useState(false);
+  const todayStr = () => new Date().toISOString().split('T')[0];
+
+  const [week, setWeek]                     = useState(() => getDefaultWeek(weekColumns, existingData));
+  const [kategori, setKategori]             = useState(KATEGORI[0]);
+  const [progres, setProgres]               = useState('');
+  const [next, setNext]                     = useState('');
+  const [dosenHadir, setDosenHadir]         = useState(new Set());
+  const [tanggalBimbingan, setTanggalBimbingan] = useState(todayStr);
+  const [error, setError]                   = useState('');
+  const [success, setSuccess]               = useState(false);
 
   const toggleDosen = (key) => {
     setDosenHadir(prev => {
@@ -231,6 +244,7 @@ export default function LaporanModal({
         setProgres(existing?.progress || '');
         setNext(existing?.next || '');
         setKategori(existing?.category && KATEGORI.includes(existing.category) ? existing.category : KATEGORI[0]);
+        setTanggalBimbingan(existing?.tanggalBimbingan || todayStr());
         const existingDosen = new Set(
           (existing?.dosenHadir || []).map(d =>
             d.label === 'P1' ? 'p1' : d.label === 'P2' ? 'p2' : d.label === 'Pj1' ? 'pj1' : d.label === 'Pj2' ? 'pj2' : null
@@ -241,6 +255,7 @@ export default function LaporanModal({
         const defaultWeek = getDefaultWeek(weekColumns, existingData);
         setWeek(defaultWeek);
         setProgres(''); setNext(''); setKategori(KATEGORI[0]);
+        setTanggalBimbingan(todayStr());
         setDosenHadir(new Set());
       }
       setError('');
@@ -256,6 +271,7 @@ export default function LaporanModal({
         setProgres(existing.progress || '');
         setNext(existing.next || '');
         setKategori(existing.category && KATEGORI.includes(existing.category) ? existing.category : KATEGORI[0]);
+        setTanggalBimbingan(existing.tanggalBimbingan || todayStr());
         const existingDosen = new Set(
           (existing.dosenHadir || []).map(d =>
             d.label === 'P1' ? 'p1' : d.label === 'P2' ? 'p2' : d.label === 'Pj1' ? 'pj1' : d.label === 'Pj2' ? 'pj2' : null
@@ -264,6 +280,7 @@ export default function LaporanModal({
         setDosenHadir(existingDosen);
       } else {
         setProgres(''); setNext(''); setKategori(KATEGORI[0]);
+        setTanggalBimbingan(todayStr());
         setDosenHadir(new Set());
       }
     }
@@ -285,12 +302,14 @@ export default function LaporanModal({
       next: next.trim(),
       category: kategori,
       dosenHadir: selectedDosen,
+      tanggalBimbingan: tanggalBimbingan || null,
     }, mahasiswaName);
     if (ok) {
       setSuccess(true);
       setTimeout(() => {
         setSuccess(false);
         setWeek(''); setProgres(''); setNext(''); setKategori(KATEGORI[0]);
+        setTanggalBimbingan(todayStr());
         setDosenHadir(new Set());
         onClose();
       }, 1400);
@@ -306,7 +325,7 @@ export default function LaporanModal({
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
       <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
       <div
-        className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 overflow-hidden"
+        className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -344,7 +363,7 @@ export default function LaporanModal({
         )}
 
         {/* Form */}
-        {unreported.length > 0 && <form onSubmit={handleSubmit} className="px-5 py-5 space-y-4">
+        {unreported.length > 0 && <form onSubmit={handleSubmit} className="overflow-y-auto flex-1 px-5 py-5 space-y-4">
           {error && (
             <div className="flex items-center gap-2 px-3 py-2.5 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
               <AlertCircle className="w-4 h-4 shrink-0" />
@@ -372,6 +391,20 @@ export default function LaporanModal({
               <option value="">-- Pilih Periode --</option>
               {unreported.map(w => <option key={w} value={w}>{w}</option>)}
             </select>
+          </div>
+
+          {/* Tanggal Bimbingan */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+              <CalendarDays className="w-3.5 h-3.5 text-slate-400" />
+              Tanggal Bimbingan
+            </label>
+            <input
+              type="date"
+              value={tanggalBimbingan}
+              onChange={e => setTanggalBimbingan(e.target.value)}
+              className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 text-slate-800"
+            />
           </div>
 
           {/* Kategori Tahapan */}

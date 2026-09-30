@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import {
   GraduationCap, BookOpen, CheckCircle2, AlertCircle,
   ArrowRight, UserCheck, Calendar, TrendingUp, Clock,
-  PlusCircle, ShieldCheck, PencilLine, Trash2, XCircle, RefreshCw
+  PlusCircle, ShieldCheck, PencilLine, Trash2, XCircle, RefreshCw, CalendarDays
 } from 'lucide-react';
 import { getCategoryBadgeStyle } from '../utils/helpers';
 import LaporanModal, { getLocalReportsForNim, parseWeekRange, deleteReport } from './LaporanModal';
@@ -318,6 +318,23 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
                           <span className="text-[10px] font-bold text-slate-400 uppercase block mb-0.5">Progres</span>
                           <p className="text-slate-800 font-medium leading-relaxed">{upd.progress}</p>
                         </div>
+                        {upd.tanggalBimbingan && (
+                          <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                            <CalendarDays className="w-3.5 h-3.5 text-slate-400" />
+                            <span>Tanggal bimbingan: <span className="font-semibold text-slate-700">{new Date(upd.tanggalBimbingan + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></span>
+                          </div>
+                        )}
+                        {upd.dosenHadir?.length > 0 && (
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <UserCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span className="text-[11px] text-slate-500">Bimbingan dengan:</span>
+                            {upd.dosenHadir.map(d => (
+                              <span key={d.label} className="text-[11px] bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
+                                {d.label} · {d.name.split(',')[0]}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                         {upd.next && (
                           <div className="flex items-start gap-1.5 bg-brand-50/60 p-2.5 rounded-lg border border-brand-100">
                             <ArrowRight className="w-3.5 h-3.5 text-brand-600 shrink-0 mt-0.5" />

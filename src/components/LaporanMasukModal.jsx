@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Inbox, BookOpen, Users, ArrowRight, ShieldCheck, ShieldOff, XCircle, RefreshCw } from 'lucide-react';
+import { X, Inbox, BookOpen, Users, ArrowRight, ShieldCheck, ShieldOff, XCircle, RefreshCw, CalendarDays } from 'lucide-react';
 import { getDosenLaporan, markDosenLaporanRead } from './LaporanModal';
 import { getCategoryBadgeStyle } from '../utils/helpers';
 import { getVerifikasi, saveVerifikasi, cancelVerifikasi, getPenolakan, savePenolakan, cancelPenolakan } from '../utils/exportUtils';
@@ -86,6 +86,15 @@ function LaporanCard({ item, dosenName, onRead, verifData, tolkData, onVerifChan
           </div>
           <div className="flex items-center gap-2 mt-1 flex-wrap">
             <span className="text-xs text-slate-500">{item.week}</span>
+            {item.tanggalBimbingan && (
+              <>
+                <span className="text-slate-300">·</span>
+                <span className="flex items-center gap-0.5 text-[11px] text-slate-400">
+                  <CalendarDays className="w-3 h-3" />
+                  {new Date(item.tanggalBimbingan + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </span>
+              </>
+            )}
             <span className="text-slate-300">·</span>
             <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-semibold border ${badge.bg} ${badge.text} ${badge.border}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
