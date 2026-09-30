@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Lock, X, Eye, EyeOff, ShieldCheck, AlertCircle, UserPlus, LogIn, Mail, Search, GraduationCap, BookOpen, KeyRound, ArrowLeft, CheckCircle2, RefreshCw } from 'lucide-react';
 import { STUDENT_NIM_MAP } from '../utils/studentDatabase';
+import { supabase } from '../lib/supabase';
 
 const ADMIN_USER = 'datascience@itera.ac.id';
 const ADMIN_PASS_B64 = btoa('prodi2026');
@@ -45,85 +46,157 @@ function classifyEmail(email) {
   return null;
 }
 
-function getStoredUsers() {
+// Normalize Supabase row (snake_case) to app user object (camelCase)
+function fromDb(row) {
+  return {
+    email: row.email,
+    name: row.name,
+    role: row.role,
+    nim: row.nim || '',
+    lecturerName: row.lecturer_name || '',
+    passwordHash: row.password_hash || '',
+    isSeeded: row.is_seeded || false,
+  };
+}
+
+// Convert app user object to Supabase row format
+function toDb(user) {
+  return {
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    nim: user.nim || '',
+    lecturer_name: user.lecturerName || '',
+    password_hash: user.passwordHash || '',
+    is_seeded: user.isSeeded || false,
+  };
+}
+
+function getLocalUsers() {
   try { return JSON.parse(localStorage.getItem('app_users') || '[]'); } catch { return []; }
 }
-function saveStoredUsers(users) {
+function saveLocalUsers(users) {
   try { localStorage.setItem('app_users', JSON.stringify(users)); } catch {}
 }
 
-export function loginWithCredentials(identifier, password) {
+async function getStoredUsers() {
+  if (supabase) {
+    const { data, error } = await supabase.from('app_users').select('*');
+    if (!error && data) return data.map(fromDb);
+  }
+  return getLocalUsers();
+}
+
+export async function loginWithCredentials(identifier, password) {
   if (identifier === ADMIN_USER && btoa(password) === ADMIN_PASS_B64) {
     return { role: 'admin', email: ADMIN_USER, name: 'Administrator', lecturerName: '', nim: '' };
   }
-  const users = getStoredUsers();
+  if (supabase) {
+    const { data } = await supabase
+      .from('app_users')
+      .select('*')
+      .eq('email', identifier.toLowerCase())
+      .eq('password_hash', btoa(password))
+      .single();
+    if (data) return { role: data.role || 'user', email: data.email, name: data.name, lecturerName: data.lecturer_name || '', nim: data.nim || '' };
+    return null;
+  }
+  const users = getLocalUsers();
   const found = users.find(u => u.email === identifier.toLowerCase() && u.passwordHash === btoa(password));
   if (found) return { role: found.role || 'user', email: found.email, name: found.name, lecturerName: found.lecturerName || '', nim: found.nim || '' };
   return null;
 }
 
-export function registerUser(email, password, overrideName = null, overrideRole = null, overrideNim = null) {
+export async function registerUser(email, password, overrideName = null, overrideRole = null, overrideNim = null) {
   if (!email.trim() || !password) return { error: 'Semua field wajib diisi.' };
   const emailLower = email.trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailLower)) return { error: 'Format email tidak valid.' };
   const role = overrideRole || classifyEmail(emailLower);
-  if (!role) {
-    return { error: 'Hanya email ITERA yang diizinkan (@sd.itera.ac.id, @student.itera.ac.id, dll.).' };
-  }
+  if (!role) return { error: 'Hanya email ITERA yang diizinkan (@sd.itera.ac.id, @student.itera.ac.id, dll.).' };
   if (password.length < 6) return { error: 'Password minimal 6 karakter.' };
-  const users = getStoredUsers();
-  if (users.some(u => u.email === emailLower)) return { error: 'Email sudah terdaftar.' };
   const lecturerName = LECTURER_EMAIL_MAP[emailLower] || '';
   const name = overrideName || emailLower.split('@')[0];
+  if (supabase) {
+    const { data: existing } = await supabase.from('app_users').select('email').eq('email', emailLower).maybeSingle();
+    if (existing) return { error: 'Email sudah terdaftar.' };
+    const { error } = await supabase.from('app_users').insert(toDb({ email: emailLower, name, role, lecturerName, nim: overrideNim || '', passwordHash: btoa(password), isSeeded: false }));
+    if (error) return { error: error.message };
+    return { success: true };
+  }
+  const users = getLocalUsers();
+  if (users.some(u => u.email === emailLower)) return { error: 'Email sudah terdaftar.' };
   users.push({ email: emailLower, name, role, lecturerName, nim: overrideNim || '', passwordHash: btoa(password) });
-  saveStoredUsers(users);
+  saveLocalUsers(users);
   return { success: true };
 }
 
-export function getStoredUsersList() {
-  return getStoredUsers().map(({ passwordHash, ...u }) => u);
+export async function getStoredUsersList() {
+  const users = await getStoredUsers();
+  return users.map(({ passwordHash, ...u }) => u);
 }
-export function getStoredUsersWithPasswords() {
-  return getStoredUsers().map(u => ({ ...u, password: u.passwordHash ? atob(u.passwordHash) : '' }));
+export async function getStoredUsersWithPasswords() {
+  const users = await getStoredUsers();
+  return users.map(u => ({ ...u, password: u.passwordHash ? atob(u.passwordHash) : '' }));
 }
-export function deleteStoredUser(email) {
-  saveStoredUsers(getStoredUsers().filter(u => u.email !== email.toLowerCase()));
+export async function deleteStoredUser(email) {
+  if (supabase) {
+    await supabase.from('app_users').delete().eq('email', email.toLowerCase());
+    return;
+  }
+  saveLocalUsers(getLocalUsers().filter(u => u.email !== email.toLowerCase()));
 }
 
-export function seedDefaultAccounts(students) {
+export async function seedDefaultAccounts(students) {
   if (!Array.isArray(students) || students.length === 0) return 0;
-  const users = getStoredUsers();
+  if (supabase) {
+    const records = students
+      .filter(s => s.nim && s.nama)
+      .map(s => ({
+        email: `${s.nim}@student.itera.ac.id`,
+        name: s.nama,
+        role: 'mahasiswa',
+        lecturer_name: '',
+        nim: s.nim,
+        password_hash: btoa(s.nim),
+        is_seeded: true,
+      }));
+    await supabase.from('app_users').upsert(records, { onConflict: 'email', ignoreDuplicates: true });
+    return records.length;
+  }
+  const users = getLocalUsers();
   const existingEmails = new Set(users.map(u => u.email));
   let added = 0;
   students.forEach(student => {
     if (!student.nim || !student.nama) return;
     const email = `${student.nim}@student.itera.ac.id`;
     if (existingEmails.has(email)) return;
-    users.push({
-      email,
-      name: student.nama,
-      role: 'mahasiswa',
-      lecturerName: '',
-      nim: student.nim,
-      passwordHash: btoa(student.nim),
-      isSeeded: true
-    });
+    users.push({ email, name: student.nama, role: 'mahasiswa', lecturerName: '', nim: student.nim, passwordHash: btoa(student.nim), isSeeded: true });
     existingEmails.add(email);
     added++;
   });
-  if (added > 0) saveStoredUsers(users);
+  if (added > 0) saveLocalUsers(users);
   return added;
 }
 
-export function resetPassword(email, newPassword) {
+export async function resetPassword(email, newPassword) {
   const emailLower = email.trim().toLowerCase();
   if (!emailLower || !newPassword) return { error: 'Semua field wajib diisi.' };
   if (newPassword.length < 6) return { error: 'Password minimal 6 karakter.' };
-  const users = getStoredUsers();
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('app_users')
+      .update({ password_hash: btoa(newPassword) })
+      .eq('email', emailLower)
+      .select('name')
+      .single();
+    if (error || !data) return { error: 'Email tidak ditemukan. Pastikan Anda sudah mendaftar.' };
+    return { success: true, name: data.name };
+  }
+  const users = getLocalUsers();
   const idx = users.findIndex(u => u.email === emailLower);
   if (idx === -1) return { error: 'Email tidak ditemukan. Pastikan Anda sudah mendaftar.' };
   users[idx].passwordHash = btoa(newPassword);
-  saveStoredUsers(users);
+  saveLocalUsers(users);
   return { success: true, name: users[idx].name };
 }
 
@@ -238,8 +311,14 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
   };
 
   const sendResetLink = async (email) => {
-    const users = getStoredUsers();
-    const found = users.find(u => u.email === email);
+    let found;
+    if (supabase) {
+      const { data } = await supabase.from('app_users').select('name').eq('email', email).maybeSingle();
+      found = data;
+    } else {
+      const users = getLocalUsers();
+      found = users.find(u => u.email === email);
+    }
     if (!found) return { error: 'Email tidak terdaftar di sistem. Silakan daftar akun baru.' };
     const token = generateToken();
     storeResetToken(email, token);
@@ -277,21 +356,22 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
     }
   };
 
-  const handleForgotStep2 = (e) => {
+  const handleForgotStep2 = async (e) => {
     e.preventDefault();
     setForgotError('');
     if (forgotNewPass !== forgotConfirm) { setForgotError('Password tidak cocok.'); return; }
     setForgotLoading(true);
-    setTimeout(() => {
-      const result = resetPassword(forgotEmail, forgotNewPass);
+    try {
+      const result = await resetPassword(forgotEmail, forgotNewPass);
       if (result.error) { setForgotError(result.error); }
       else {
         if (resetToken) consumeResetToken(resetToken);
         setForgotSuccess('Password berhasil direset. Silakan login dengan password baru.');
         setTimeout(() => { resetForgot(); setTab('login'); }, 2000);
       }
+    } finally {
       setForgotLoading(false);
-    }, 400);
+    }
   };
 
   const handleResendLink = async () => {
@@ -321,12 +401,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
     }
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setLoginError('');
     setLoginLoading(true);
-    setTimeout(() => {
-      const result = loginWithCredentials(loginEmail.trim(), loginPassword);
+    try {
+      const result = await loginWithCredentials(loginEmail.trim(), loginPassword);
       if (result) {
         try { sessionStorage.setItem('auth_session', JSON.stringify(result)); } catch {}
         onSuccess(result);
@@ -334,11 +414,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
       } else {
         setLoginError('Email atau password salah.');
       }
+    } finally {
       setLoginLoading(false);
-    }, 400);
+    }
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setRegError(''); setRegSuccess('');
     if (regPassword !== regConfirm) { setRegError('Password tidak cocok.'); return; }
@@ -348,8 +429,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
     const overrideName = regRole === 'mahasiswa' ? regFoundName : null;
     const overrideNim  = regRole === 'mahasiswa' ? regNim.trim() : null;
     setRegLoading(true);
-    setTimeout(() => {
-      const result = registerUser(regEmail, regPassword, overrideName, regRole, overrideNim);
+    try {
+      const result = await registerUser(regEmail, regPassword, overrideName, regRole, overrideNim);
       if (result.error) { setRegError(result.error); }
       else {
         setRegSuccess('Akun berhasil dibuat! Silakan login.');
@@ -357,8 +438,9 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
         setRegNim(''); setRegFoundName(''); setRegNimError('');
         setTimeout(() => setTab('login'), 1200);
       }
+    } finally {
       setRegLoading(false);
-    }, 400);
+    }
   };
 
   return (

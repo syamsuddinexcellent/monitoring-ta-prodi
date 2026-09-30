@@ -59,8 +59,8 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData }) {
   const [showPass, setShowPass] = useState({});
   const [resetForm, setResetForm] = useState({}); // { [email]: { open, value, error } }
 
-  const refresh = () => {
-    setUsers(getStoredUsersWithPasswords());
+  const refresh = async () => {
+    setUsers(await getStoredUsersWithPasswords());
     setReportsSummary(getLocalReportsSummary());
     setDosenSummary(getDosenLaporanSummary());
     setLocalPeriods(getLocalPeriods());
@@ -104,14 +104,14 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData }) {
 
   const showFlash = (msg) => { setFlash(msg); setTimeout(() => setFlash(''), 2500); };
 
-  const handleResetPassword = (email) => {
+  const handleResetPassword = async (email) => {
     const form = resetForm[email] || {};
     const newPass = (form.value || '').trim();
     if (newPass.length < 6) {
       setResetForm(prev => ({ ...prev, [email]: { ...form, error: 'Minimal 6 karakter.' } }));
       return;
     }
-    const result = resetPassword(email, newPass);
+    const result = await resetPassword(email, newPass);
     if (result?.error) {
       setResetForm(prev => ({ ...prev, [email]: { ...form, error: result.error } }));
     } else {
@@ -121,9 +121,9 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData }) {
     }
   };
 
-  const handleDeleteUser = (email) => {
+  const handleDeleteUser = async (email) => {
     if (confirmDelete === email) {
-      deleteStoredUser(email);
+      await deleteStoredUser(email);
       showFlash(`Akun ${email} berhasil dihapus.`);
       setConfirmDelete(null);
       refresh();

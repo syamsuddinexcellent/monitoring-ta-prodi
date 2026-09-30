@@ -125,7 +125,7 @@ export default function App() {
       if (lp.length > 0) {
         result.weekColumns = [...result.weekColumns, ...lp.filter(p => !result.weekColumns.includes(p))];
       }
-      seedDefaultAccounts(result.students);
+      await seedDefaultAccounts(result.students);
       setData(result);
       if (!selectedWeek && result.weekColumns.length > 0) {
         const lastWithData = [...result.weekColumns].reverse().find(w =>
