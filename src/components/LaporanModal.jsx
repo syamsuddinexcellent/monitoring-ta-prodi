@@ -87,20 +87,21 @@ export async function getDosenLaporan(dosenName) {
     const { data, error } = await supabase
       .from('laporan_bimbingan')
       .select('*')
-      .contains('dosen_hadir', [{ name: dosenName }])
       .order('submitted_at', { ascending: false });
     if (!error && data) {
       const inbox = JSON.parse(localStorage.getItem('dosen_laporan') || '{}');
       const readKeys = new Set(
         (inbox[dosenName] || []).filter(r => r.read).map(r => `${r.nim}|${r.week}`)
       );
-      return data.map(r => ({
-        nim: r.nim, nama: r.nama, week: r.week,
-        category: r.category, progress: r.progress,
-        next: r.next_target, dosenHadir: r.dosen_hadir,
-        submittedAt: r.submitted_at,
-        read: readKeys.has(`${r.nim}|${r.week}`),
-      }));
+      return data
+        .filter(r => (r.dosen_hadir || []).some(d => d.name === dosenName))
+        .map(r => ({
+          nim: r.nim, nama: r.nama, week: r.week,
+          category: r.category, progress: r.progress,
+          next: r.next_target, dosenHadir: r.dosen_hadir,
+          submittedAt: r.submitted_at,
+          read: readKeys.has(`${r.nim}|${r.week}`),
+        }));
     }
   }
   try {
