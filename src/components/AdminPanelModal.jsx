@@ -479,6 +479,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   const mahasiswaUsers = users.filter(u => u.role === 'mahasiswa');
 
   return (
+    <>
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={onClose} />
       <div
@@ -1562,5 +1563,6 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
         </div>
       </div>
     )}
+    </>
   );
 }
