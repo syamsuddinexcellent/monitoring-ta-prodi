@@ -117,6 +117,9 @@ export async function registerUser(email, password, overrideName = null, overrid
   if (role === 'dosen' && emailLower.split('@')[1] !== 'sd.itera.ac.id') {
     return { error: 'Akun dosen hanya dapat didaftarkan dengan email @sd.itera.ac.id.' };
   }
+  if (role === 'mahasiswa' && emailLower.split('@')[1] !== 'student.itera.ac.id') {
+    return { error: 'Akun mahasiswa hanya dapat didaftarkan dengan email @student.itera.ac.id.' };
+  }
   const lecturerName = LECTURER_EMAIL_MAP[emailLower] || '';
   const name = overrideName || emailLower.split('@')[0];
   if (supabase) {
@@ -772,6 +775,9 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
                       className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-slate-50 placeholder:text-slate-400"
                     />
                   </div>
+                  {regEmailLower.includes('@') && regEmailLower.split('@')[1] !== 'student.itera.ac.id' && (
+                    <p className="mt-1.5 text-[11px] text-red-500">Akun mahasiswa hanya dapat didaftarkan dengan email @student.itera.ac.id</p>
+                  )}
                   {regFoundName && regNim && (
                     <p className="mt-1 text-[11px] text-slate-400">
                       Saran: <button type="button"
