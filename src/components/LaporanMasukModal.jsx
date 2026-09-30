@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Inbox, CheckCircle2, Clock, ArrowRight, BookOpen, Users, ChevronDown, ChevronUp, ShieldCheck, ShieldOff } from 'lucide-react';
+import { X, Inbox, BookOpen, Users, ArrowRight, ShieldCheck, ShieldOff, XCircle } from 'lucide-react';
 import { getDosenLaporan, markDosenLaporanRead } from './LaporanModal';
 import { getCategoryBadgeStyle } from '../utils/helpers';
-import { getVerifikasi, saveVerifikasi, cancelVerifikasi } from '../utils/exportUtils';
+import { getVerifikasi, saveVerifikasi, cancelVerifikasi, getPenolakan, savePenolakan, cancelPenolakan } from '../utils/exportUtils';
 
 function formatDate(iso) {
   if (!iso) return '-';
@@ -12,15 +12,19 @@ function formatDate(iso) {
   }).format(new Date(iso));
 }
 
-function LaporanCard({ item, dosenName, onRead, verifData, onVerifChange }) {
-  const [expanded, setExpanded] = useState(false);
+function LaporanCard({ item, dosenName, onRead, verifData, tolkData, onVerifChange }) {
+  const [showTolakForm, setShowTolakForm] = useState(false);
+  const [alasan, setAlasan] = useState('');
+
   const badge = getCategoryBadgeStyle(item.category);
   const isVerified = verifData?.[item.nim]?.[item.week]?.verified;
+  const penolakanInfo = tolkData?.[item.nim]?.[item.week];
+  const isTolak = !!penolakanInfo;
 
-  const handleExpand = () => {
+  // Auto-mark as read when rendered
+  useEffect(() => {
     if (!item.read) onRead(dosenName, item.nim, item.week);
-    setExpanded(v => !v);
-  };
+  }, []);
 
   const handleVerify = async () => {
     if (isVerified) {
@@ -31,13 +35,23 @@ function LaporanCard({ item, dosenName, onRead, verifData, onVerifChange }) {
     onVerifChange();
   };
 
+  const handleTolak = async () => {
+    if (!alasan.trim()) return;
+    await savePenolakan(item.nim, item.week, dosenName, alasan.trim());
+    setAlasan('');
+    setShowTolakForm(false);
+    onVerifChange();
+  };
+
+  const handleCancelTolak = async () => {
+    await cancelPenolakan(item.nim, item.week);
+    onVerifChange();
+  };
+
   return (
-    <div className={`rounded-xl border transition-all ${item.read ? 'border-slate-200 bg-white' : 'border-brand-300 bg-brand-50/40 ring-1 ring-brand-200'}`}>
-      <button
-        type="button"
-        onClick={handleExpand}
-        className="w-full flex items-start gap-3 px-4 py-3 text-left"
-      >
+    <div className={`rounded-xl border transition-all ${isTolak ? 'border-red-200 bg-red-50/30' : item.read ? 'border-slate-200 bg-white' : 'border-brand-300 bg-brand-50/40 ring-1 ring-brand-200'}`}>
+      {/* Header */}
+      <div className="flex items-start gap-3 px-4 pt-4 pb-3">
         <div className={`mt-0.5 w-2 h-2 rounded-full shrink-0 ${item.read ? 'bg-slate-300' : 'bg-brand-500'}`} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -45,6 +59,16 @@ function LaporanCard({ item, dosenName, onRead, verifData, onVerifChange }) {
             <span className="text-xs font-mono text-slate-400">{item.nim}</span>
             {!item.read && (
               <span className="text-[10px] font-bold text-brand-600 bg-brand-100 px-1.5 py-0.5 rounded-full">Baru</span>
+            )}
+            {isVerified && (
+              <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
+                <ShieldCheck className="w-2.5 h-2.5" /> Terverifikasi
+              </span>
+            )}
+            {isTolak && !isVerified && (
+              <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded-full">
+                <XCircle className="w-2.5 h-2.5" /> Ditolak
+              </span>
             )}
           </div>
           <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -54,69 +78,124 @@ function LaporanCard({ item, dosenName, onRead, verifData, onVerifChange }) {
               <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
               {item.category}
             </span>
+            <span className="text-[10px] text-slate-400 ml-auto">{formatDate(item.submittedAt)}</span>
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0 ml-1">
-          {isVerified && <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" title="Terverifikasi" />}
-          <span className="text-[10px] text-slate-400 hidden sm:block">{formatDate(item.submittedAt)}</span>
-          {expanded ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
-        </div>
-      </button>
+      </div>
 
-      {expanded && (
-        <div className="px-4 pb-4 space-y-3 border-t border-slate-100 pt-3">
-          {/* Progres */}
-          <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-100">
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <BookOpen className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Progres Periode Ini</span>
-            </div>
-            <p className="text-sm text-slate-800 font-medium leading-relaxed">{item.progress}</p>
+      {/* Detail */}
+      <div className="px-4 pb-4 space-y-3 border-t border-slate-100 pt-3">
+        {/* Progres */}
+        <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-100">
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <BookOpen className="w-3.5 h-3.5 text-slate-400" />
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Progres Periode Ini</span>
           </div>
+          <p className="text-sm text-slate-800 font-medium leading-relaxed">{item.progress || <span className="text-slate-400 italic">—</span>}</p>
+        </div>
 
-          {/* Target */}
-          {item.next && (
-            <div className="flex items-start gap-2 bg-brand-50/60 rounded-xl p-3.5 border border-brand-100">
-              <ArrowRight className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
-              <div>
-                <span className="text-[10px] font-bold text-brand-700 uppercase tracking-wider block mb-0.5">Target Periode Depan</span>
-                <p className="text-sm text-slate-800 font-semibold">{item.next}</p>
-              </div>
+        {/* Target */}
+        {item.next && (
+          <div className="flex items-start gap-2 bg-brand-50/60 rounded-xl p-3.5 border border-brand-100">
+            <ArrowRight className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
+            <div>
+              <span className="text-[10px] font-bold text-brand-700 uppercase tracking-wider block mb-0.5">Target Periode Depan</span>
+              <p className="text-sm text-slate-800 font-semibold">{item.next}</p>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Dosen hadir */}
-          {item.dosenHadir?.length > 0 && (
-            <div className="flex items-center gap-2 flex-wrap">
-              <Users className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bimbingan dengan:</span>
-              {item.dosenHadir.map(d => (
-                <span key={d.label} className="text-xs bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
-                  {d.label} · {d.name.split(',')[0]}
-                </span>
-              ))}
-            </div>
-          )}
+        {/* Dosen hadir */}
+        {item.dosenHadir?.length > 0 && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <Users className="w-3.5 h-3.5 text-slate-400" />
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bimbingan dengan:</span>
+            {item.dosenHadir.map(d => (
+              <span key={d.label} className="text-xs bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
+                {d.label} · {d.name.split(',')[0]}
+              </span>
+            ))}
+          </div>
+        )}
 
-          {/* Verifikasi */}
-          <div className="flex items-center justify-between">
-            <div className="text-[10px] text-slate-400">
-              Dikirim {formatDate(item.submittedAt)}
+        {/* Alasan tolak jika ada */}
+        {isTolak && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-3 space-y-1">
+            <p className="text-[10px] font-bold text-red-600 uppercase tracking-wider">Alasan Penolakan</p>
+            <p className="text-xs text-red-800 font-medium leading-relaxed">{penolakanInfo.alasan || '—'}</p>
+            <p className="text-[10px] text-red-400">oleh {penolakanInfo.dosenName?.split(',')[0]} · {formatDate(penolakanInfo.at)}</p>
+          </div>
+        )}
+
+        {/* Form alasan tolak */}
+        {showTolakForm && (
+          <div className="space-y-2 bg-red-50/60 border border-red-200 rounded-xl p-3">
+            <p className="text-[10px] font-bold text-red-700 uppercase tracking-wider">Alasan Penolakan</p>
+            <textarea
+              value={alasan}
+              onChange={e => setAlasan(e.target.value)}
+              placeholder="Tuliskan alasan penolakan laporan ini..."
+              rows={2}
+              className="w-full text-xs px-3 py-2 border border-red-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-red-400 bg-white placeholder:text-slate-400 resize-none"
+            />
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => { setShowTolakForm(false); setAlasan(''); }}
+                className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 font-semibold"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleTolak}
+                disabled={!alasan.trim()}
+                className="text-xs px-3 py-1.5 rounded-lg bg-red-500 text-white font-bold hover:bg-red-600 disabled:opacity-40 transition-colors"
+              >
+                Konfirmasi Tolak
+              </button>
             </div>
+          </div>
+        )}
+
+        {/* Action bar */}
+        <div className="flex items-center justify-end gap-2 pt-1">
+          {isTolak ? (
+            <button
+              onClick={handleCancelTolak}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-colors"
+            >
+              <XCircle className="w-3.5 h-3.5" />
+              Batalkan Penolakan
+            </button>
+          ) : isVerified ? (
             <button
               onClick={handleVerify}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                isVerified
-                  ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
-                  : 'bg-slate-100 text-slate-500 hover:bg-indigo-50 hover:text-indigo-700 border border-slate-200 hover:border-indigo-200'
-              }`}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition-colors"
             >
-              {isVerified ? <ShieldCheck className="w-3.5 h-3.5" /> : <ShieldOff className="w-3.5 h-3.5" />}
-              {isVerified ? 'Terverifikasi' : 'Tandai Terverifikasi'}
+              <ShieldCheck className="w-3.5 h-3.5" />
+              Terverifikasi
             </button>
-          </div>
+          ) : (
+            <>
+              {!showTolakForm && (
+                <button
+                  onClick={() => setShowTolakForm(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-600 border border-slate-200 hover:border-red-200 transition-colors"
+                >
+                  <XCircle className="w-3.5 h-3.5" />
+                  Tolak
+                </button>
+              )}
+              <button
+                onClick={handleVerify}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-500 hover:bg-indigo-50 hover:text-indigo-700 border border-slate-200 hover:border-indigo-200 transition-colors"
+              >
+                <ShieldOff className="w-3.5 h-3.5" />
+                Tandai Terverifikasi
+              </button>
+            </>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -124,8 +203,13 @@ function LaporanCard({ item, dosenName, onRead, verifData, onVerifChange }) {
 export default function LaporanMasukModal({ isOpen, onClose, dosenName }) {
   const [laporan, setLaporan] = useState([]);
   const [verifData, setVerifData] = useState({});
+  const [tolkData, setTolkData] = useState({});
 
-  const refreshVerif = async () => setVerifData(await getVerifikasi());
+  const refreshVerif = async () => {
+    const [v, t] = await Promise.all([getVerifikasi(), getPenolakan()]);
+    setVerifData(v);
+    setTolkData(t);
+  };
 
   useEffect(() => {
     if (isOpen && dosenName) {
@@ -189,6 +273,7 @@ export default function LaporanMasukModal({ isOpen, onClose, dosenName }) {
                 dosenName={dosenName}
                 onRead={handleRead}
                 verifData={verifData}
+                tolkData={tolkData}
                 onVerifChange={refreshVerif}
               />
             ))

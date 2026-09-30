@@ -2,11 +2,11 @@ import React, { useMemo, useState, useEffect } from 'react';
 import {
   GraduationCap, BookOpen, CheckCircle2, AlertCircle,
   ArrowRight, UserCheck, Calendar, TrendingUp, Clock,
-  PlusCircle, ShieldCheck, PencilLine, Trash2
+  PlusCircle, ShieldCheck, PencilLine, Trash2, XCircle
 } from 'lucide-react';
 import { getCategoryBadgeStyle } from '../utils/helpers';
 import LaporanModal, { getLocalReportsForNim, parseWeekRange, deleteReport } from './LaporanModal';
-import { getVerifikasi } from '../utils/exportUtils';
+import { getVerifikasi, getPenolakan } from '../utils/exportUtils';
 
 function ProgressRing({ pct }) {
   const r = 36, circ = 2 * Math.PI * r;
@@ -33,6 +33,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
   const [editWeek, setEditWeek] = useState('');
   const [localReports, setLocalReports] = useState({});
   const [verifData, setVerifData] = useState({});
+  const [tolkData, setTolkData] = useState({});
 
   const openEdit = (weekStr) => {
     setEditWeek(weekStr);
@@ -51,6 +52,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
     if (nim) {
       getLocalReportsForNim(nim).then(setLocalReports);
       getVerifikasi().then(all => setVerifData(all[nim] || {}));
+      getPenolakan().then(all => setTolkData(all[nim] || {}));
     }
   }, [nim, isLaporanOpen]);
 
@@ -260,11 +262,13 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
               const isReported = upd?.reported;
               const isFromApp = upd?._appReport === true;
               const isVerified = isVerifiedByDosen(week);
+              const penolakanInfo = tolkData[week];
+              const isTolak = !!penolakanInfo && !isVerified;
               const badge = getCategoryBadgeStyle(upd?.category);
               return (
                 <div key={week} className="relative group">
                   <div className={`absolute -left-[31px] top-1 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center ${
-                    isReported ? (isVerified ? 'bg-emerald-500 ring-4 ring-emerald-100' : 'bg-brand-500 ring-4 ring-brand-100') : 'bg-slate-200'
+                    isReported ? (isVerified ? 'bg-emerald-500 ring-4 ring-emerald-100' : isTolak ? 'bg-red-400 ring-4 ring-red-100' : 'bg-brand-500 ring-4 ring-brand-100') : 'bg-slate-200'
                   }`} />
                   <div className={`rounded-xl p-4 border transition-colors ${
                     isReported
@@ -279,6 +283,12 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
                           <span className="flex items-center gap-0.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
                             <ShieldCheck className="w-2.5 h-2.5" />
                             Terverifikasi
+                          </span>
+                        )}
+                        {isTolak && (
+                          <span className="flex items-center gap-0.5 text-[10px] font-semibold text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded-full">
+                            <XCircle className="w-2.5 h-2.5" />
+                            Ditolak
                           </span>
                         )}
                       </div>
@@ -304,6 +314,20 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
                           <div className="flex items-start gap-1.5 bg-brand-50/60 p-2.5 rounded-lg border border-brand-100">
                             <ArrowRight className="w-3.5 h-3.5 text-brand-600 shrink-0 mt-0.5" />
                             <p className="text-slate-800 font-semibold">{upd.next}</p>
+                          </div>
+                        )}
+                        {isTolak && (
+                          <div className="bg-red-50 border border-red-200 rounded-lg p-2.5 space-y-0.5">
+                            <div className="flex items-center gap-1 text-[10px] font-bold text-red-600 uppercase tracking-wider">
+                              <XCircle className="w-3 h-3" />
+                              Laporan Ditolak Dosen
+                            </div>
+                            <p className="text-xs text-red-800 font-medium leading-relaxed">
+                              {penolakanInfo.alasan || '—'}
+                            </p>
+                            <p className="text-[10px] text-red-400">
+                              Silakan edit dan kirim ulang laporan Anda.
+                            </p>
                           </div>
                         )}
                         <div className="flex items-center justify-end gap-3 pt-1">

@@ -408,6 +408,53 @@ export async function cancelVerifikasi(nim, week) {
   localStorage.setItem(VERIF_KEY, JSON.stringify(all));
 }
 
+// ─── Penolakan helpers ────────────────────────────────────────────────────────
+
+const PENOLAKAN_KEY = 'penolakan_laporan';
+
+function getLocalPenolakan() {
+  try { return JSON.parse(localStorage.getItem(PENOLAKAN_KEY) || '{}'); } catch { return {}; }
+}
+
+export async function getPenolakan() {
+  if (supabase) {
+    const { data, error } = await supabase.from('penolakan_laporan').select('*');
+    if (!error && data) {
+      const result = {};
+      data.forEach(r => {
+        if (!result[r.nim]) result[r.nim] = {};
+        result[r.nim][r.week] = { alasan: r.alasan, dosenName: r.dosen_name, at: r.rejected_at };
+      });
+      return result;
+    }
+  }
+  return getLocalPenolakan();
+}
+
+export async function savePenolakan(nim, week, dosenName, alasan) {
+  if (supabase) {
+    await supabase.from('penolakan_laporan').upsert(
+      { nim, week, dosen_name: dosenName, alasan, rejected_at: new Date().toISOString() },
+      { onConflict: 'nim,week' }
+    );
+    return;
+  }
+  const all = getLocalPenolakan();
+  if (!all[nim]) all[nim] = {};
+  all[nim][week] = { alasan, dosenName, at: new Date().toISOString() };
+  localStorage.setItem(PENOLAKAN_KEY, JSON.stringify(all));
+}
+
+export async function cancelPenolakan(nim, week) {
+  if (supabase) {
+    await supabase.from('penolakan_laporan').delete().eq('nim', nim).eq('week', week);
+    return;
+  }
+  const all = getLocalPenolakan();
+  if (all[nim]) delete all[nim][week];
+  localStorage.setItem(PENOLAKAN_KEY, JSON.stringify(all));
+}
+
 // ─── Local periods helpers ────────────────────────────────────────────────────
 
 const LOCAL_PERIODS_KEY = 'local_periods';
