@@ -18,10 +18,40 @@ const _PM = {
   Januari: 0, Februari: 1, Maret: 2, April: 3, Mei: 4, Juni: 5,
   Juli: 6, Agustus: 7, September: 8, Oktober: 9, November: 10, Desember: 11,
 };
+const _MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
 function parsePeriodEnd(label) {
   const m = label.match(/\d+\s*-\s*(\d+)\s+(\w+)\s+(\d+)/);
   if (!m) return new Date(0);
   return new Date(2000 + parseInt(m[3]), _PM[m[2]] ?? 0, parseInt(m[1]));
+}
+
+// Generate "DD - DD Month YY" label from ISO date strings
+function formatPeriodLabel(startIso, endIso) {
+  if (!startIso || !endIso) return '';
+  const sd = new Date(startIso + 'T00:00:00');
+  const ed = new Date(endIso + 'T00:00:00');
+  const startDay = String(sd.getDate()).padStart(2, '0');
+  const endDay = String(ed.getDate()).padStart(2, '0');
+  return `${startDay} - ${endDay} ${_MONTHS_ID[ed.getMonth()]} ${String(ed.getFullYear()).slice(-2)}`;
+}
+
+// Parse existing "DD - DD Month YY" label back to {start, end} ISO dates
+function parseLabelToDates(label) {
+  const m = label.match(/(\d+)\s*-\s*(\d+)\s+(\w+)\s+(\d+)/);
+  if (!m) return { start: '', end: '' };
+  const startDay = parseInt(m[1]), endDay = parseInt(m[2]);
+  const endMonth = _PM[m[3]] ?? 0, endYear = 2000 + parseInt(m[4]);
+  let startMonth = endMonth, startYear = endYear;
+  if (startDay > endDay) {
+    startMonth--;
+    if (startMonth < 0) { startMonth = 11; startYear--; }
+  }
+  const toISO = (y, mo, d) => `${y}-${String(mo + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  return {
+    start: toISO(startYear, startMonth, startDay),
+    end: toISO(endYear, endMonth, endDay),
+  };
 }
 
 function getRoleLabel(role) {
@@ -64,9 +94,9 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   const [showPeriode, setShowPeriode] = useState(false);
   // Periods now stored as {label, semester}[]
   const [customPeriods, setCustomPeriods] = useState([]);
-  const [newPeriodBySemester, setNewPeriodBySemester] = useState({});
+  const [newPeriodDatesBySemester, setNewPeriodDatesBySemester] = useState({});
   const [editPeriodLabel, setEditPeriodLabel] = useState(null);
-  const [editPeriodVal, setEditPeriodVal] = useState('');
+  const [editPeriodDates, setEditPeriodDates] = useState({ start: '', end: '' });
   const [exportPeriodeIdx, setExportPeriodeIdx] = useState('');
   const [localSemesters, setLocalSemesters] = useState([]);
   const [newSemesterLabel, setNewSemesterLabel] = useState('');
@@ -124,11 +154,13 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   };
 
   const handleAddPeriod = async (semester) => {
-    const label = (newPeriodBySemester[semester] || '').trim();
+    const { start = '', end = '' } = newPeriodDatesBySemester[semester] || {};
+    if (!start || !end || start > end) return;
+    const label = formatPeriodLabel(start, end);
     if (!label || allWeekColumns.includes(label)) return;
     await addCustomPeriod(label, semester);
     await _refreshCustomPeriods();
-    setNewPeriodBySemester(prev => ({ ...prev, [semester]: '' }));
+    setNewPeriodDatesBySemester(prev => ({ ...prev, [semester]: { start: '', end: '' } }));
     showFlash(`Periode "${label}" berhasil ditambahkan.`);
   };
 
@@ -139,12 +171,14 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   };
 
   const handleSaveEditPeriod = async (oldLabel) => {
-    const newLabel = editPeriodVal.trim();
+    const { start = '', end = '' } = editPeriodDates;
+    if (!start || !end || start > end) return;
+    const newLabel = formatPeriodLabel(start, end);
     if (!newLabel || (newLabel !== oldLabel && allWeekColumns.includes(newLabel))) return;
     await updateCustomPeriod(oldLabel, newLabel);
     await _refreshCustomPeriods();
     setEditPeriodLabel(null);
-    setEditPeriodVal('');
+    setEditPeriodDates({ start: '', end: '' });
     showFlash(`Periode diperbarui.`);
   };
 
@@ -853,16 +887,32 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                                     <span className={`w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center shrink-0 ${isAdmin ? 'bg-amber-100 text-amber-700' : 'bg-indigo-100 text-indigo-700'}`}>{pIdx + 1}</span>
                                     {isEditing ? (
                                       <>
-                                        <input
-                                          type="text"
-                                          value={editPeriodVal}
-                                          onChange={e => setEditPeriodVal(e.target.value)}
-                                          onKeyDown={e => e.key === 'Enter' && handleSaveEditPeriod(p.label)}
-                                          className="flex-1 text-xs border border-brand-300 rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-brand-400"
-                                          autoFocus
-                                        />
-                                        <button onClick={() => handleSaveEditPeriod(p.label)} className="text-[10px] font-bold text-emerald-700 hover:text-emerald-900">Simpan</button>
-                                        <button onClick={() => setEditPeriodLabel(null)} className="text-[10px] text-slate-400 hover:text-slate-600">Batal</button>
+                                        <div className="flex items-center gap-1.5 flex-1">
+                                          <div className="flex flex-col gap-0.5 flex-1">
+                                            <span className="text-[9px] text-slate-400 font-semibold">Dari</span>
+                                            <input type="date"
+                                              value={editPeriodDates.start || ''}
+                                              onChange={e => setEditPeriodDates(prev => ({ ...prev, start: e.target.value }))}
+                                              className="text-[10px] border border-brand-300 rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-brand-400 w-full"
+                                              autoFocus />
+                                          </div>
+                                          <span className="text-slate-400 text-[10px] mt-3">–</span>
+                                          <div className="flex flex-col gap-0.5 flex-1">
+                                            <span className="text-[9px] text-slate-400 font-semibold">Sampai</span>
+                                            <input type="date"
+                                              value={editPeriodDates.end || ''}
+                                              min={editPeriodDates.start || ''}
+                                              onChange={e => setEditPeriodDates(prev => ({ ...prev, end: e.target.value }))}
+                                              className="text-[10px] border border-brand-300 rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-brand-400 w-full" />
+                                          </div>
+                                        </div>
+                                        {editPeriodDates.start && editPeriodDates.end && (
+                                          <span className="text-[9px] text-brand-600 font-mono bg-brand-50 px-1.5 py-0.5 rounded shrink-0">
+                                            {formatPeriodLabel(editPeriodDates.start, editPeriodDates.end)}
+                                          </span>
+                                        )}
+                                        <button onClick={() => handleSaveEditPeriod(p.label)} className="text-[10px] font-bold text-emerald-700 hover:text-emerald-900 shrink-0">Simpan</button>
+                                        <button onClick={() => setEditPeriodLabel(null)} className="text-[10px] text-slate-400 hover:text-slate-600 shrink-0">Batal</button>
                                       </>
                                     ) : (
                                       <>
@@ -875,7 +925,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                                         {isAdmin ? (
                                           <>
                                             <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-semibold">Admin</span>
-                                            <button onClick={() => { setEditPeriodLabel(p.label); setEditPeriodVal(p.label); }} className="p-1 text-slate-400 hover:text-brand-600"><Pencil className="w-3 h-3" /></button>
+                                            <button onClick={() => { setEditPeriodLabel(p.label); setEditPeriodDates(parseLabelToDates(p.label)); }} className="p-1 text-slate-400 hover:text-brand-600"><Pencil className="w-3 h-3" /></button>
                                             <button onClick={() => handleDeleteLocalPeriod(p.label)} className="p-1 text-slate-400 hover:text-rose-600"><Trash2 className="w-3 h-3" /></button>
                                           </>
                                         ) : (
@@ -894,24 +944,41 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                                 );
                               })
                             )}
-                            {/* Add period for this semester */}
-                            <div className="flex items-center gap-2 pt-2 border-t border-slate-200 mt-2">
-                              <input
-                                type="text"
-                                placeholder="Nama periode baru, cth: 05 - 09 Oktober 26"
-                                value={newPeriodBySemester[sem] || ''}
-                                onChange={e => setNewPeriodBySemester(prev => ({ ...prev, [sem]: e.target.value }))}
-                                onKeyDown={e => e.key === 'Enter' && handleAddPeriod(sem)}
-                                className="flex-1 text-[10px] border border-slate-200 rounded-lg px-2 py-1.5 outline-none focus:ring-1 focus:ring-brand-400 bg-white"
-                              />
-                              <button
-                                onClick={() => handleAddPeriod(sem)}
-                                disabled={!(newPeriodBySemester[sem] || '').trim()}
-                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold bg-brand-600 hover:bg-brand-700 text-white disabled:opacity-40 transition-colors shrink-0"
-                              >
-                                <Plus className="w-3 h-3" />
-                                Tambah Periode
-                              </button>
+                            {/* Add period for this semester — date range picker */}
+                            <div className="pt-2 border-t border-slate-200 mt-2 space-y-1.5">
+                              <p className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">Tambah Periode Baru</p>
+                              <div className="flex items-end gap-2">
+                                <div className="flex flex-col gap-0.5 flex-1">
+                                  <label className="text-[9px] text-slate-400">Dari</label>
+                                  <input type="date"
+                                    value={(newPeriodDatesBySemester[sem] || {}).start || ''}
+                                    onChange={e => setNewPeriodDatesBySemester(prev => ({ ...prev, [sem]: { ...(prev[sem] || {}), start: e.target.value } }))}
+                                    className="text-[10px] border border-slate-200 rounded-lg px-2 py-1.5 outline-none focus:ring-1 focus:ring-brand-400 bg-white w-full" />
+                                </div>
+                                <div className="flex flex-col gap-0.5 flex-1">
+                                  <label className="text-[9px] text-slate-400">Sampai</label>
+                                  <input type="date"
+                                    value={(newPeriodDatesBySemester[sem] || {}).end || ''}
+                                    min={(newPeriodDatesBySemester[sem] || {}).start || ''}
+                                    onChange={e => setNewPeriodDatesBySemester(prev => ({ ...prev, [sem]: { ...(prev[sem] || {}), end: e.target.value } }))}
+                                    className="text-[10px] border border-slate-200 rounded-lg px-2 py-1.5 outline-none focus:ring-1 focus:ring-brand-400 bg-white w-full" />
+                                </div>
+                                <div className="flex flex-col gap-0.5 shrink-0">
+                                  {(newPeriodDatesBySemester[sem] || {}).start && (newPeriodDatesBySemester[sem] || {}).end && (
+                                    <span className="text-[9px] text-brand-600 font-mono bg-brand-50 px-1.5 py-0.5 rounded text-center">
+                                      {formatPeriodLabel((newPeriodDatesBySemester[sem] || {}).start, (newPeriodDatesBySemester[sem] || {}).end)}
+                                    </span>
+                                  )}
+                                  <button
+                                    onClick={() => handleAddPeriod(sem)}
+                                    disabled={!(newPeriodDatesBySemester[sem] || {}).start || !(newPeriodDatesBySemester[sem] || {}).end || (newPeriodDatesBySemester[sem] || {}).start > (newPeriodDatesBySemester[sem] || {}).end}
+                                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold bg-brand-600 hover:bg-brand-700 text-white disabled:opacity-40 transition-colors"
+                                  >
+                                    <Plus className="w-3 h-3" />
+                                    Tambah
+                                  </button>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         )}
