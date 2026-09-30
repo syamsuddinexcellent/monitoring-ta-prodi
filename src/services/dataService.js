@@ -41,7 +41,8 @@ export const ORDERED_DEFAULT_WEEKS = [
   '07 - 11 September 26',
   '14 - 18 September 26',
   '21 - 25 September 26',
-  '28 - 02 Oktober 26'
+  '28 - 02 Oktober 26',
+  '05 - 09 Oktober 26'
 ];
 
 /**
