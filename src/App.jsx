@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Header from './components/Header';
 import MetricCards from './components/MetricCards';
 import WeekSelector from './components/WeekSelector';
@@ -48,10 +48,40 @@ export default function App() {
   const [selectedSemester, setSelectedSemester] = useState('Semester Ganjil 2026/2027');
   const [localSemesters, setLocalSemesters] = useState(() => getLocalSemesters());
   const [lockedPeriods, setLockedPeriods] = useState([]);
-  const availableSemesters = useMemo(
-    () => [...BUILTIN_SEMESTERS, ...localSemesters],
-    [localSemesters]
-  );
+  const [customPeriodsData, setCustomPeriodsData] = useState([]); // {label, semester}[]
+
+  // Semesters from localSemesters + any semester referenced by custom periods (cross-browser safety)
+  const availableSemesters = useMemo(() => {
+    const customSems = customPeriodsData.map(p => p.semester).filter(
+      s => !BUILTIN_SEMESTERS.includes(s) && !localSemesters.includes(s)
+    );
+    return [...BUILTIN_SEMESTERS, ...localSemesters, ...new Set(customSems)];
+  }, [localSemesters, customPeriodsData]);
+
+  // Periods filtered for the currently selected semester
+  const activePeriods = useMemo(() => {
+    if (!data) return [];
+    const isBuiltin = selectedSemester === BUILTIN_SEMESTERS[0];
+    const sheets = isBuiltin ? (data.sheetsWeekColumns || []) : [];
+    const custom = customPeriodsData
+      .filter(p => p.semester === selectedSemester)
+      .map(p => p.label);
+    const merged = [...sheets, ...custom.filter(w => !sheets.includes(w))];
+    merged.sort((a, b) => parsePeriodEnd(a) - parsePeriodEnd(b));
+    return merged;
+  }, [data, selectedSemester, customPeriodsData]);
+
+  // Reset selectedWeek when activePeriods changes and current selectedWeek is not in it
+  const selectedWeekRef = useRef(selectedWeek);
+  selectedWeekRef.current = selectedWeek;
+  useEffect(() => {
+    if (activePeriods.length > 0 && !activePeriods.includes(selectedWeekRef.current)) {
+      const lastWithData = [...activePeriods].reverse().find(w =>
+        data?.students.some(s => s.weeklyUpdates[w]?.reported)
+      ) || activePeriods[activePeriods.length - 1];
+      setSelectedWeek(lastWithData);
+    }
+  }, [activePeriods]);
 
   // WhatsApp Gateway State
   const [gatewayStatus, setGatewayStatus] = useState({
@@ -185,15 +215,23 @@ export default function App() {
     try {
       const result = await loadMonitoringData();
       result.students = await mergeSupabaseReports(result.students);
-      const lp = await getCustomPeriods();
-      if (lp.length > 0) {
-        const merged = [...result.weekColumns, ...lp.filter(p => !result.weekColumns.includes(p))];
+
+      // Save raw Sheets periods before merging custom
+      result.sheetsWeekColumns = [...result.weekColumns];
+
+      const customPeriods = await getCustomPeriods(); // {label, semester}[]
+      setCustomPeriodsData(customPeriods);
+      const customLabels = customPeriods.map(p => p.label);
+      if (customLabels.length > 0) {
+        const merged = [...result.weekColumns, ...customLabels.filter(p => !result.weekColumns.includes(p))];
         merged.sort((a, b) => parsePeriodEnd(a) - parsePeriodEnd(b));
         result.weekColumns = merged;
       }
+
       const locked = await getLockedPeriods();
       setLockedPeriods(locked);
       setData(result);
+
       if (!selectedWeek && result.weekColumns.length > 0) {
         const lastWithData = [...result.weekColumns].reverse().find(w =>
           result.students.some(s => s.weeklyUpdates[w]?.reported)
@@ -213,15 +251,15 @@ export default function App() {
     setGatewayStatus(status);
   };
 
-  // Determine next week label
+  // Determine next week label (within the selected semester's active periods)
   const nextWeek = useMemo(() => {
-    if (!data || !selectedWeek) return '';
-    const idx = data.weekColumns.indexOf(selectedWeek);
-    if (idx !== -1 && idx < data.weekColumns.length - 1) {
-      return data.weekColumns[idx + 1];
+    if (!selectedWeek || activePeriods.length === 0) return '';
+    const idx = activePeriods.indexOf(selectedWeek);
+    if (idx !== -1 && idx < activePeriods.length - 1) {
+      return activePeriods[idx + 1];
     }
     return '';
-  }, [data, selectedWeek]);
+  }, [activePeriods, selectedWeek]);
 
   // Metrics for active week
   // All-student metrics (admin view)
@@ -252,10 +290,10 @@ export default function App() {
 
   // Multi-week trend (scoped to dosen's students when dosen is logged in)
   const trendData = useMemo(() => {
-    if (!data) return [];
+    if (!data || activePeriods.length === 0) return [];
     const students = isDosen && dosenStudents.length > 0 ? dosenStudents : data.students;
-    return getAllWeeksTrend(students, data.weekColumns);
-  }, [data, isDosen, dosenStudents]);
+    return getAllWeeksTrend(students, activePeriods);
+  }, [data, isDosen, dosenStudents, activePeriods]);
 
   // Distinct angkatan
   const availableAngkatan = useMemo(() => {
@@ -476,7 +514,7 @@ export default function App() {
         onlineCount={onlineCount}
         bottomRow={
           <WeekSelector
-            weekColumns={data?.weekColumns || []}
+            weekColumns={activePeriods}
             selectedWeek={selectedWeek}
             onSelectWeek={setSelectedWeek}
             viewMode={viewMode}
@@ -537,7 +575,7 @@ export default function App() {
         {viewMode === 'matrix' ? (
           <MatrixView
             students={filteredStudents}
-            weekColumns={data?.weekColumns || []}
+            weekColumns={activePeriods}
             onOpenDetail={setDetailStudent}
           />
         ) : (
@@ -721,6 +759,7 @@ export default function App() {
         sheetsData={data}
         onSemestersChange={setLocalSemesters}
         onLockedPeriodsChange={setLockedPeriods}
+        onCustomPeriodsChange={setCustomPeriodsData}
       />
     </div>
   );

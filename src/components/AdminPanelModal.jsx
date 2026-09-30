@@ -50,7 +50,7 @@ function getDosenLaporanSummary() {
   } catch { return []; }
 }
 
-export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemestersChange, onLockedPeriodsChange }) {
+export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemestersChange, onLockedPeriodsChange, onCustomPeriodsChange }) {
   const [tab, setTab] = useState('akun');
   const [users, setUsers] = useState([]);
   const [reportsSummary, setReportsSummary] = useState({ students: 0, total: 0 });
@@ -62,13 +62,15 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   const [sortCol, setSortCol] = useState('nim');
   const [sortAsc, setSortAsc] = useState(true);
   const [showPeriode, setShowPeriode] = useState(false);
-  const [localPeriods, setLocalPeriods] = useState([]);
-  const [newPeriodLabel, setNewPeriodLabel] = useState('');
-  const [editPeriodIdx, setEditPeriodIdx] = useState(null);
+  // Periods now stored as {label, semester}[]
+  const [customPeriods, setCustomPeriods] = useState([]);
+  const [newPeriodBySemester, setNewPeriodBySemester] = useState({});
+  const [editPeriodLabel, setEditPeriodLabel] = useState(null);
   const [editPeriodVal, setEditPeriodVal] = useState('');
   const [exportPeriodeIdx, setExportPeriodeIdx] = useState('');
   const [localSemesters, setLocalSemesters] = useState([]);
   const [newSemesterLabel, setNewSemesterLabel] = useState('');
+  const [expandedSemester, setExpandedSemester] = useState(BUILTIN_SEMESTERS[0]);
   const [lockedPeriodSet, setLockedPeriodSet] = useState(new Set());
   // password show/hide & reset per user (keyed by email)
   const [showPass, setShowPass] = useState({});
@@ -78,31 +80,61 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     setUsers(await getStoredUsersWithPasswords());
     setReportsSummary(getLocalReportsSummary());
     setDosenSummary(getDosenLaporanSummary());
-    setLocalPeriods(await getCustomPeriods());
+    const cp = await getCustomPeriods();
+    setCustomPeriods(cp);
     setLocalSemesters(getLocalSemesters());
     setLockedPeriodSet(new Set(await getLockedPeriods()));
   };
 
   useEffect(() => { if (isOpen) { refresh(); setConfirmDelete(null); setFlash(''); } }, [isOpen]);
 
-  const allWeekColumns = useMemo(() => {
-    const sheets = sheetsData?.weekColumns || [];
-    const local = localPeriods.filter(p => !sheets.includes(p));
-    return [...sheets, ...local].sort((a, b) => parsePeriodEnd(a) - parsePeriodEnd(b));
-  }, [sheetsData, localPeriods]);
+  const allSemesters = useMemo(() => [...BUILTIN_SEMESTERS, ...localSemesters], [localSemesters]);
 
-  const handleAddPeriod = async () => {
-    const label = newPeriodLabel.trim();
+  // Group periods by semester; sheets periods belong to BUILTIN_SEMESTERS[0]
+  const periodsBySemester = useMemo(() => {
+    const sheetsWeeks = sheetsData?.sheetsWeekColumns || sheetsData?.weekColumns || [];
+    const result = {};
+    allSemesters.forEach(s => { result[s] = []; });
+    sheetsWeeks.forEach(w => {
+      result[BUILTIN_SEMESTERS[0]].push({ label: w, source: 'sheets' });
+    });
+    customPeriods.forEach(p => {
+      const sem = p.semester || BUILTIN_SEMESTERS[0];
+      if (!result[sem]) result[sem] = [];
+      if (!result[sem].some(x => x.label === p.label)) {
+        result[sem].push({ label: p.label, source: 'admin' });
+      }
+    });
+    Object.keys(result).forEach(s => {
+      result[s].sort((a, b) => parsePeriodEnd(a.label) - parsePeriodEnd(b.label));
+    });
+    return result;
+  }, [sheetsData, customPeriods, allSemesters]);
+
+  // All week columns across all semesters (for export)
+  const allWeekColumns = useMemo(() => {
+    const all = Object.values(periodsBySemester).flat().map(p => p.label);
+    return [...new Set(all)].sort((a, b) => parsePeriodEnd(a) - parsePeriodEnd(b));
+  }, [periodsBySemester]);
+
+  const _refreshCustomPeriods = async () => {
+    const cp = await getCustomPeriods();
+    setCustomPeriods(cp);
+    onCustomPeriodsChange?.(cp);
+  };
+
+  const handleAddPeriod = async (semester) => {
+    const label = (newPeriodBySemester[semester] || '').trim();
     if (!label || allWeekColumns.includes(label)) return;
-    await addCustomPeriod(label);
-    setLocalPeriods(await getCustomPeriods());
-    setNewPeriodLabel('');
+    await addCustomPeriod(label, semester);
+    await _refreshCustomPeriods();
+    setNewPeriodBySemester(prev => ({ ...prev, [semester]: '' }));
     showFlash(`Periode "${label}" berhasil ditambahkan.`);
   };
 
   const handleDeleteLocalPeriod = async (label) => {
     await deleteCustomPeriod(label);
-    setLocalPeriods(await getCustomPeriods());
+    await _refreshCustomPeriods();
     showFlash(`Periode "${label}" dihapus.`);
   };
 
@@ -110,8 +142,8 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     const newLabel = editPeriodVal.trim();
     if (!newLabel || (newLabel !== oldLabel && allWeekColumns.includes(newLabel))) return;
     await updateCustomPeriod(oldLabel, newLabel);
-    setLocalPeriods(await getCustomPeriods());
-    setEditPeriodIdx(null);
+    await _refreshCustomPeriods();
+    setEditPeriodLabel(null);
     setEditPeriodVal('');
     showFlash(`Periode diperbarui.`);
   };
@@ -132,8 +164,6 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     }
   };
 
-  const allSemesters = [...BUILTIN_SEMESTERS, ...localSemesters];
-
   const handleAddSemester = () => {
     const label = newSemesterLabel.trim();
     if (!label || allSemesters.includes(label)) return;
@@ -142,6 +172,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     setLocalSemesters(updated);
     onSemestersChange?.(updated);
     setNewSemesterLabel('');
+    setExpandedSemester(label);
     showFlash(`Semester "${label}" berhasil ditambahkan.`);
   };
 
@@ -150,6 +181,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     saveLocalSemesters(updated);
     setLocalSemesters(updated);
     onSemestersChange?.(updated);
+    if (expandedSemester === label) setExpandedSemester(BUILTIN_SEMESTERS[0]);
     showFlash(`Semester "${label}" dihapus.`);
   };
 
@@ -765,122 +797,138 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                 </div>
               </div>
 
-              {/* ── Kelola Periode ── */}
-              <div className="rounded-xl border border-slate-200 overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-indigo-600" />
-                    <span className="text-xs font-bold text-slate-700">Kelola Periode</span>
-                    <span className="text-[10px] text-slate-400">({allWeekColumns.length} total)</span>
-                  </div>
-                </div>
-                <div className="px-4 py-3 space-y-3">
-                  {/* Semua periode terurut kronologis */}
-                  {allWeekColumns.map((w, i) => {
-                    const isLocal = localPeriods.includes(w);
-                    const localIdx = localPeriods.indexOf(w);
-                    const isEditing = isLocal && editPeriodIdx === localIdx;
-                    return (
-                      <div key={w} className="flex items-center gap-2">
-                        <span className={`w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center shrink-0 ${isLocal ? 'bg-amber-100 text-amber-700' : 'bg-indigo-100 text-indigo-700'}`}>{i + 1}</span>
-                        {isEditing ? (
-                          <>
-                            <input
-                              type="text"
-                              value={editPeriodVal}
-                              onChange={e => setEditPeriodVal(e.target.value)}
-                              onKeyDown={e => e.key === 'Enter' && handleSaveEditPeriod(w)}
-                              className="flex-1 text-xs border border-brand-300 rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-brand-400"
-                              autoFocus
-                            />
-                            <button onClick={() => handleSaveEditPeriod(w)} className="text-[10px] font-bold text-emerald-700 hover:text-emerald-900">Simpan</button>
-                            <button onClick={() => setEditPeriodIdx(null)} className="text-[10px] text-slate-400 hover:text-slate-600">Batal</button>
-                          </>
-                        ) : (
-                          <>
-                            <span className="flex-1 text-xs text-slate-700">{w}</span>
-                            {lockedPeriodSet.has(w) && (
-                              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 font-semibold flex items-center gap-0.5">
-                                <Lock className="w-2.5 h-2.5" />Dikunci
-                              </span>
-                            )}
-                            {isLocal ? (
-                              <>
-                                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-semibold">Admin</span>
-                                <button onClick={() => { setEditPeriodIdx(localIdx); setEditPeriodVal(w); }} className="p-1 text-slate-400 hover:text-brand-600"><Pencil className="w-3 h-3" /></button>
-                                <button onClick={() => handleDeleteLocalPeriod(w)} className="p-1 text-slate-400 hover:text-rose-600"><Trash2 className="w-3 h-3" /></button>
-                              </>
-                            ) : (
-                              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 font-semibold">Sheets</span>
-                            )}
-                            <button
-                              onClick={() => handleToggleLock(w)}
-                              title={lockedPeriodSet.has(w) ? 'Buka kunci periode' : 'Kunci periode'}
-                              className={`p-1 transition-colors ${lockedPeriodSet.has(w) ? 'text-slate-500 hover:text-emerald-600' : 'text-slate-300 hover:text-slate-600'}`}
-                            >
-                              {lockedPeriodSet.has(w) ? <Unlock className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    );
-                  })}
-                  {/* Tambah periode baru */}
-                  <div className="flex items-center gap-2 pt-1 border-t border-slate-100">
-                    <input
-                      type="text"
-                      placeholder="Nama periode baru, cth: 05 - 09 Oktober 26"
-                      value={newPeriodLabel}
-                      onChange={e => setNewPeriodLabel(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && handleAddPeriod()}
-                      className="flex-1 text-[10px] border border-slate-200 rounded-lg px-2 py-1.5 outline-none focus:ring-1 focus:ring-brand-400"
-                    />
-                    <button
-                      onClick={handleAddPeriod}
-                      disabled={!newPeriodLabel.trim()}
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold bg-brand-600 hover:bg-brand-700 text-white disabled:opacity-40 transition-colors shrink-0"
-                    >
-                      <Plus className="w-3 h-3" />
-                      Tambah
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* ── Kelola Semester ── */}
+              {/* ── Kelola Semester (dengan periode di dalamnya) ── */}
               <div className="rounded-xl border border-slate-200 overflow-hidden">
                 <div className="flex items-center gap-2 px-4 py-3 bg-slate-50 border-b border-slate-200">
                   <Layers className="w-4 h-4 text-violet-600" />
                   <span className="text-xs font-bold text-slate-700">Kelola Semester</span>
-                  <span className="text-[10px] text-slate-400">({allSemesters.length} total)</span>
+                  <span className="text-[10px] text-slate-400">({allSemesters.length} semester)</span>
                 </div>
-                <div className="px-4 py-3 space-y-2">
-                  {/* Built-in semesters */}
-                  {BUILTIN_SEMESTERS.map((s, i) => (
-                    <div key={s} className="flex items-center gap-2 text-xs">
-                      <span className="w-5 h-5 rounded-full bg-violet-100 text-violet-700 text-[10px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
-                      <span className="flex-1 text-slate-700">{s}</span>
-                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 font-semibold">Bawaan</span>
-                    </div>
-                  ))}
-                  {/* Local semesters */}
-                  {localSemesters.map((s, i) => (
-                    <div key={s} className="flex items-center gap-2 text-xs">
-                      <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold flex items-center justify-center shrink-0">{BUILTIN_SEMESTERS.length + i + 1}</span>
-                      <span className="flex-1 text-slate-700">{s}</span>
-                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-semibold">Lokal</span>
-                      <button onClick={() => handleDeleteLocalSemester(s)} className="p-1 text-slate-400 hover:text-rose-600"><Trash2 className="w-3 h-3" /></button>
-                    </div>
-                  ))}
-                  {/* Tambah semester baru */}
-                  <div className="flex items-center gap-2 pt-1 border-t border-slate-100">
+                <div className="divide-y divide-slate-100">
+                  {allSemesters.map((sem, semIdx) => {
+                    const isBuiltin = BUILTIN_SEMESTERS.includes(sem);
+                    const isExpanded = expandedSemester === sem;
+                    const semPeriods = periodsBySemester[sem] || [];
+
+                    return (
+                      <div key={sem}>
+                        {/* Semester header row */}
+                        <div
+                          className="flex items-center gap-2 px-4 py-3 cursor-pointer hover:bg-slate-50/80 transition-colors select-none"
+                          onClick={() => setExpandedSemester(isExpanded ? null : sem)}
+                        >
+                          <span className="w-5 h-5 rounded-full bg-violet-100 text-violet-700 text-[10px] font-bold flex items-center justify-center shrink-0">{semIdx + 1}</span>
+                          <span className="flex-1 text-xs font-semibold text-slate-700">{sem}</span>
+                          <span className="text-[10px] text-slate-400">{semPeriods.length} periode</span>
+                          {isBuiltin ? (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 font-semibold">Bawaan</span>
+                          ) : (
+                            <>
+                              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-semibold">Admin</span>
+                              <button
+                                onClick={e => { e.stopPropagation(); handleDeleteLocalSemester(sem); }}
+                                className="p-1 text-slate-300 hover:text-rose-600 transition-colors"
+                                title="Hapus semester"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            </>
+                          )}
+                          {isExpanded ? <ChevronUp className="w-3.5 h-3.5 text-slate-400" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
+                        </div>
+
+                        {/* Expanded: period list + add input */}
+                        {isExpanded && (
+                          <div className="border-t border-slate-100 bg-slate-50/40 px-4 pb-4 pt-3 space-y-2">
+                            {semPeriods.length === 0 ? (
+                              <p className="text-[10px] text-slate-400 italic py-1">Belum ada periode untuk semester ini.</p>
+                            ) : (
+                              semPeriods.map((p, pIdx) => {
+                                const isAdmin = p.source === 'admin';
+                                const isLocked = lockedPeriodSet.has(p.label);
+                                const isEditing = editPeriodLabel === p.label;
+
+                                return (
+                                  <div key={p.label} className="flex items-center gap-2">
+                                    <span className={`w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center shrink-0 ${isAdmin ? 'bg-amber-100 text-amber-700' : 'bg-indigo-100 text-indigo-700'}`}>{pIdx + 1}</span>
+                                    {isEditing ? (
+                                      <>
+                                        <input
+                                          type="text"
+                                          value={editPeriodVal}
+                                          onChange={e => setEditPeriodVal(e.target.value)}
+                                          onKeyDown={e => e.key === 'Enter' && handleSaveEditPeriod(p.label)}
+                                          className="flex-1 text-xs border border-brand-300 rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-brand-400"
+                                          autoFocus
+                                        />
+                                        <button onClick={() => handleSaveEditPeriod(p.label)} className="text-[10px] font-bold text-emerald-700 hover:text-emerald-900">Simpan</button>
+                                        <button onClick={() => setEditPeriodLabel(null)} className="text-[10px] text-slate-400 hover:text-slate-600">Batal</button>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <span className="flex-1 text-xs text-slate-700">{p.label}</span>
+                                        {isLocked && (
+                                          <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 font-semibold flex items-center gap-0.5">
+                                            <Lock className="w-2.5 h-2.5" />Dikunci
+                                          </span>
+                                        )}
+                                        {isAdmin ? (
+                                          <>
+                                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-semibold">Admin</span>
+                                            <button onClick={() => { setEditPeriodLabel(p.label); setEditPeriodVal(p.label); }} className="p-1 text-slate-400 hover:text-brand-600"><Pencil className="w-3 h-3" /></button>
+                                            <button onClick={() => handleDeleteLocalPeriod(p.label)} className="p-1 text-slate-400 hover:text-rose-600"><Trash2 className="w-3 h-3" /></button>
+                                          </>
+                                        ) : (
+                                          <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 font-semibold">Sheets</span>
+                                        )}
+                                        <button
+                                          onClick={() => handleToggleLock(p.label)}
+                                          title={isLocked ? 'Buka kunci periode' : 'Kunci periode'}
+                                          className={`p-1 transition-colors ${isLocked ? 'text-slate-500 hover:text-emerald-600' : 'text-slate-300 hover:text-slate-600'}`}
+                                        >
+                                          {isLocked ? <Unlock className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+                                        </button>
+                                      </>
+                                    )}
+                                  </div>
+                                );
+                              })
+                            )}
+                            {/* Add period for this semester */}
+                            <div className="flex items-center gap-2 pt-2 border-t border-slate-200 mt-2">
+                              <input
+                                type="text"
+                                placeholder="Nama periode baru, cth: 05 - 09 Oktober 26"
+                                value={newPeriodBySemester[sem] || ''}
+                                onChange={e => setNewPeriodBySemester(prev => ({ ...prev, [sem]: e.target.value }))}
+                                onKeyDown={e => e.key === 'Enter' && handleAddPeriod(sem)}
+                                className="flex-1 text-[10px] border border-slate-200 rounded-lg px-2 py-1.5 outline-none focus:ring-1 focus:ring-brand-400 bg-white"
+                              />
+                              <button
+                                onClick={() => handleAddPeriod(sem)}
+                                disabled={!(newPeriodBySemester[sem] || '').trim()}
+                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold bg-brand-600 hover:bg-brand-700 text-white disabled:opacity-40 transition-colors shrink-0"
+                              >
+                                <Plus className="w-3 h-3" />
+                                Tambah Periode
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                {/* Add new semester */}
+                <div className="px-4 py-3 border-t border-slate-200 bg-slate-50">
+                  <div className="flex items-center gap-2">
                     <input
                       type="text"
                       placeholder="cth: Semester Genap 2027/2028"
                       value={newSemesterLabel}
                       onChange={e => setNewSemesterLabel(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && handleAddSemester()}
-                      className="flex-1 text-[10px] border border-slate-200 rounded-lg px-2 py-1.5 outline-none focus:ring-1 focus:ring-brand-400"
+                      className="flex-1 text-[10px] border border-slate-200 rounded-lg px-2 py-1.5 outline-none focus:ring-1 focus:ring-violet-400 bg-white"
                     />
                     <button
                       onClick={handleAddSemester}
@@ -888,7 +936,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                       className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold bg-violet-600 hover:bg-violet-700 text-white disabled:opacity-40 transition-colors shrink-0"
                     >
                       <Plus className="w-3 h-3" />
-                      Tambah
+                      Tambah Semester
                     </button>
                   </div>
                 </div>

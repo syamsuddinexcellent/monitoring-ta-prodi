@@ -486,15 +486,15 @@ function _saveLocalPeriods(list) {
 
 export async function getCustomPeriods() {
   if (supabase) {
-    const { data, error } = await supabase.from('custom_periods').select('label').order('created_at');
-    if (!error && data) return data.map(r => r.label);
+    const { data, error } = await supabase.from('custom_periods').select('label, semester').order('created_at');
+    if (!error && data) return data.map(r => ({ label: r.label, semester: r.semester || BUILTIN_SEMESTERS[0] }));
   }
-  return _getLocalPeriods();
+  return _getLocalPeriods().map(label => ({ label, semester: BUILTIN_SEMESTERS[0] }));
 }
 
-export async function addCustomPeriod(label) {
+export async function addCustomPeriod(label, semester = BUILTIN_SEMESTERS[0]) {
   if (supabase) {
-    await supabase.from('custom_periods').insert({ label });
+    await supabase.from('custom_periods').insert({ label, semester });
     return;
   }
   const list = _getLocalPeriods();
