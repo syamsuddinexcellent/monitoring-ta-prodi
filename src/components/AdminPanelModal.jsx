@@ -4,12 +4,13 @@ import {
   Trash2, RefreshCw, AlertTriangle, CheckCircle2, Inbox,
   RotateCcw, Calendar, Layers, Clock, Wifi, WifiOff, Search,
   ChevronUp, ChevronDown, Phone, FileSpreadsheet, Printer, Plus, Pencil,
-  Eye, EyeOff, KeyRound
+  Eye, EyeOff, KeyRound, Lock, Unlock
 } from 'lucide-react';
 import { getStoredUsersList, getStoredUsersWithPasswords, deleteStoredUser, resetPassword } from './AuthModal';
 import {
   exportExcelAll, exportExcelPeriode, printRekapPeriode, printRekapAll,
   getCustomPeriods, addCustomPeriod, deleteCustomPeriod, updateCustomPeriod,
+  getLockedPeriods, lockPeriod, unlockPeriod,
   BUILTIN_SEMESTERS, getLocalSemesters, saveLocalSemesters
 } from '../utils/exportUtils';
 
@@ -49,7 +50,7 @@ function getDosenLaporanSummary() {
   } catch { return []; }
 }
 
-export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemestersChange }) {
+export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemestersChange, onLockedPeriodsChange }) {
   const [tab, setTab] = useState('akun');
   const [users, setUsers] = useState([]);
   const [reportsSummary, setReportsSummary] = useState({ students: 0, total: 0 });
@@ -68,6 +69,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   const [exportPeriodeIdx, setExportPeriodeIdx] = useState('');
   const [localSemesters, setLocalSemesters] = useState([]);
   const [newSemesterLabel, setNewSemesterLabel] = useState('');
+  const [lockedPeriodSet, setLockedPeriodSet] = useState(new Set());
   // password show/hide & reset per user (keyed by email)
   const [showPass, setShowPass] = useState({});
   const [resetForm, setResetForm] = useState({}); // { [email]: { open, value, error } }
@@ -78,6 +80,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     setDosenSummary(getDosenLaporanSummary());
     setLocalPeriods(await getCustomPeriods());
     setLocalSemesters(getLocalSemesters());
+    setLockedPeriodSet(new Set(await getLockedPeriods()));
   };
 
   useEffect(() => { if (isOpen) { refresh(); setConfirmDelete(null); setFlash(''); } }, [isOpen]);
@@ -111,6 +114,22 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     setEditPeriodIdx(null);
     setEditPeriodVal('');
     showFlash(`Periode diperbarui.`);
+  };
+
+  const handleToggleLock = async (label) => {
+    if (lockedPeriodSet.has(label)) {
+      await unlockPeriod(label);
+      const updated = new Set(await getLockedPeriods());
+      setLockedPeriodSet(updated);
+      onLockedPeriodsChange?.([...updated]);
+      showFlash(`Periode "${label}" dibuka kembali.`);
+    } else {
+      await lockPeriod(label);
+      const updated = new Set(await getLockedPeriods());
+      setLockedPeriodSet(updated);
+      onLockedPeriodsChange?.([...updated]);
+      showFlash(`Periode "${label}" dikunci.`);
+    }
   };
 
   const allSemesters = [...BUILTIN_SEMESTERS, ...localSemesters];
@@ -780,6 +799,11 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                         ) : (
                           <>
                             <span className="flex-1 text-xs text-slate-700">{w}</span>
+                            {lockedPeriodSet.has(w) && (
+                              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 font-semibold flex items-center gap-0.5">
+                                <Lock className="w-2.5 h-2.5" />Dikunci
+                              </span>
+                            )}
                             {isLocal ? (
                               <>
                                 <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-semibold">Admin</span>
@@ -789,6 +813,13 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                             ) : (
                               <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 font-semibold">Sheets</span>
                             )}
+                            <button
+                              onClick={() => handleToggleLock(w)}
+                              title={lockedPeriodSet.has(w) ? 'Buka kunci periode' : 'Kunci periode'}
+                              className={`p-1 transition-colors ${lockedPeriodSet.has(w) ? 'text-slate-500 hover:text-emerald-600' : 'text-slate-300 hover:text-slate-600'}`}
+                            >
+                              {lockedPeriodSet.has(w) ? <Unlock className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+                            </button>
                           </>
                         )}
                       </div>

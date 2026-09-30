@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import {
   GraduationCap, BookOpen, CheckCircle2, AlertCircle,
   ArrowRight, UserCheck, Calendar, TrendingUp, Clock,
-  PlusCircle, ShieldCheck, PencilLine, Trash2, XCircle, RefreshCw, CalendarDays
+  PlusCircle, ShieldCheck, PencilLine, Trash2, XCircle, RefreshCw, CalendarDays, Lock
 } from 'lucide-react';
 import { getCategoryBadgeStyle } from '../utils/helpers';
 import LaporanModal, { getLocalReportsForNim, parseWeekRange, deleteReport } from './LaporanModal';
@@ -28,7 +28,7 @@ function ProgressRing({ pct }) {
   );
 }
 
-export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
+export default function MahasiswaView({ student, weekColumns, loggedInUser, lockedPeriods = [] }) {
   const [isLaporanOpen, setIsLaporanOpen] = useState(false);
   const [editWeek, setEditWeek] = useState('');
   const [localReports, setLocalReports] = useState({});
@@ -267,6 +267,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
               const isResubmitted = isTolak && upd?.submittedAt && penolakanInfo?.at &&
                 new Date(upd.submittedAt) > new Date(penolakanInfo.at);
               const badge = getCategoryBadgeStyle(upd?.category);
+              const isLocked = lockedPeriods.includes(week);
               return (
                 <div key={week} className="relative group">
                   <div className={`absolute -left-[31px] top-1 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center ${
@@ -304,6 +305,11 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold border ${badge.bg} ${badge.text} ${badge.border}`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
                           {upd.category}
+                        </span>
+                      ) : isLocked ? (
+                        <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 text-slate-500 border border-slate-200">
+                          <Lock className="w-3 h-3" />
+                          Dikunci
                         </span>
                       ) : (
                         <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-rose-100 text-rose-600 border border-rose-200">
@@ -395,14 +401,16 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
                     ) : (
                       <div className="flex items-center justify-between mt-1">
                         <p className="text-xs text-slate-400 italic">
-                          Belum ada laporan bimbingan untuk periode ini.
+                          {isLocked ? 'Periode ini dikunci oleh admin.' : 'Belum ada laporan bimbingan untuk periode ini.'}
                         </p>
-                        <button
-                          onClick={() => setIsLaporanOpen(true)}
-                          className="text-[11px] font-semibold text-brand-600 hover:text-brand-700 hover:underline ml-2 shrink-0"
-                        >
-                          + Lapor
-                        </button>
+                        {!isLocked && (
+                          <button
+                            onClick={() => setIsLaporanOpen(true)}
+                            className="text-[11px] font-semibold text-brand-600 hover:text-brand-700 hover:underline ml-2 shrink-0"
+                          >
+                            + Lapor
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
@@ -425,6 +433,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
         penguji1={student.penguji1 || ''}
         penguji2={student.penguji2 || ''}
         forceWeek={editWeek}
+        lockedPeriods={lockedPeriods}
       />
     </>
   );

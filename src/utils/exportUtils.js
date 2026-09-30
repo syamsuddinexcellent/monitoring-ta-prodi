@@ -519,3 +519,33 @@ export async function updateCustomPeriod(oldLabel, newLabel) {
 
 // kept for backward compat (used by old localStorage data only)
 export function getLocalPeriods() { return _getLocalPeriods(); }
+
+// ─── Locked periods helpers (Supabase-backed) ─────────────────────────────────
+
+const LOCAL_LOCKED_KEY = 'locked_periods';
+
+export async function getLockedPeriods() {
+  if (supabase) {
+    const { data, error } = await supabase.from('locked_periods').select('label');
+    if (!error && data) return data.map(r => r.label);
+  }
+  try { return JSON.parse(localStorage.getItem(LOCAL_LOCKED_KEY) || '[]'); } catch { return []; }
+}
+
+export async function lockPeriod(label) {
+  if (supabase) {
+    await supabase.from('locked_periods').upsert({ label }, { onConflict: 'label' });
+    return;
+  }
+  const list = await getLockedPeriods();
+  if (!list.includes(label)) localStorage.setItem(LOCAL_LOCKED_KEY, JSON.stringify([...list, label]));
+}
+
+export async function unlockPeriod(label) {
+  if (supabase) {
+    await supabase.from('locked_periods').delete().eq('label', label);
+    return;
+  }
+  const list = await getLockedPeriods();
+  localStorage.setItem(LOCAL_LOCKED_KEY, JSON.stringify(list.filter(p => p !== label)));
+}

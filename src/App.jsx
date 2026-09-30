@@ -21,7 +21,7 @@ import {
   getAllWeeksTrend,
   mergeSupabaseReports
 } from './services/dataService';
-import { getCustomPeriods, BUILTIN_SEMESTERS, getLocalSemesters } from './utils/exportUtils';
+import { getCustomPeriods, getLockedPeriods, BUILTIN_SEMESTERS, getLocalSemesters } from './utils/exportUtils';
 import {
   checkGatewayStatus,
   logoutGateway
@@ -47,6 +47,7 @@ export default function App() {
   const [viewMode, setViewMode] = useState('cards'); // 'cards' | 'table' | 'matrix'
   const [selectedSemester, setSelectedSemester] = useState('Semester Ganjil 2026/2027');
   const [localSemesters, setLocalSemesters] = useState(() => getLocalSemesters());
+  const [lockedPeriods, setLockedPeriods] = useState([]);
   const availableSemesters = useMemo(
     () => [...BUILTIN_SEMESTERS, ...localSemesters],
     [localSemesters]
@@ -190,6 +191,8 @@ export default function App() {
         merged.sort((a, b) => parsePeriodEnd(a) - parsePeriodEnd(b));
         result.weekColumns = merged;
       }
+      const locked = await getLockedPeriods();
+      setLockedPeriods(locked);
       setData(result);
       if (!selectedWeek && result.weekColumns.length > 0) {
         const lastWithData = [...result.weekColumns].reverse().find(w =>
@@ -437,6 +440,7 @@ export default function App() {
             student={student}
             weekColumns={data?.weekColumns || []}
             loggedInUser={loggedInUser}
+            lockedPeriods={lockedPeriods}
           />
         </main>
         <AuthModal
@@ -716,6 +720,7 @@ export default function App() {
         onClose={() => setIsAdminPanelOpen(false)}
         sheetsData={data}
         onSemestersChange={setLocalSemesters}
+        onLockedPeriodsChange={setLockedPeriods}
       />
     </div>
   );

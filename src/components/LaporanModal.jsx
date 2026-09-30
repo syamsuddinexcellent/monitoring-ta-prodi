@@ -207,6 +207,7 @@ export default function LaporanModal({
   isOpen, onClose, weekColumns, nim, mahasiswaName = '', existingData,
   pembimbing1 = '', pembimbing2 = '', penguji1 = '', penguji2 = '',
   forceWeek = '',
+  lockedPeriods = [],
 }) {
   const dosenList = [
     { key: 'p1',  label: 'P1',  name: pembimbing1 },
@@ -318,8 +319,10 @@ export default function LaporanModal({
     }
   };
 
-  // Only show weeks that haven't been reported yet (but include forceWeek for editing)
-  const unreported = weekColumns.filter(w => !existingData?.[w]?.reported || w === forceWeek);
+  // Only show weeks that haven't been reported yet, aren't locked (but include forceWeek for editing)
+  const unreported = weekColumns.filter(w =>
+    (!existingData?.[w]?.reported || w === forceWeek) && !lockedPeriods.includes(w)
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
