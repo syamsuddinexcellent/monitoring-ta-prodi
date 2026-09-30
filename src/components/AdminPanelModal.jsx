@@ -357,6 +357,17 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     return [...new Set(sheetsData.students.map(s => s.angkatan))].sort();
   }, [sheetsData]);
 
+  const allDosenOptions = useMemo(() => {
+    const fromSheet = sheetsData?.students?.flatMap(s =>
+      [s.pembimbing1, s.pembimbing2, s.penguji1, s.penguji2].filter(Boolean)
+    ) ?? [];
+    const fromUsers = users
+      .filter(u => u.role === 'dosen')
+      .map(u => u.lecturerName || u.name)
+      .filter(Boolean);
+    return [...new Set([...fromSheet, ...fromUsers])].sort();
+  }, [sheetsData, users]);
+
   const totalPeriode = sheetsData?.weekColumns?.length ?? 0;
 
   const filteredStudents = useMemo(() => {
@@ -824,7 +835,6 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                                   { field: 'penguji2',    val: s.penguji2 },
                                 ].map(({ field, val }) => {
                                   const isEditing = editingCell?.nim === s.nim && editingCell?.field === field;
-                                  const dosenOptions = dosenUsers.map(u => u.lecturerName || u.name).filter(Boolean);
                                   return (
                                     <td key={field} className="px-2 py-2 border-r border-slate-100 max-w-[112px]">
                                       {isEditing ? (
@@ -837,11 +847,11 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                                           className="w-full text-[10px] border border-brand-300 rounded px-1 py-0.5 outline-none focus:ring-1 focus:ring-brand-400 bg-white"
                                         >
                                           <option value="">— pilih dosen —</option>
-                                          {dosenOptions.map(name => (
+                                          {allDosenOptions.map(name => (
                                             <option key={name} value={name}>{name}</option>
                                           ))}
-                                          {val && !dosenOptions.includes(val) && (
-                                            <option value={val}>{val} (sheets)</option>
+                                          {val && !allDosenOptions.includes(val) && (
+                                            <option value={val}>{val} (lainnya)</option>
                                           )}
                                         </select>
                                       ) : (
