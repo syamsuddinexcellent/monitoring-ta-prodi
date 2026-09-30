@@ -44,15 +44,35 @@ export default function Header({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between py-4 gap-4">
           {/* Logo & Title */}
-          <div className="flex items-center space-x-3">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-brand-700 via-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
-              <span className="text-2xl">📊</span>
+          <div className="flex items-center gap-4">
+            {/* Three institution logos */}
+            <div className="flex items-center gap-2.5 shrink-0">
+              <img
+                src="/logo-fs.jpg"
+                alt="Fakultas Sains"
+                className="h-10 w-10 rounded-lg object-cover shadow-sm ring-1 ring-slate-200"
+              />
+              <div className="h-8 w-px bg-slate-200" />
+              <img
+                src="/logo-itera.jpg"
+                alt="ITERA"
+                className="h-10 w-10 rounded-lg object-contain shadow-sm ring-1 ring-slate-200 bg-white p-0.5"
+              />
+              <div className="h-8 w-px bg-slate-200" />
+              <img
+                src="/logo-sainsdata.jpg"
+                alt="Sains Data"
+                className="h-10 w-10 rounded-lg object-cover shadow-sm ring-1 ring-slate-200"
+              />
             </div>
+            {/* Divider */}
+            <div className="h-10 w-px bg-slate-200 hidden sm:block" />
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-                Monitoring Tugas Akhir Program Studi Sains Data
+              <h1 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight leading-tight">
+                Monitoring Tugas Akhir
+                <span className="hidden sm:inline"> Program Studi Sains Data</span>
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+              <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
                 Pemantauan berkala tahapan bimbingan Tugas Akhir mahasiswa
               </p>
             </div>
