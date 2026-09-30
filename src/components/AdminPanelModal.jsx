@@ -782,7 +782,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                             <span className="flex-1 text-xs text-slate-700">{w}</span>
                             {isLocal ? (
                               <>
-                                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-semibold">Lokal</span>
+                                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-semibold">Admin</span>
                                 <button onClick={() => { setEditPeriodIdx(localIdx); setEditPeriodVal(w); }} className="p-1 text-slate-400 hover:text-brand-600"><Pencil className="w-3 h-3" /></button>
                                 <button onClick={() => handleDeleteLocalPeriod(w)} className="p-1 text-slate-400 hover:text-rose-600"><Trash2 className="w-3 h-3" /></button>
                               </>
