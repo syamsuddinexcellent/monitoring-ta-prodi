@@ -47,23 +47,17 @@ export default function Header({
           <div className="flex items-center gap-4">
             {/* Three institution logos */}
             <div className="flex items-center gap-3 shrink-0">
-              <img
-                src="/logo-itera.jpg"
-                alt="ITERA"
-                className="h-14 w-14 rounded-xl object-contain shadow-md ring-1 ring-slate-200 bg-white"
-              />
+              <div className="h-14 w-14 rounded-xl overflow-hidden shadow-md ring-1 ring-slate-200 bg-white flex items-center justify-center p-1 shrink-0">
+                <img src="/logo-itera.jpg" alt="ITERA" className="w-full h-full object-contain" />
+              </div>
               <div className="h-10 w-px bg-slate-200" />
-              <img
-                src="/logo-fs.jpg"
-                alt="Fakultas Sains"
-                className="h-14 w-14 rounded-xl object-cover shadow-md ring-1 ring-slate-200"
-              />
+              <div className="h-14 w-14 rounded-xl overflow-hidden shadow-md ring-1 ring-slate-200 shrink-0">
+                <img src="/logo-fs.jpg" alt="Fakultas Sains" className="w-full h-full object-cover" />
+              </div>
               <div className="h-10 w-px bg-slate-200" />
-              <img
-                src="/logo-sainsdata.jpg"
-                alt="Sains Data"
-                className="h-14 w-14 rounded-xl object-cover shadow-md ring-1 ring-slate-200"
-              />
+              <div className="h-14 w-14 rounded-xl overflow-hidden shadow-md ring-1 ring-slate-200 shrink-0">
+                <img src="/logo-sainsdata.jpg" alt="Sains Data" className="w-full h-full object-cover" />
+              </div>
             </div>
             {/* Divider */}
             <div className="h-12 w-px bg-slate-200 hidden sm:block" />
