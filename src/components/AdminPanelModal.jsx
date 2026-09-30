@@ -98,6 +98,20 @@ function getDosenLaporanSummary() {
   } catch { return []; }
 }
 
+function getDosenSummaryFromLaporan(laporan) {
+  const map = {};
+  laporan.forEach(l => {
+    const dh = l.dosen_hadir;
+    const list = dh?.list || (Array.isArray(dh) ? dh : []);
+    list.forEach(d => {
+      if (!d?.name) return;
+      if (!map[d.name]) map[d.name] = { dosen: d.name, total: 0 };
+      map[d.name].total++;
+    });
+  });
+  return Object.values(map).sort((a, b) => b.total - a.total);
+}
+
 export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemestersChange, onLockedPeriodsChange, onCustomPeriodsChange }) {
   const [tab, setTab] = useState('akun');
   const [users, setUsers] = useState([]);
@@ -133,7 +147,6 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   const refresh = async () => {
     setUsers(await getStoredUsersWithPasswords());
     setReportsSummary(getLocalReportsSummary());
-    setDosenSummary(getDosenLaporanSummary());
     const cp = await getCustomPeriods();
     setCustomPeriods(cp);
     setLocalSemesters(getLocalSemesters());
@@ -148,6 +161,9 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     setVerifData(verif);
     setPenolakanData(penolakan);
     setMasukDbList(masukDb);
+    // Compute dosen inbox from Supabase data; fall back to localStorage if empty
+    const fromSupabase = getDosenSummaryFromLaporan(laporan);
+    setDosenSummary(fromSupabase.length > 0 ? fromSupabase : getDosenLaporanSummary());
   };
 
   useEffect(() => { if (isOpen) { refresh(); setConfirmDelete(null); setFlash(''); } }, [isOpen]);
