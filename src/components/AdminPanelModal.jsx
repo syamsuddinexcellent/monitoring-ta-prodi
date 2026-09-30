@@ -14,6 +14,7 @@ import {
   BUILTIN_SEMESTERS, getLocalSemesters, saveLocalSemesters,
   getVerifikasi, getPenolakan,
   getAllLaporanBimbingan, getLaporanMasukDatabase, tandaiMasukDatabase, batalMasukDatabase,
+  getStudentOverrides, upsertStudentOverride,
 } from '../utils/exportUtils';
 
 const _PM = {
@@ -71,6 +72,15 @@ function parseLabelToDates(label) {
     end: toISO(endYear, endMonth, endDay),
   };
 }
+
+const STATUS_TA_CLS = {
+  'Proposal':      'bg-blue-50 text-blue-700 border-blue-200',
+  'Seminar Hasil': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+  'Sidang':        'bg-purple-50 text-purple-700 border-purple-200',
+  'Revisi':        'bg-amber-50 text-amber-700 border-amber-200',
+  'Lulus':         'bg-emerald-50 text-emerald-700 border-emerald-200',
+};
+const STATUS_TA_OPTIONS = ['Proposal', 'Seminar Hasil', 'Sidang', 'Revisi', 'Lulus'];
 
 function getRoleLabel(role) {
   if (role === 'dosen') return { label: 'Dosen', cls: 'bg-indigo-50 text-indigo-700 border-indigo-200' };
@@ -140,6 +150,10 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   const [penolakanData, setPenolakanData] = useState({});
   const [masukDbList, setMasukDbList] = useState([]);
   const [laporanFilter, setLaporanFilter] = useState('semua');
+  // Student dosen overrides
+  const [studentOverrides, setStudentOverrides] = useState({});
+  const [editingCell, setEditingCell] = useState(null); // { nim, field }
+  const [editingValue, setEditingValue] = useState('');
   // password show/hide & reset per user (keyed by email)
   const [showPass, setShowPass] = useState({});
   const [resetForm, setResetForm] = useState({}); // { [email]: { open, value, error } }
@@ -164,6 +178,11 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     // Compute dosen inbox from Supabase data; fall back to localStorage if empty
     const fromSupabase = getDosenSummaryFromLaporan(laporan);
     setDosenSummary(fromSupabase.length > 0 ? fromSupabase : getDosenLaporanSummary());
+    setStudentOverrides(await getStudentOverrides());
+  };
+
+  const _refreshStudentOverrides = async () => {
+    setStudentOverrides(await getStudentOverrides());
   };
 
   useEffect(() => { if (isOpen) { refresh(); setConfirmDelete(null); setFlash(''); } }, [isOpen]);
@@ -196,6 +215,22 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     const all = Object.values(periodsBySemester).flat().map(p => p.label);
     return [...new Set(all)].sort((a, b) => parsePeriodEnd(a) - parsePeriodEnd(b));
   }, [periodsBySemester]);
+
+  // sheetsData students merged with admin overrides
+  const mergedStudents = useMemo(() => {
+    if (!sheetsData?.students) return [];
+    return sheetsData.students.map(s => {
+      const ov = studentOverrides[s.nim] || {};
+      return {
+        ...s,
+        pembimbing1: ov.pembimbing1 !== undefined ? ov.pembimbing1 : s.pembimbing1,
+        pembimbing2: ov.pembimbing2 !== undefined ? ov.pembimbing2 : s.pembimbing2,
+        penguji1:    ov.penguji1    !== undefined ? ov.penguji1    : s.penguji1,
+        penguji2:    ov.penguji2    !== undefined ? ov.penguji2    : s.penguji2,
+        statusTA:    ov.status_ta   !== undefined ? ov.status_ta   : s.statusTA,
+      };
+    });
+  }, [sheetsData, studentOverrides]);
 
   const _refreshCustomPeriods = async () => {
     const cp = await getCustomPeriods();
@@ -324,8 +359,8 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   const totalPeriode = sheetsData?.weekColumns?.length ?? 0;
 
   const filteredStudents = useMemo(() => {
-    if (!sheetsData?.students) return [];
-    let list = sheetsData.students;
+    if (!mergedStudents.length && !sheetsData?.students?.length) return [];
+    let list = mergedStudents;
     if (filterAngkatan !== 'all') list = list.filter(s => s.angkatan === filterAngkatan);
     if (search.trim()) {
       const q = search.trim().toLowerCase();
@@ -349,12 +384,27 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
       if (av > bv) return sortAsc ? 1 : -1;
       return 0;
     });
-  }, [sheetsData, search, filterAngkatan, sortCol, sortAsc]);
+  }, [mergedStudents, sheetsData, search, filterAngkatan, sortCol, sortAsc]);
 
   const handleSort = (col) => {
     if (sortCol === col) setSortAsc(p => !p);
     else { setSortCol(col); setSortAsc(true); }
   };
+
+  const startEdit = (nim, field, currentValue) => {
+    setEditingCell({ nim, field });
+    setEditingValue(currentValue || '');
+  };
+
+  const saveEdit = async () => {
+    if (!editingCell) return;
+    const { nim, field } = editingCell;
+    setEditingCell(null);
+    await upsertStudentOverride(nim, { [field]: editingValue.trim() });
+    await _refreshStudentOverrides();
+  };
+
+  const cancelEdit = () => { setEditingCell(null); setEditingValue(''); };
 
   if (!isOpen) return null;
 
@@ -706,6 +756,9 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                   };
                   return (
                     <div className="overflow-x-auto max-h-[480px] overflow-y-auto">
+                      <datalist id="dosen-autocomplete">
+                        {dosenUsers.map(u => <option key={u.email} value={u.lecturerName || u.name} />)}
+                      </datalist>
                       <table className="w-full text-[10px] border-collapse">
                         <thead className="sticky top-0 z-10 bg-slate-100">
                           <tr>
@@ -759,16 +812,66 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                                 <td className="px-2 py-2 text-center border-r border-slate-100">
                                   <span className="px-1.5 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-200 font-bold">{s.angkatan}</span>
                                 </td>
-                                <td className="px-2 py-2 text-slate-600 border-r border-slate-100 max-w-[112px]"><span className="line-clamp-2">{s.pembimbing1 || <span className="text-slate-300">-</span>}</span></td>
-                                <td className="px-2 py-2 text-slate-600 border-r border-slate-100 max-w-[112px]"><span className="line-clamp-2">{s.pembimbing2 || <span className="text-slate-300">-</span>}</span></td>
-                                <td className="px-2 py-2 text-slate-600 border-r border-slate-100 max-w-[112px]"><span className="line-clamp-2">{s.penguji1 || <span className="text-slate-300">-</span>}</span></td>
-                                <td className="px-2 py-2 text-slate-600 border-r border-slate-100 max-w-[112px]"><span className="line-clamp-2">{s.penguji2 || <span className="text-slate-300">-</span>}</span></td>
+                                {[
+                                  { field: 'pembimbing1', val: s.pembimbing1 },
+                                  { field: 'pembimbing2', val: s.pembimbing2 },
+                                  { field: 'penguji1',    val: s.penguji1 },
+                                  { field: 'penguji2',    val: s.penguji2 },
+                                ].map(({ field, val }) => {
+                                  const isEditing = editingCell?.nim === s.nim && editingCell?.field === field;
+                                  return (
+                                    <td key={field} className="px-2 py-2 border-r border-slate-100 max-w-[112px]">
+                                      {isEditing ? (
+                                        <input
+                                          type="text"
+                                          value={editingValue}
+                                          onChange={e => setEditingValue(e.target.value)}
+                                          onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
+                                          onBlur={saveEdit}
+                                          autoFocus
+                                          list="dosen-autocomplete"
+                                          className="w-full text-[10px] border border-brand-300 rounded px-1 py-0.5 outline-none focus:ring-1 focus:ring-brand-400 bg-white"
+                                          placeholder="Nama dosen…"
+                                        />
+                                      ) : (
+                                        <div className="flex items-center gap-0.5 group cursor-pointer" onClick={() => startEdit(s.nim, field, val)}>
+                                          <span className="line-clamp-2 text-[10px] text-slate-600 flex-1">{val || <span className="text-slate-300 group-hover:text-brand-400">+ dosen</span>}</span>
+                                          <Pencil className="w-2 h-2 text-slate-200 group-hover:text-brand-400 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        </div>
+                                      )}
+                                    </td>
+                                  );
+                                })}
                                 <td className="px-2 py-2 whitespace-nowrap border-r border-slate-100">
                                   {s.phone ? <span className="flex items-center gap-0.5 text-emerald-700"><Phone className="w-2.5 h-2.5" />{s.phone}</span> : <span className="text-slate-300">-</span>}
                                 </td>
-                                <td className="px-2 py-2 border-r border-slate-100">
-                                  {s.statusTA ? <span className="px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[9px] font-semibold whitespace-nowrap">{s.statusTA}</span> : <span className="text-slate-300">-</span>}
-                                </td>
+                                {(() => {
+                                  const isEditing = editingCell?.nim === s.nim && editingCell?.field === 'status_ta';
+                                  const staCls = STATUS_TA_CLS[s.statusTA] || 'bg-slate-100 text-slate-600 border-slate-200';
+                                  return (
+                                    <td className="px-2 py-2 border-r border-slate-100">
+                                      {isEditing ? (
+                                        <select
+                                          value={editingValue}
+                                          onChange={e => setEditingValue(e.target.value)}
+                                          onBlur={saveEdit}
+                                          autoFocus
+                                          className="w-full text-[10px] border border-brand-300 rounded px-1 py-0.5 outline-none bg-white"
+                                        >
+                                          <option value="">— hapus —</option>
+                                          {STATUS_TA_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                                        </select>
+                                      ) : (
+                                        <div className="cursor-pointer group" onClick={() => startEdit(s.nim, 'status_ta', s.statusTA)}>
+                                          {s.statusTA
+                                            ? <span className={`px-1.5 py-0.5 rounded-full border text-[9px] font-semibold whitespace-nowrap ${staCls}`}>{s.statusTA}</span>
+                                            : <span className="text-slate-300 text-[9px] group-hover:text-brand-400 transition-colors">+ status</span>
+                                          }
+                                        </div>
+                                      )}
+                                    </td>
+                                  );
+                                })()}
                                 <td className="px-2 py-2 text-center whitespace-nowrap border-r border-slate-200 bg-slate-50">
                                   <span className={`font-black text-xs ${reportedCount === weeks.length && weeks.length > 0 ? 'text-emerald-600' : reportedCount > 0 ? 'text-amber-600' : 'text-rose-400'}`}>{reportedCount}</span>
                                   <span className="text-slate-400">/{weeks.length}</span>

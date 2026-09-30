@@ -567,6 +567,33 @@ export async function updateCustomPeriod(oldLabel, newLabel) {
 // kept for backward compat (used by old localStorage data only)
 export function getLocalPeriods() { return _getLocalPeriods(); }
 
+// ─── Student dosen overrides (Supabase-backed, localStorage fallback) ─────────
+
+const STUDENT_OV_KEY = 'student_overrides';
+
+export async function getStudentOverrides() {
+  if (supabase) {
+    const { data, error } = await supabase.from('student_overrides').select('*');
+    if (!error && data) return data.reduce((acc, r) => { acc[r.nim] = r; return acc; }, {});
+  }
+  try { return JSON.parse(localStorage.getItem(STUDENT_OV_KEY) || '{}'); } catch { return {}; }
+}
+
+export async function upsertStudentOverride(nim, fields) {
+  if (supabase) {
+    await supabase.from('student_overrides').upsert(
+      { nim, ...fields, updated_at: new Date().toISOString() },
+      { onConflict: 'nim' }
+    );
+    return;
+  }
+  try {
+    const all = JSON.parse(localStorage.getItem(STUDENT_OV_KEY) || '{}');
+    all[nim] = { ...(all[nim] || {}), ...fields };
+    localStorage.setItem(STUDENT_OV_KEY, JSON.stringify(all));
+  } catch {}
+}
+
 // ─── Locked periods helpers (Supabase-backed) ─────────────────────────────────
 
 const LOCAL_LOCKED_KEY = 'locked_periods';
