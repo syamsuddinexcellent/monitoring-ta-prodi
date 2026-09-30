@@ -1201,44 +1201,88 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
               })()}
 
               {/* ── Inbox Dosen ── */}
-              <div className="rounded-xl border border-slate-200 overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
-                  <div className="flex items-center gap-2">
-                    <Inbox className="w-4 h-4 text-indigo-600" />
-                    <span className="text-xs font-bold text-slate-700">Inbox Laporan Dosen</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[10px] text-slate-400">{dosenSummary.length} dosen</span>
-                    <button
-                      onClick={handleClearDosenInbox}
-                      disabled={dosenSummary.length === 0}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                      Hapus Semua
-                    </button>
-                  </div>
-                </div>
-                <div className="divide-y divide-slate-100 max-h-40 overflow-y-auto">
-                  {dosenSummary.length === 0 ? (
-                    <p className="px-4 py-3 text-xs text-slate-400 italic">Inbox dosen kosong.</p>
-                  ) : (
-                    dosenSummary.map(({ dosen, total, unread }) => (
-                      <div key={dosen} className="flex items-center justify-between px-4 py-2.5">
-                        <p className="text-xs text-slate-700 font-medium truncate flex-1">{dosen}</p>
-                        <div className="flex items-center gap-2 shrink-0">
-                          {unread > 0 && (
-                            <span className="px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-bold">
-                              {unread} belum dibaca
-                            </span>
-                          )}
-                          <span className="text-[10px] text-slate-400">{total} laporan</span>
-                        </div>
+              {(() => {
+                const mdbSet = new Set(masukDbList.map(r => `${r.nim}|${r.week}`));
+                const getInboxStatus = (nim, week) => {
+                  if (mdbSet.has(`${nim}|${week}`)) return 'masuk_database';
+                  if (verifData[nim]?.[week]) return 'diverifikasi';
+                  if (penolakanData[nim]?.[week]) return 'ditolak';
+                  return 'menunggu';
+                };
+                return (
+                  <div className="rounded-xl border border-slate-200 overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
+                      <div className="flex items-center gap-2">
+                        <Inbox className="w-4 h-4 text-indigo-600" />
+                        <span className="text-xs font-bold text-slate-700">Inbox Laporan Dosen</span>
                       </div>
-                    ))
-                  )}
-                </div>
-              </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] text-slate-400">{dosenSummary.length} dosen</span>
+                        <button
+                          onClick={handleClearDosenInbox}
+                          disabled={dosenSummary.length === 0}
+                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          Hapus Semua
+                        </button>
+                      </div>
+                    </div>
+                    <div className="divide-y divide-slate-100 max-h-52 overflow-y-auto">
+                      {dosenSummary.length === 0 ? (
+                        <p className="px-4 py-3 text-xs text-slate-400 italic">Inbox dosen kosong.</p>
+                      ) : (
+                        dosenSummary.map(({ dosen, total }) => {
+                          const dosenLaporan = allLaporan.filter(l => {
+                            const list = l.dosen_hadir?.list || (Array.isArray(l.dosen_hadir) ? l.dosen_hadir : []);
+                            return list.some(d => d.name === dosen);
+                          });
+                          const nVerif = dosenLaporan.filter(l => {
+                            const s = getInboxStatus(l.nim, l.week);
+                            return s === 'diverifikasi' || s === 'masuk_database';
+                          }).length;
+                          const nDitolak = dosenLaporan.filter(l => getInboxStatus(l.nim, l.week) === 'ditolak').length;
+                          const nMenunggu = dosenLaporan.filter(l => getInboxStatus(l.nim, l.week) === 'menunggu').length;
+                          const nDibaca = nVerif + nDitolak;
+                          const count = dosenLaporan.length || total;
+                          return (
+                            <div key={dosen} className="px-4 py-2.5">
+                              <div className="flex items-center justify-between gap-2">
+                                <p className="text-xs text-slate-700 font-medium truncate flex-1">{dosen}</p>
+                                <span className="text-[10px] text-slate-400 shrink-0">{count} laporan</span>
+                              </div>
+                              {dosenLaporan.length > 0 && (
+                                <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                                  {nMenunggu > 0 && (
+                                    <span className="px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-semibold">
+                                      {nMenunggu} menunggu
+                                    </span>
+                                  )}
+                                  {nDibaca > 0 && (
+                                    <span className="px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-semibold">
+                                      {nDibaca} sudah dibaca
+                                    </span>
+                                  )}
+                                  {nVerif > 0 && (
+                                    <span className="px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-semibold">
+                                      {nVerif} diverifikasi
+                                    </span>
+                                  )}
+                                  {nDitolak > 0 && (
+                                    <span className="px-1.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-semibold">
+                                      {nDitolak} menolak
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* ── Token Reset ── */}
               <div className="rounded-xl border border-slate-200 overflow-hidden">
