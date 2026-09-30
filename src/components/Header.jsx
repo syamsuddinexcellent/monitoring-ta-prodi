@@ -135,10 +135,10 @@ export default function Header({
               <button
                 onClick={onLoginClick}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-brand-700 bg-white hover:bg-brand-50 border border-slate-200 hover:border-brand-300 rounded-lg transition-colors shadow-xs"
-                title="Masuk ke akun"
+                title="Masuk / Daftar akun"
               >
                 <Lock className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Masuk</span>
+                <span className="hidden sm:inline">Masuk/Daftar</span>
               </button>
             )}
           </div>
