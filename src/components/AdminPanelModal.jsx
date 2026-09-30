@@ -392,6 +392,17 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
 
   const totalPeriode = sheetsData?.weekColumns?.length ?? 0;
 
+  const dosenStats = useMemo(() => {
+    const registeredNames = new Set(
+      users.filter(u => u.role === 'dosen').map(u => u.lecturerName || u.name).filter(Boolean)
+    );
+    return allDosenOptions.map(nama => {
+      const bimbingan = mergedStudents.filter(s => s.pembimbing1 === nama || s.pembimbing2 === nama);
+      const penguji   = mergedStudents.filter(s => s.penguji1 === nama || s.penguji2 === nama);
+      return { nama, bimbingan: bimbingan.length, penguji: penguji.length, registered: registeredNames.has(nama) };
+    });
+  }, [allDosenOptions, mergedStudents, users]);
+
   const filteredStudents = useMemo(() => {
     if (!mergedStudents.length && !sheetsData?.students?.length) return [];
     let list = mergedStudents;
@@ -985,6 +996,51 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                     </div>
                   );
                 })()}
+              </div>
+
+              {/* ── Daftar Dosen ── */}
+              <div className="rounded-xl border border-slate-200 overflow-hidden">
+                <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
+                  <Users className="w-4 h-4 text-indigo-600" />
+                  <span className="text-xs font-bold text-slate-700">Daftar Dosen</span>
+                  <span className="text-[10px] text-slate-400">({dosenStats.length} dosen)</span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-[11px]">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-100 text-left">
+                        <th className="px-3 py-2 text-slate-500 font-semibold w-8">No</th>
+                        <th className="px-3 py-2 text-slate-500 font-semibold">Nama Dosen</th>
+                        <th className="px-3 py-2 text-slate-500 font-semibold text-center">Bimbingan</th>
+                        <th className="px-3 py-2 text-slate-500 font-semibold text-center">Penguji</th>
+                        <th className="px-3 py-2 text-slate-500 font-semibold text-center">Akun</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dosenStats.map((d, i) => (
+                        <tr key={d.nama} className="border-b border-slate-50 hover:bg-slate-50/60 transition-colors">
+                          <td className="px-3 py-2 text-slate-400">{i + 1}</td>
+                          <td className="px-3 py-2 text-slate-700 font-medium">{d.nama}</td>
+                          <td className="px-3 py-2 text-center">
+                            {d.bimbingan > 0
+                              ? <span className="px-1.5 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-200 text-[10px] font-semibold">{d.bimbingan} mhs</span>
+                              : <span className="text-slate-300">—</span>}
+                          </td>
+                          <td className="px-3 py-2 text-center">
+                            {d.penguji > 0
+                              ? <span className="px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-semibold">{d.penguji} mhs</span>
+                              : <span className="text-slate-300">—</span>}
+                          </td>
+                          <td className="px-3 py-2 text-center">
+                            {d.registered
+                              ? <span className="px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-semibold">Terdaftar</span>
+                              : <span className="px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-400 text-[10px]">Belum</span>}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
               {/* ── Export ── */}
