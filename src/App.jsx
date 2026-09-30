@@ -10,7 +10,7 @@ import MatrixView from './components/MatrixView';
 import StudentDetailModal from './components/StudentDetailModal';
 import WhatsAppModal from './components/WhatsAppModal';
 import WhatsAppConnectModal from './components/WhatsAppConnectModal';
-import AuthModal, { validateResetToken } from './components/AuthModal';
+import AuthModal, { validateResetToken, seedDefaultAccounts } from './components/AuthModal';
 import MahasiswaView from './components/MahasiswaView';
 import LaporanMasukModal from './components/LaporanMasukModal';
 import AdminPanelModal from './components/AdminPanelModal';
@@ -125,6 +125,7 @@ export default function App() {
       if (lp.length > 0) {
         result.weekColumns = [...result.weekColumns, ...lp.filter(p => !result.weekColumns.includes(p))];
       }
+      seedDefaultAccounts(result.students);
       setData(result);
       if (!selectedWeek && result.weekColumns.length > 0) {
         const lastWithData = [...result.weekColumns].reverse().find(w =>

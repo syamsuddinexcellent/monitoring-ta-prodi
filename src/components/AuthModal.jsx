@@ -90,6 +90,31 @@ export function deleteStoredUser(email) {
   saveStoredUsers(getStoredUsers().filter(u => u.email !== email.toLowerCase()));
 }
 
+export function seedDefaultAccounts(students) {
+  if (!Array.isArray(students) || students.length === 0) return 0;
+  const users = getStoredUsers();
+  const existingEmails = new Set(users.map(u => u.email));
+  let added = 0;
+  students.forEach(student => {
+    if (!student.nim || !student.nama) return;
+    const email = `${student.nim}@student.itera.ac.id`;
+    if (existingEmails.has(email)) return;
+    users.push({
+      email,
+      name: student.nama,
+      role: 'mahasiswa',
+      lecturerName: '',
+      nim: student.nim,
+      passwordHash: btoa(student.nim),
+      isSeeded: true
+    });
+    existingEmails.add(email);
+    added++;
+  });
+  if (added > 0) saveStoredUsers(users);
+  return added;
+}
+
 export function resetPassword(email, newPassword) {
   const emailLower = email.trim().toLowerCase();
   if (!emailLower || !newPassword) return { error: 'Semua field wajib diisi.' };
