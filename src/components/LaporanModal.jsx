@@ -109,6 +109,36 @@ export async function getDosenLaporan(dosenName) {
   } catch { return []; }
 }
 
+export async function deleteReport(nim, week) {
+  if (supabase) {
+    const { error } = await supabase
+      .from('laporan_bimbingan')
+      .delete()
+      .eq('nim', nim)
+      .eq('week', week);
+    if (!error) {
+      // Clean up local read-tracking too
+      try {
+        const inbox = JSON.parse(localStorage.getItem('dosen_laporan') || '{}');
+        Object.keys(inbox).forEach(d => {
+          inbox[d] = inbox[d].filter(r => !(r.nim === nim && r.week === week));
+        });
+        localStorage.setItem('dosen_laporan', JSON.stringify(inbox));
+      } catch {}
+      return true;
+    }
+  }
+  // Fallback: localStorage
+  try {
+    const all = JSON.parse(localStorage.getItem('mahasiswa_reports') || '{}');
+    if (all[nim]) {
+      delete all[nim][week];
+      localStorage.setItem('mahasiswa_reports', JSON.stringify(all));
+    }
+    return true;
+  } catch { return false; }
+}
+
 export function markDosenLaporanRead(dosenName, nim, week) {
   try {
     const inbox = JSON.parse(localStorage.getItem('dosen_laporan') || '{}');

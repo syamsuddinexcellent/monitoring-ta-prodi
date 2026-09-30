@@ -2,10 +2,10 @@ import React, { useMemo, useState, useEffect } from 'react';
 import {
   GraduationCap, BookOpen, CheckCircle2, AlertCircle,
   ArrowRight, UserCheck, Calendar, TrendingUp, Clock,
-  PlusCircle, ShieldCheck, PencilLine
+  PlusCircle, ShieldCheck, PencilLine, Trash2
 } from 'lucide-react';
 import { getCategoryBadgeStyle } from '../utils/helpers';
-import LaporanModal, { getLocalReportsForNim, parseWeekRange } from './LaporanModal';
+import LaporanModal, { getLocalReportsForNim, parseWeekRange, deleteReport } from './LaporanModal';
 import { getVerifikasi } from '../utils/exportUtils';
 
 function ProgressRing({ pct }) {
@@ -55,6 +55,14 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
   }, [nim, isLaporanOpen]);
 
   const isVerifiedByDosen = (week) => verifData[week]?.verified === true;
+
+  const handleDelete = async (week) => {
+    if (!window.confirm(`Hapus laporan Periode ini? Tindakan ini tidak dapat dibatalkan.`)) return;
+    const ok = await deleteReport(nim, week);
+    if (ok) {
+      getLocalReportsForNim(nim).then(setLocalReports);
+    }
+  };
 
   // Merged weekly data: app reports (Supabase/_appReport) take priority over sheet data
   const mergedUpdates = useMemo(() => {
@@ -298,20 +306,29 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
                             <p className="text-slate-800 font-semibold">{upd.next}</p>
                           </div>
                         )}
-                        <div className="flex justify-end">
+                        <div className="flex items-center justify-end gap-3 pt-1">
                           {isVerified ? (
                             <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
                               <ShieldCheck className="w-3.5 h-3.5" />
                               Sudah diverifikasi dosen · tidak dapat diedit
                             </span>
                           ) : isFromApp ? (
-                            <button
-                              onClick={() => openEdit(week)}
-                              className="flex items-center gap-1 text-[11px] font-semibold text-brand-600 hover:text-brand-700 hover:underline"
-                            >
-                              <PencilLine className="w-3.5 h-3.5" />
-                              Edit Laporan
-                            </button>
+                            <>
+                              <button
+                                onClick={() => openEdit(week)}
+                                className="flex items-center gap-1 text-[11px] font-semibold text-brand-600 hover:text-brand-700 hover:underline"
+                              >
+                                <PencilLine className="w-3.5 h-3.5" />
+                                Edit Laporan
+                              </button>
+                              <button
+                                onClick={() => handleDelete(week)}
+                                className="flex items-center gap-1 text-[11px] font-semibold text-rose-500 hover:text-rose-600 hover:underline"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                Hapus
+                              </button>
+                            </>
                           ) : null}
                         </div>
                       </div>
