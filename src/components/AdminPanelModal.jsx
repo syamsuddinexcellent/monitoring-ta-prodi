@@ -365,7 +365,9 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
       .filter(u => u.role === 'dosen')
       .map(u => u.lecturerName || u.name)
       .filter(Boolean);
-    return [...new Set([...fromSheet, ...fromUsers])].sort();
+    return [...new Set([...fromSheet, ...fromUsers])]
+      .filter(n => n.includes(' ') && n.length > 5)
+      .sort();
   }, [sheetsData, users]);
 
   const totalPeriode = sheetsData?.weekColumns?.length ?? 0;
