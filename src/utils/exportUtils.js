@@ -473,14 +473,49 @@ export function saveLocalSemesters(list) {
   localStorage.setItem(LOCAL_SEMESTERS_KEY, JSON.stringify(list));
 }
 
-// ─── Local periods helpers ────────────────────────────────────────────────────
+// ─── Custom periods helpers (Supabase-backed, localStorage fallback) ─────────
 
 const LOCAL_PERIODS_KEY = 'local_periods';
 
-export function getLocalPeriods() {
+function _getLocalPeriods() {
   try { return JSON.parse(localStorage.getItem(LOCAL_PERIODS_KEY) || '[]'); } catch { return []; }
 }
-
-export function saveLocalPeriods(list) {
+function _saveLocalPeriods(list) {
   localStorage.setItem(LOCAL_PERIODS_KEY, JSON.stringify(list));
 }
+
+export async function getCustomPeriods() {
+  if (supabase) {
+    const { data, error } = await supabase.from('custom_periods').select('label').order('created_at');
+    if (!error && data) return data.map(r => r.label);
+  }
+  return _getLocalPeriods();
+}
+
+export async function addCustomPeriod(label) {
+  if (supabase) {
+    await supabase.from('custom_periods').insert({ label });
+    return;
+  }
+  const list = _getLocalPeriods();
+  if (!list.includes(label)) _saveLocalPeriods([...list, label]);
+}
+
+export async function deleteCustomPeriod(label) {
+  if (supabase) {
+    await supabase.from('custom_periods').delete().eq('label', label);
+    return;
+  }
+  _saveLocalPeriods(_getLocalPeriods().filter(p => p !== label));
+}
+
+export async function updateCustomPeriod(oldLabel, newLabel) {
+  if (supabase) {
+    await supabase.from('custom_periods').update({ label: newLabel }).eq('label', oldLabel);
+    return;
+  }
+  _saveLocalPeriods(_getLocalPeriods().map(p => p === oldLabel ? newLabel : p));
+}
+
+// kept for backward compat (used by old localStorage data only)
+export function getLocalPeriods() { return _getLocalPeriods(); }

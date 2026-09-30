@@ -9,7 +9,7 @@ import {
 import { getStoredUsersList, getStoredUsersWithPasswords, deleteStoredUser, resetPassword } from './AuthModal';
 import {
   exportExcelAll, exportExcelPeriode, printRekapPeriode, printRekapAll,
-  getLocalPeriods, saveLocalPeriods,
+  getCustomPeriods, addCustomPeriod, deleteCustomPeriod, updateCustomPeriod,
   BUILTIN_SEMESTERS, getLocalSemesters, saveLocalSemesters
 } from '../utils/exportUtils';
 
@@ -76,7 +76,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     setUsers(await getStoredUsersWithPasswords());
     setReportsSummary(getLocalReportsSummary());
     setDosenSummary(getDosenLaporanSummary());
-    setLocalPeriods(getLocalPeriods());
+    setLocalPeriods(await getCustomPeriods());
     setLocalSemesters(getLocalSemesters());
   };
 
@@ -88,29 +88,26 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     return [...sheets, ...local].sort((a, b) => parsePeriodEnd(a) - parsePeriodEnd(b));
   }, [sheetsData, localPeriods]);
 
-  const handleAddPeriod = () => {
+  const handleAddPeriod = async () => {
     const label = newPeriodLabel.trim();
     if (!label || allWeekColumns.includes(label)) return;
-    const updated = [...localPeriods, label];
-    saveLocalPeriods(updated);
-    setLocalPeriods(updated);
+    await addCustomPeriod(label);
+    setLocalPeriods(await getCustomPeriods());
     setNewPeriodLabel('');
     showFlash(`Periode "${label}" berhasil ditambahkan.`);
   };
 
-  const handleDeleteLocalPeriod = (label) => {
-    const updated = localPeriods.filter(p => p !== label);
-    saveLocalPeriods(updated);
-    setLocalPeriods(updated);
+  const handleDeleteLocalPeriod = async (label) => {
+    await deleteCustomPeriod(label);
+    setLocalPeriods(await getCustomPeriods());
     showFlash(`Periode "${label}" dihapus.`);
   };
 
-  const handleSaveEditPeriod = (oldLabel) => {
+  const handleSaveEditPeriod = async (oldLabel) => {
     const newLabel = editPeriodVal.trim();
     if (!newLabel || (newLabel !== oldLabel && allWeekColumns.includes(newLabel))) return;
-    const updated = localPeriods.map(p => p === oldLabel ? newLabel : p);
-    saveLocalPeriods(updated);
-    setLocalPeriods(updated);
+    await updateCustomPeriod(oldLabel, newLabel);
+    setLocalPeriods(await getCustomPeriods());
     setEditPeriodIdx(null);
     setEditPeriodVal('');
     showFlash(`Periode diperbarui.`);

@@ -21,7 +21,7 @@ import {
   getAllWeeksTrend,
   mergeSupabaseReports
 } from './services/dataService';
-import { getLocalPeriods, BUILTIN_SEMESTERS, getLocalSemesters } from './utils/exportUtils';
+import { getCustomPeriods, BUILTIN_SEMESTERS, getLocalSemesters } from './utils/exportUtils';
 import {
   checkGatewayStatus,
   logoutGateway
@@ -184,7 +184,7 @@ export default function App() {
     try {
       const result = await loadMonitoringData();
       result.students = await mergeSupabaseReports(result.students);
-      const lp = getLocalPeriods();
+      const lp = await getCustomPeriods();
       if (lp.length > 0) {
         const merged = [...result.weekColumns, ...lp.filter(p => !result.weekColumns.includes(p))];
         merged.sort((a, b) => parsePeriodEnd(a) - parsePeriodEnd(b));
