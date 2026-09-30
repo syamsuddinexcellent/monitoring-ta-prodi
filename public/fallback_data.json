@@ -4,7 +4,7 @@
       "nim": "120450062",
       "nama": "Queena Aurora Batubara",
       "angkatan": "2020",
-      "phone": "\u202a6288219758365\u202c",
+      "phone": "‪6288219758365‬",
       "pembimbing1": "Christyan Tamaro Nadeak, S.Si., M.Si.",
       "pembimbing2": "Luluk Muthoharoh, S.Si., M.Si.",
       "penguji1": "Tirta Setiawan, S.Pd., M.Si.",
@@ -44,7 +44,7 @@
       "nim": "120450004",
       "nama": "Alem Ardemi",
       "angkatan": "2020",
-      "phone": "\u202a6285817743940\u202c",
+      "phone": "‪6285817743940‬",
       "pembimbing1": "Christyan Tamaro Nadeak, S.Si., M.Si.",
       "pembimbing2": "Tirta Setiawan, S.Pd., M.Si.",
       "penguji1": "",
@@ -64,7 +64,7 @@
       "nim": "120450022",
       "nama": "FIKRI DWI ALPIAN",
       "angkatan": "2020",
-      "phone": "\u202a6282388137794\u202c",
+      "phone": "‪6282388137794‬",
       "pembimbing1": "Luluk Muthoharoh, S.Si., M.Si.",
       "pembimbing2": "Mika Alvionita S, S.Si., M.Si.",
       "penguji1": "Christyan Tamaro Nadeak, S.Si., M.Si.",
@@ -104,7 +104,7 @@
       "nim": "120450102",
       "nama": "CORNEL SILAEN",
       "angkatan": "2020",
-      "phone": "\u202a6282278660066\u202c",
+      "phone": "‪6282278660066‬",
       "pembimbing1": "Tirta Setiawan, S.Pd., M.Si.",
       "pembimbing2": "Luluk Muthoharoh, S.Si., M.Si.",
       "penguji1": "Mika Alvionita S, S.Si., M.Si.",
@@ -204,7 +204,7 @@
       "nim": "121450014",
       "nama": "GEDE MOENA",
       "angkatan": "2020",
-      "phone": "\u202a6281291786941\u202c",
+      "phone": "‪6281291786941‬",
       "pembimbing1": "Christyan Tamaro Nadeak, S.Si., M.Si.",
       "pembimbing2": "Yuliana, S.Pd., M.Cs.",
       "penguji1": "Ahmad Luky Ramdani, S.Komp., M.Kom.",
@@ -244,7 +244,7 @@
       "nim": "121450030",
       "nama": "Pramudya Wibowo",
       "angkatan": "2020",
-      "phone": "\u202a6285764173923\u202c",
+      "phone": "‪6285764173923‬",
       "pembimbing1": "",
       "pembimbing2": "",
       "penguji1": "",
@@ -544,7 +544,7 @@
       "nim": "121450136",
       "nama": "ADISTY SYAWALDA ARIYANTO",
       "angkatan": "2020",
-      "phone": "\u202a6282377198091\u202c",
+      "phone": "‪6282377198091‬",
       "pembimbing1": "Ade Lailani, S.Si., M.Si.",
       "pembimbing2": "Yusni Puspha Lestari, S.T., M.Si.",
       "penguji1": "",
@@ -644,7 +644,7 @@
       "nim": "121450161",
       "nama": "JIHAN PUTRI YANI",
       "angkatan": "2020",
-      "phone": "\u202a6282183021387\u202c",
+      "phone": "‪6282183021387‬",
       "pembimbing1": "",
       "pembimbing2": "",
       "penguji1": "",
@@ -697,7 +697,7 @@
         "07 - 11 September 26": "Progres: data sudah di acc (ada pergantian data), finalisasi BAB 1,  bimbingan denga pbbb 1 >6 kali\nNext: bimbingan untuk penulisan bab 1 dan 2",
         "14 - 18 September 26": "Progres : Telah bimbingan ke dosen pembimbing 1\nNext :",
         "21 - 25 September 26": "",
-        "28 - 02 Oktober 26": ""
+        "28 - 02 Oktober 26": "Progres : bimbingan ke pembimbing 2 terkait bab 1\nNext : menyelesaikan bab 1-3 fix"
       }
     },
     {
@@ -777,7 +777,7 @@
         "07 - 11 September 26": "Progres : dataset masih banyak yg korupt, solusi data menggunakan sedikit,  komputasi menggunakan collab memakan waktu yang lama beralih ke kaglle, hasil training tidak ada, BAP fiksasi, baru 1 kali bimbingan\nNext: fokus ke BAP dan Pbb 1, nyoba komputasi ke lab",
         "14 - 18 September 26": "Progres : Pembahasan BAP, bahas hasil pelatihan dan perbandingan lima varian model, penetapan area ROI di lajur kiri dan kanan jalan, tambah library ByteTrack untuk tracking dan hitung kecepatan masing-masing kendaraan, implementasi best weight model yolo26s-seg.pt untuk uji pemantauan kemacetan, buat dashboard sementara untuk lihat hasil uji pemantauan kemacetan.\nNext : Penulisan hasil dan analisis.",
         "21 - 25 September 26": "",
-        "28 - 02 Oktober 26": ""
+        "28 - 02 Oktober 26": "Progres : BAP dengan penguji, saran revisi penulisan dengan pembimbing 1\nNext : bimbingan dengan pembimbing 2"
       }
     },
     {
@@ -1017,7 +1017,7 @@
         "07 - 11 September 26": "Progres : Penyelesaian code dan penulisan\nNext : Penulisan BAB 4 selesai dan review coding",
         "14 - 18 September 26": "Progres : Penyusunan dan revisi BAB 4, Bimbingan membahas terkait penulisan dan code hasil di bab 4\nNext : menyelesaikan BAB 4 & 5 secara keseluruhan, revisi Bab 4 hingga 5",
         "21 - 25 September 26": "",
-        "28 - 02 Oktober 26": ""
+        "28 - 02 Oktober 26": "Progres : Revisi Penulisan dengan Dosen pembimbing 2\nNext : Menyelesaikan BAB 4-5 secara keseluruhan"
       }
     },
     {
@@ -1077,7 +1077,7 @@
         "07 - 11 September 26": "Progres : Mengurus SemHas\nNext : Daftar by sistem semhas",
         "14 - 18 September 26": "Progres : Melakukan pendaftaran seminar hasil\nNext : Mempersiapkan seminar hasil seperti pembuatan ppt dan belajar",
         "21 - 25 September 26": "Progres : Pelaksanaan Semhas",
-        "28 - 02 Oktober 26": ""
+        "28 - 02 Oktober 26": "Progres : Pelaksanaan semhas\nNext : Melakukan revisi"
       }
     },
     {
@@ -1137,7 +1137,7 @@
         "07 - 11 September 26": "Progres : BAP Selesai\nNext : Laporan progres codingan",
         "14 - 18 September 26": "Progres : bimbingan terkait  hasil anotasi gambar \nNext : anotasi gambar",
         "21 - 25 September 26": "",
-        "28 - 02 Oktober 26": ""
+        "28 - 02 Oktober 26": "Progres : diskusi hasil & bab 4-5\nNext : penulisan bab 4-5 ke pembimbing 2"
       }
     },
     {
@@ -1637,7 +1637,7 @@
         "07 - 11 September 26": "Progres : Sudah daftar Sempro\nNext : Sempro lama banget",
         "14 - 18 September 26": "Progres : Persiapan Sempro\nNext : Sempro tanggal 21",
         "21 - 25 September 26": "Progres : Pelaksanaan Sempro\nNext : Laporan revisi dan BAP",
-        "28 - 02 Oktober 26": ""
+        "28 - 02 Oktober 26": "Progres : Revisi BAP Sempro\nNext : Pengerjaan bab 4"
       }
     },
     {
@@ -1717,7 +1717,7 @@
         "07 - 11 September 26": "Progres : BAP Sempro selesai, bab 4 dan coding selesai, bimbingan belum\nNext : Laporan bimbingan dengan Pembimbing 1 dan 2",
         "14 - 18 September 26": "Progres : Perbaikan dan penambahan pada bab 4\nNext : Hasil perbaikan bab 4",
         "21 - 25 September 26": "",
-        "28 - 02 Oktober 26": ""
+        "28 - 02 Oktober 26": "Progres : ACC pembimbing 1, ada revisi minor dibagian kesimpulan dan saran\nNext : Menyelesaikan revisi bab 5, bimbingan ke pembimbing 2 dihari kamis"
       }
     },
     {
@@ -1757,7 +1757,7 @@
         "07 - 11 September 26": "Progres : Penulisan BAB 1\nNext : Finalisasi BAB 1 dan BAB 2",
         "14 - 18 September 26": "Progres : bimbingan judul dan bab 1\nNext : menyelesaikan bab 2",
         "21 - 25 September 26": "",
-        "28 - 02 Oktober 26": ""
+        "28 - 02 Oktober 26": "Progres : Revisi bab 2\nNext : bab 3"
       }
     },
     {
@@ -1777,7 +1777,7 @@
         "07 - 11 September 26": "Progres : Draft Sempro sudah selesai\nNext : Finalisasi ke pembimbing 2",
         "14 - 18 September 26": "Progres : Revisi flowchart, penambahan subbab, perbaikan paragraf\nNext : Pemangkasan halaman, revisi penulisan, formating gambar dan tabel",
         "21 - 25 September 26": "",
-        "28 - 02 Oktober 26": ""
+        "28 - 02 Oktober 26": "Progres : bimbingan dengan pembimbing 1\nNext : revisi flowchart, penulisan, bimbingan dengan pembimbing 2"
       }
     },
     {
@@ -1797,7 +1797,7 @@
         "07 - 11 September 26": "Progres : BAP Sempro selesai\nNext : Laporan proses coding dan Penulisan BAB 4",
         "14 - 18 September 26": "Progres : bimbingan terkait  ekstraksi frame & pemilihan gambar yang akan dianotasi\nNext : Perbaikan anotasi gambar",
         "21 - 25 September 26": "",
-        "28 - 02 Oktober 26": ""
+        "28 - 02 Oktober 26": "Progres : revisi hasil\nNext : penulisan bab 4&5"
       }
     },
     {
@@ -1957,7 +1957,7 @@
         "07 - 11 September 26": "Progres: bimbingan ke bu ira 4 kali, dan Pbb 2 baru 1 kali, data sudah, penulisan sudah sampai bab 3, gambar pipeline belum.  \nNext: Bimbingan ke Pbb 1 dan Pbb 2 terkait revisi",
         "14 - 18 September 26": "Progres : bimbingan terkait penulisan bab 1-3 ke dosen pembimbing 2, fiksasi rancangan sistem ke pembimbing 1\nNext : review kembali dosen pembimbing 2",
         "21 - 25 September 26": "",
-        "28 - 02 Oktober 26": ""
+        "28 - 02 Oktober 26": "Progres : finalisasi draft sempro, daftar sempro\nNext : pelaksanaan sempro"
       }
     },
     {
@@ -2057,7 +2057,7 @@
         "07 - 11 September 26": "Progres : Rapihkan penulisan\nNext : Selesaikan penulisan dan BAP Penguji",
         "14 - 18 September 26": "Progres : revisi bab 4 dan 5\nNext : menyusun lampiran dan menyelesaikan revisi minggu ini",
         "21 - 25 September 26": "",
-        "28 - 02 Oktober 26": ""
+        "28 - 02 Oktober 26": "Progres : BAP penguji dan finalisasi draft bab 4, 5, dan lampiran\nNext : daftar semhas"
       }
     },
     {
@@ -2137,7 +2137,7 @@
         "07 - 11 September 26": "Progres : pemahaman kembali teori ke pembimbing 2\nNext : Bimbingan dengan pembimbing 2 serta finalisasi draft sempro",
         "14 - 18 September 26": "Progres : Mendaftar sempro\nNext : Persiapan untuk ssmpro",
         "21 - 25 September 26": "",
-        "28 - 02 Oktober 26": ""
+        "28 - 02 Oktober 26": "Progres : Pelaksanaan sempro\nNext : melakukan revisi"
       }
     },
     {
@@ -2157,7 +2157,7 @@
         "07 - 11 September 26": "Progres : project Insectera, hasil sudah tinggal penulisan, minggu ini sampai minggu depan masih persentasi, bimbingan pak ardika 3 kali lebih \nNext: senin hubungi llpm untuk presentasi, daftar semhas minggu depan",
         "14 - 18 September 26": "Progres : Persentasi ke Sekretaris LPPM\nNext : Bimbingan bab 4-5 & mendaftar semhas",
         "21 - 25 September 26": "",
-        "28 - 02 Oktober 26": ""
+        "28 - 02 Oktober 26": "Progres : bimbingan pembimbing kedua terkait final\nNext : daftar seminar hasil"
       }
     },
     {
@@ -2317,7 +2317,7 @@
         "07 - 11 September 26": "",
         "14 - 18 September 26": "",
         "21 - 25 September 26": "",
-        "28 - 02 Oktober 26": ""
+        "28 - 02 Oktober 26": "Progres : Pelaksanaan semhas\nNext : BAP & pengajuan sidang"
       }
     },
     {
@@ -2384,7 +2384,7 @@
       "nim": "120450062",
       "nama": "Queena Aurora Batubara",
       "angkatan": "2021",
-      "phone": "\u202a6288219758365\u202c",
+      "phone": "‪6288219758365‬",
       "pembimbing1": "Christyan Tamaro Nadeak, S.Si., M.Si.",
       "pembimbing2": "Luluk Muthoharoh, S.Si., M.Si.",
       "penguji1": "Tirta Setiawan, S.Pd., M.Si.",
@@ -2424,7 +2424,7 @@
       "nim": "120450004",
       "nama": "Alem Ardemi",
       "angkatan": "2021",
-      "phone": "\u202a6285817743940\u202c",
+      "phone": "‪6285817743940‬",
       "pembimbing1": "Christyan Tamaro Nadeak, S.Si., M.Si.",
       "pembimbing2": "Tirta Setiawan, S.Pd., M.Si.",
       "penguji1": "",
@@ -2444,7 +2444,7 @@
       "nim": "120450022",
       "nama": "FIKRI DWI ALPIAN",
       "angkatan": "2021",
-      "phone": "\u202a6282388137794\u202c",
+      "phone": "‪6282388137794‬",
       "pembimbing1": "Luluk Muthoharoh, S.Si., M.Si.",
       "pembimbing2": "Mika Alvionita S, S.Si., M.Si.",
       "penguji1": "Christyan Tamaro Nadeak, S.Si., M.Si.",
@@ -2484,7 +2484,7 @@
       "nim": "120450102",
       "nama": "CORNEL SILAEN",
       "angkatan": "2021",
-      "phone": "\u202a6282278660066\u202c",
+      "phone": "‪6282278660066‬",
       "pembimbing1": "Tirta Setiawan, S.Pd., M.Si.",
       "pembimbing2": "Luluk Muthoharoh, S.Si., M.Si.",
       "penguji1": "Mika Alvionita S, S.Si., M.Si.",
@@ -2584,7 +2584,7 @@
       "nim": "121450014",
       "nama": "GEDE MOENA",
       "angkatan": "2021",
-      "phone": "\u202a6281291786941\u202c",
+      "phone": "‪6281291786941‬",
       "pembimbing1": "Christyan Tamaro Nadeak, S.Si., M.Si.",
       "pembimbing2": "Yuliana, S.Pd., M.Cs.",
       "penguji1": "Ahmad Luky Ramdani, S.Komp., M.Kom.",
@@ -2624,7 +2624,7 @@
       "nim": "121450030",
       "nama": "Pramudya Wibowo",
       "angkatan": "2021",
-      "phone": "\u202a6285764173923\u202c",
+      "phone": "‪6285764173923‬",
       "pembimbing1": "",
       "pembimbing2": "",
       "penguji1": "",
@@ -2924,7 +2924,7 @@
       "nim": "121450136",
       "nama": "ADISTY SYAWALDA ARIYANTO",
       "angkatan": "2021",
-      "phone": "\u202a6282377198091\u202c",
+      "phone": "‪6282377198091‬",
       "pembimbing1": "Ade Lailani, S.Si., M.Si.",
       "pembimbing2": "Yusni Puspha Lestari, S.T., M.Si.",
       "penguji1": "",
@@ -3024,7 +3024,7 @@
       "nim": "121450161",
       "nama": "JIHAN PUTRI YANI",
       "angkatan": "2021",
-      "phone": "\u202a6282183021387\u202c",
+      "phone": "‪6282183021387‬",
       "pembimbing1": "",
       "pembimbing2": "",
       "penguji1": "",
@@ -4764,7 +4764,7 @@
       "nim": "120450062",
       "nama": "Queena Aurora Batubara",
       "angkatan": "2022",
-      "phone": "\u202a6288219758365\u202c",
+      "phone": "‪6288219758365‬",
       "pembimbing1": "Christyan Tamaro Nadeak, S.Si., M.Si.",
       "pembimbing2": "Luluk Muthoharoh, S.Si., M.Si.",
       "penguji1": "Tirta Setiawan, S.Pd., M.Si.",
@@ -4804,7 +4804,7 @@
       "nim": "120450004",
       "nama": "Alem Ardemi",
       "angkatan": "2022",
-      "phone": "\u202a6285817743940\u202c",
+      "phone": "‪6285817743940‬",
       "pembimbing1": "Christyan Tamaro Nadeak, S.Si., M.Si.",
       "pembimbing2": "Tirta Setiawan, S.Pd., M.Si.",
       "penguji1": "",
@@ -4824,7 +4824,7 @@
       "nim": "120450022",
       "nama": "FIKRI DWI ALPIAN",
       "angkatan": "2022",
-      "phone": "\u202a6282388137794\u202c",
+      "phone": "‪6282388137794‬",
       "pembimbing1": "Luluk Muthoharoh, S.Si., M.Si.",
       "pembimbing2": "Mika Alvionita S, S.Si., M.Si.",
       "penguji1": "Christyan Tamaro Nadeak, S.Si., M.Si.",
@@ -4864,7 +4864,7 @@
       "nim": "120450102",
       "nama": "CORNEL SILAEN",
       "angkatan": "2022",
-      "phone": "\u202a6282278660066\u202c",
+      "phone": "‪6282278660066‬",
       "pembimbing1": "Tirta Setiawan, S.Pd., M.Si.",
       "pembimbing2": "Luluk Muthoharoh, S.Si., M.Si.",
       "penguji1": "Mika Alvionita S, S.Si., M.Si.",
@@ -4964,7 +4964,7 @@
       "nim": "121450014",
       "nama": "GEDE MOENA",
       "angkatan": "2022",
-      "phone": "\u202a6281291786941\u202c",
+      "phone": "‪6281291786941‬",
       "pembimbing1": "Christyan Tamaro Nadeak, S.Si., M.Si.",
       "pembimbing2": "Yuliana, S.Pd., M.Cs.",
       "penguji1": "Ahmad Luky Ramdani, S.Komp., M.Kom.",
@@ -5004,7 +5004,7 @@
       "nim": "121450030",
       "nama": "Pramudya Wibowo",
       "angkatan": "2022",
-      "phone": "\u202a6285764173923\u202c",
+      "phone": "‪6285764173923‬",
       "pembimbing1": "",
       "pembimbing2": "",
       "penguji1": "",
@@ -5304,7 +5304,7 @@
       "nim": "121450136",
       "nama": "ADISTY SYAWALDA ARIYANTO",
       "angkatan": "2022",
-      "phone": "\u202a6282377198091\u202c",
+      "phone": "‪6282377198091‬",
       "pembimbing1": "Ade Lailani, S.Si., M.Si.",
       "pembimbing2": "Yusni Puspha Lestari, S.T., M.Si.",
       "penguji1": "",
@@ -5404,7 +5404,7 @@
       "nim": "121450161",
       "nama": "JIHAN PUTRI YANI",
       "angkatan": "2022",
-      "phone": "\u202a6282183021387\u202c",
+      "phone": "‪6282183021387‬",
       "pembimbing1": "",
       "pembimbing2": "",
       "penguji1": "",
