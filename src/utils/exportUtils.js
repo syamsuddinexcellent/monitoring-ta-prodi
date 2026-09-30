@@ -459,10 +459,6 @@ export async function cancelPenolakan(nim, week) {
 
 export const BUILTIN_SEMESTERS = [
   'Semester Ganjil 2026/2027',
-  'Semester Genap 2025/2026',
-  'Semester Ganjil 2025/2026',
-  'Semester Genap 2024/2025',
-  'Semester Ganjil 2024/2025',
 ];
 
 // ─── Local semesters helpers (admin-added) ────────────────────────────────────
