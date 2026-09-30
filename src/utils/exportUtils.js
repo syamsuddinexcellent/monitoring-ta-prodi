@@ -455,6 +455,53 @@ export async function cancelPenolakan(nim, week) {
   localStorage.setItem(PENOLAKAN_KEY, JSON.stringify(all));
 }
 
+// ─── Admin: all laporan & masuk-database tracking ────────────────────────────
+
+export async function getAllLaporanBimbingan() {
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('laporan_bimbingan')
+    .select('nim, nama, week, category, progress, next_target, dosen_hadir, submitted_at')
+    .order('submitted_at', { ascending: false });
+  return error ? [] : (data || []);
+}
+
+const MASUK_DB_KEY = 'laporan_masuk_database';
+function _getLocalMasukDb() {
+  try { return JSON.parse(localStorage.getItem(MASUK_DB_KEY) || '[]'); } catch { return []; }
+}
+
+export async function getLaporanMasukDatabase() {
+  if (supabase) {
+    const { data, error } = await supabase.from('laporan_masuk_database').select('nim, week, masuk_at');
+    if (!error && data) return data;
+  }
+  return _getLocalMasukDb();
+}
+
+export async function tandaiMasukDatabase(nim, week) {
+  if (supabase) {
+    await supabase.from('laporan_masuk_database').upsert(
+      { nim, week, masuk_at: new Date().toISOString() },
+      { onConflict: 'nim,week' }
+    );
+    return;
+  }
+  const list = _getLocalMasukDb();
+  if (!list.some(r => r.nim === nim && r.week === week)) {
+    localStorage.setItem(MASUK_DB_KEY, JSON.stringify([...list, { nim, week, masuk_at: new Date().toISOString() }]));
+  }
+}
+
+export async function batalMasukDatabase(nim, week) {
+  if (supabase) {
+    await supabase.from('laporan_masuk_database').delete().eq('nim', nim).eq('week', week);
+    return;
+  }
+  const list = _getLocalMasukDb();
+  localStorage.setItem(MASUK_DB_KEY, JSON.stringify(list.filter(r => !(r.nim === nim && r.week === week))));
+}
+
 // ─── Built-in semesters (hardcoded baseline) ─────────────────────────────────
 
 export const BUILTIN_SEMESTERS = [
