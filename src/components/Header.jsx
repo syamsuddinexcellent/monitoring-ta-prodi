@@ -46,27 +46,27 @@ export default function Header({
           {/* Logo & Title */}
           <div className="flex items-center gap-4">
             {/* Three institution logos */}
-            <div className="flex items-center gap-2.5 shrink-0">
+            <div className="flex items-center gap-3 shrink-0">
               <img
                 src="/logo-fs.jpg"
                 alt="Fakultas Sains"
-                className="h-10 w-10 rounded-lg object-cover shadow-sm ring-1 ring-slate-200"
+                className="h-14 w-14 rounded-xl object-cover shadow-md ring-1 ring-slate-200"
               />
-              <div className="h-8 w-px bg-slate-200" />
+              <div className="h-10 w-px bg-slate-200" />
               <img
                 src="/logo-itera.jpg"
                 alt="ITERA"
-                className="h-10 w-10 rounded-lg object-contain shadow-sm ring-1 ring-slate-200 bg-white p-0.5"
+                className="h-14 w-auto rounded-xl object-contain shadow-md ring-1 ring-slate-200 bg-white px-1"
               />
-              <div className="h-8 w-px bg-slate-200" />
+              <div className="h-10 w-px bg-slate-200" />
               <img
                 src="/logo-sainsdata.jpg"
                 alt="Sains Data"
-                className="h-10 w-10 rounded-lg object-cover shadow-sm ring-1 ring-slate-200"
+                className="h-14 w-14 rounded-xl object-cover shadow-md ring-1 ring-slate-200"
               />
             </div>
             {/* Divider */}
-            <div className="h-10 w-px bg-slate-200 hidden sm:block" />
+            <div className="h-12 w-px bg-slate-200 hidden sm:block" />
             <div>
               <h1 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight leading-tight">
                 Monitoring Tugas Akhir
