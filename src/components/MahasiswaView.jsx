@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import {
   GraduationCap, BookOpen, CheckCircle2, AlertCircle,
   ArrowRight, UserCheck, Calendar, TrendingUp, Clock,
-  PlusCircle, ShieldCheck, PencilLine, Trash2, XCircle
+  PlusCircle, ShieldCheck, PencilLine, Trash2, XCircle, RefreshCw
 } from 'lucide-react';
 import { getCategoryBadgeStyle } from '../utils/helpers';
 import LaporanModal, { getLocalReportsForNim, parseWeekRange, deleteReport } from './LaporanModal';
@@ -264,11 +264,13 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
               const isVerified = isVerifiedByDosen(week);
               const penolakanInfo = tolkData[week];
               const isTolak = !!penolakanInfo && !isVerified;
+              const isResubmitted = isTolak && upd?.submittedAt && penolakanInfo?.at &&
+                new Date(upd.submittedAt) > new Date(penolakanInfo.at);
               const badge = getCategoryBadgeStyle(upd?.category);
               return (
                 <div key={week} className="relative group">
                   <div className={`absolute -left-[31px] top-1 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center ${
-                    isReported ? (isVerified ? 'bg-emerald-500 ring-4 ring-emerald-100' : isTolak ? 'bg-red-400 ring-4 ring-red-100' : 'bg-brand-500 ring-4 ring-brand-100') : 'bg-slate-200'
+                    isReported ? (isVerified ? 'bg-emerald-500 ring-4 ring-emerald-100' : (isTolak && !isResubmitted) ? 'bg-red-400 ring-4 ring-red-100' : 'bg-brand-500 ring-4 ring-brand-100') : 'bg-slate-200'
                   }`} />
                   <div className={`rounded-xl p-4 border transition-colors ${
                     isReported
@@ -285,10 +287,16 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
                             Terverifikasi
                           </span>
                         )}
-                        {isTolak && (
+                        {isTolak && !isResubmitted && (
                           <span className="flex items-center gap-0.5 text-[10px] font-semibold text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded-full">
                             <XCircle className="w-2.5 h-2.5" />
                             Ditolak
+                          </span>
+                        )}
+                        {isResubmitted && (
+                          <span className="flex items-center gap-0.5 text-[10px] font-semibold text-brand-700 bg-brand-50 border border-brand-200 px-1.5 py-0.5 rounded-full">
+                            <RefreshCw className="w-2.5 h-2.5" />
+                            Diajukan Kembali
                           </span>
                         )}
                       </div>
@@ -316,7 +324,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
                             <p className="text-slate-800 font-semibold">{upd.next}</p>
                           </div>
                         )}
-                        {isTolak && (
+                        {isTolak && !isResubmitted && (
                           <div className="bg-red-50 border border-red-200 rounded-lg p-2.5 space-y-0.5">
                             <div className="flex items-center gap-1 text-[10px] font-bold text-red-600 uppercase tracking-wider">
                               <XCircle className="w-3 h-3" />
@@ -327,6 +335,17 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser }) {
                             </p>
                             <p className="text-[10px] text-red-400">
                               Silakan edit dan kirim ulang laporan Anda.
+                            </p>
+                          </div>
+                        )}
+                        {isResubmitted && (
+                          <div className="bg-brand-50 border border-brand-200 rounded-lg p-2.5 space-y-0.5">
+                            <div className="flex items-center gap-1 text-[10px] font-bold text-brand-700 uppercase tracking-wider">
+                              <RefreshCw className="w-3 h-3" />
+                              Laporan Diajukan Kembali
+                            </div>
+                            <p className="text-xs text-brand-800 font-medium leading-relaxed">
+                              Laporan telah dikirim ulang. Menunggu verifikasi dari dosen pembimbing.
                             </p>
                           </div>
                         )}

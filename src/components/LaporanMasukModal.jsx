@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Inbox, BookOpen, Users, ArrowRight, ShieldCheck, ShieldOff, XCircle } from 'lucide-react';
+import { X, Inbox, BookOpen, Users, ArrowRight, ShieldCheck, ShieldOff, XCircle, RefreshCw } from 'lucide-react';
 import { getDosenLaporan, markDosenLaporanRead } from './LaporanModal';
 import { getCategoryBadgeStyle } from '../utils/helpers';
 import { getVerifikasi, saveVerifikasi, cancelVerifikasi, getPenolakan, savePenolakan, cancelPenolakan } from '../utils/exportUtils';
@@ -20,6 +20,8 @@ function LaporanCard({ item, dosenName, onRead, verifData, tolkData, onVerifChan
   const isVerified = verifData?.[item.nim]?.[item.week]?.verified;
   const penolakanInfo = tolkData?.[item.nim]?.[item.week];
   const isTolak = !!penolakanInfo;
+  const isResubmitted = isTolak && item.submittedAt && penolakanInfo?.at &&
+    new Date(item.submittedAt) > new Date(penolakanInfo.at);
 
   // Auto-mark as read when rendered
   useEffect(() => {
@@ -31,6 +33,7 @@ function LaporanCard({ item, dosenName, onRead, verifData, tolkData, onVerifChan
       await cancelVerifikasi(item.nim, item.week);
     } else {
       await saveVerifikasi(item.nim, item.week, dosenName);
+      if (isTolak) await cancelPenolakan(item.nim, item.week);
     }
     onVerifChange();
   };
@@ -49,7 +52,12 @@ function LaporanCard({ item, dosenName, onRead, verifData, tolkData, onVerifChan
   };
 
   return (
-    <div className={`rounded-xl border transition-all ${isTolak ? 'border-red-200 bg-red-50/30' : item.read ? 'border-slate-200 bg-white' : 'border-brand-300 bg-brand-50/40 ring-1 ring-brand-200'}`}>
+    <div className={`rounded-xl border transition-all ${
+      isResubmitted ? 'border-brand-300 bg-brand-50/30' :
+      (isTolak && !isResubmitted) ? 'border-red-200 bg-red-50/30' :
+      item.read ? 'border-slate-200 bg-white' :
+      'border-brand-300 bg-brand-50/40 ring-1 ring-brand-200'
+    }`}>
       {/* Header */}
       <div className="flex items-start gap-3 px-4 pt-4 pb-3">
         <div className={`mt-0.5 w-2 h-2 rounded-full shrink-0 ${item.read ? 'bg-slate-300' : 'bg-brand-500'}`} />
@@ -65,9 +73,14 @@ function LaporanCard({ item, dosenName, onRead, verifData, tolkData, onVerifChan
                 <ShieldCheck className="w-2.5 h-2.5" /> Terverifikasi
               </span>
             )}
-            {isTolak && !isVerified && (
+            {isTolak && !isVerified && !isResubmitted && (
               <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded-full">
                 <XCircle className="w-2.5 h-2.5" /> Ditolak
+              </span>
+            )}
+            {isResubmitted && !isVerified && (
+              <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-brand-700 bg-brand-50 border border-brand-200 px-1.5 py-0.5 rounded-full">
+                <RefreshCw className="w-2.5 h-2.5" /> Diajukan Kembali
               </span>
             )}
           </div>
@@ -118,12 +131,27 @@ function LaporanCard({ item, dosenName, onRead, verifData, tolkData, onVerifChan
           </div>
         )}
 
-        {/* Alasan tolak jika ada */}
-        {isTolak && (
+        {/* Alasan tolak jika ada (hanya ketika belum diajukan kembali) */}
+        {isTolak && !isResubmitted && (
           <div className="bg-red-50 border border-red-200 rounded-xl p-3 space-y-1">
             <p className="text-[10px] font-bold text-red-600 uppercase tracking-wider">Alasan Penolakan</p>
             <p className="text-xs text-red-800 font-medium leading-relaxed">{penolakanInfo.alasan || '—'}</p>
             <p className="text-[10px] text-red-400">oleh {penolakanInfo.dosenName?.split(',')[0]} · {formatDate(penolakanInfo.at)}</p>
+          </div>
+        )}
+        {/* Resubmission notice */}
+        {isResubmitted && (
+          <div className="bg-brand-50 border border-brand-200 rounded-xl p-3 space-y-2">
+            <div className="flex items-center gap-1.5">
+              <RefreshCw className="w-3.5 h-3.5 text-brand-600" />
+              <p className="text-[10px] font-bold text-brand-700 uppercase tracking-wider">Mahasiswa Mengajukan Laporan Kembali</p>
+            </div>
+            <p className="text-xs text-brand-800 font-medium">Laporan baru telah dikirim setelah penolakan sebelumnya. Tinjau isi laporan di atas.</p>
+            <div className="bg-red-50/80 border border-red-100 rounded-lg p-2 space-y-0.5">
+              <p className="text-[10px] font-bold text-red-500 uppercase tracking-wider">Alasan Penolakan Sebelumnya</p>
+              <p className="text-xs text-red-700 font-medium">{penolakanInfo.alasan || '—'}</p>
+              <p className="text-[10px] text-red-400">oleh {penolakanInfo.dosenName?.split(',')[0]} · {formatDate(penolakanInfo.at)}</p>
+            </div>
           </div>
         )}
 
@@ -158,7 +186,7 @@ function LaporanCard({ item, dosenName, onRead, verifData, tolkData, onVerifChan
 
         {/* Action bar */}
         <div className="flex items-center justify-end gap-2 pt-1">
-          {isTolak ? (
+          {isTolak && !isResubmitted ? (
             <button
               onClick={handleCancelTolak}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-colors"
