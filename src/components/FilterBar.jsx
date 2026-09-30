@@ -19,10 +19,10 @@ function LecturerDropdown({ lecturerFilter, onLecturerFilterChange, availableLec
     l.toLowerCase().includes(search.toLowerCase())
   );
 
-  const label = isFiltered ? lecturerFilter : 'Mahasiswa Bimbingan Saya';
+  const label = isFiltered ? lecturerFilter : 'Mahasiswa Bimbingan';
   const shortLabel = isFiltered
     ? lecturerFilter.split(',')[0]
-    : 'Mahasiswa Bimbingan Saya';
+    : 'Mahasiswa Bimbingan';
 
   return (
     <div className="relative shrink-0" ref={ref}>
@@ -155,7 +155,7 @@ export default function FilterBar({
         {isDosen ? (
           <div className="inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg border bg-indigo-600 text-white border-indigo-700 shadow-xs shrink-0">
             <UserCheck className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate max-w-[160px] text-left">{lecturerFilter !== 'all' ? lecturerFilter.split(',')[0] : '-'}</span>
+            <span className="truncate max-w-[160px] text-left">{lecturerFilter !== 'all' ? lecturerFilter.split(',')[0] : 'Mahasiswa Bimbingan'}</span>
           </div>
         ) : (
           <LecturerDropdown
@@ -171,7 +171,7 @@ export default function FilterBar({
           onChange={e => onStatusFilterChange(e.target.value)}
           className="shrink-0 px-3 py-2 text-xs bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
         >
-          <option value="all">Semua Status Lapor</option>
+          <option value="all">Status Lapor</option>
           <option value="reported">Sudah Lapor</option>
           <option value="unreported">Belum Lapor</option>
         </select>
@@ -182,7 +182,7 @@ export default function FilterBar({
           onChange={e => onAngkatanFilterChange(e.target.value)}
           className="shrink-0 px-3 py-2 text-xs bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
         >
-          <option value="all">Semua Angkatan</option>
+          <option value="all">Angkatan</option>
           {availableAngkatan.map(ang => (
             <option key={ang} value={ang}>Angkatan {ang}</option>
           ))}
@@ -194,7 +194,7 @@ export default function FilterBar({
           onChange={e => onCategoryFilterChange(e.target.value)}
           className="shrink-0 px-3 py-2 text-xs bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
         >
-          <option value="all">Semua Tahapan</option>
+          <option value="all">Tahapan</option>
           {availableCategories.map(cat => (
             <option key={cat} value={cat}>{cat}</option>
           ))}
