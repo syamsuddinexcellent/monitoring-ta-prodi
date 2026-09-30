@@ -55,60 +55,33 @@ async function fetchSheetCsv(gid) {
 }
 
 /**
- * Load all monitoring data across all tabs
+ * Load all monitoring data from local fallback_data.json
  */
 export async function loadMonitoringData() {
-  let source = 'google_sheets';
-  let fetchedTabs = [];
-
-  // 1. Try fetching live Google Sheets tabs concurrently
   try {
-    const promises = TABS_CONFIG.map(tab =>
-      fetchSheetCsv(tab.gid).then(csvText => ({
-        angkatan: tab.angkatan,
-        csvText
-      }))
-    );
-    const results = await Promise.allSettled(promises);
-    fetchedTabs = results
-      .filter(r => r.status === 'fulfilled' && r.value.csvText.includes('Nama') && !r.value.csvText.includes('<html') && !r.value.csvText.includes('<!DOCTYPE'))
-      .map(r => r.value);
+    const res = await fetch('/fallback_data.json', { cache: 'no-cache' });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.students && json.students.length > 0) {
+        return processFallbackJson(json, 'local');
+      }
+    }
   } catch (err) {
-    console.warn('Direct Google Sheet fetch encountered error:', err);
+    console.warn('Failed to load fallback_data.json:', err);
   }
 
-  // 2. If Google Sheets fetch failed, try fallback_data.json
-  if (fetchedTabs.length === 0) {
-    try {
-      const res = await fetch('/fallback_data.json');
-      if (res.ok) {
-        const json = await res.json();
-        if (json.students && json.students.length > 0) {
-          return processFallbackJson(json, 'fallback_json');
-        }
-      }
-    } catch {
-      // ignore
+  // Fallback: data.csv
+  try {
+    const res = await fetch('/data.csv');
+    if (res.ok) {
+      const text = await res.text();
+      return processCombinedCSV(text, 'local');
     }
-
-    // 3. Try /data.csv
-    try {
-      const res = await fetch('/data.csv');
-      if (res.ok) {
-        const text = await res.text();
-        return processCombinedCSV(text, 'local_csv');
-      }
-    } catch {
-      // ignore
-    }
+  } catch {
+    // ignore
   }
 
-  // Process live fetched tabs
-  if (fetchedTabs.length > 0) {
-    return processTabsData(fetchedTabs, source);
-  }
-
-  throw new Error('Tidak dapat memuat data monitoring dari Google Sheets maupun data lokal.');
+  throw new Error('Tidak dapat memuat data mahasiswa.');
 }
 
 /**

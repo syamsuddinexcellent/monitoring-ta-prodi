@@ -19,7 +19,6 @@ import {
   loadMonitoringData,
   getWeeklyMetrics,
   getAllWeeksTrend,
-  triggerSyncDatabase,
   mergeLocalReports
 } from './services/dataService';
 import { getLocalPeriods } from './utils/exportUtils';
@@ -32,7 +31,6 @@ import { RefreshCw, FilterX } from 'lucide-react';
 export default function App() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedWeek, setSelectedWeek] = useState('');
   const [viewMode, setViewMode] = useState('cards'); // 'cards' | 'table' | 'matrix'
   const [selectedSemester, setSelectedSemester] = useState('Semester Ganjil 2026/2027');
@@ -119,12 +117,8 @@ export default function App() {
     };
   }, []);
 
-  const fetchData = async (forceSync = false) => {
+  const fetchData = async () => {
     try {
-      setIsRefreshing(true);
-      if (forceSync) {
-        await triggerSyncDatabase();
-      }
       const result = await loadMonitoringData();
       result.students = mergeLocalReports(result.students);
       const lp = getLocalPeriods();
@@ -142,7 +136,6 @@ export default function App() {
       console.error('Failed to load data:', err);
     } finally {
       setLoading(false);
-      setIsRefreshing(false);
     }
   };
 
@@ -361,9 +354,6 @@ export default function App() {
       <div className="min-h-screen bg-slate-50 flex flex-col pb-16">
         <Header
           lastUpdated={data?.lastUpdated}
-          isRefreshing={isRefreshing}
-          onRefresh={() => fetchData(false)}
-          dataSource={data?.source}
           totalStudents={data?.students.length || 0}
           onExportCSV={() => {}}
           gatewayStatus={gatewayStatus}
@@ -398,9 +388,6 @@ export default function App() {
       {/* Header Bar */}
       <Header
         lastUpdated={data?.lastUpdated}
-        isRefreshing={isRefreshing}
-        onRefresh={() => fetchData(true)}
-        dataSource={data?.source}
         totalStudents={data?.students.length || 0}
         onExportCSV={handleExportCSV}
         gatewayStatus={gatewayStatus}
@@ -660,8 +647,6 @@ export default function App() {
         isOpen={isAdminPanelOpen}
         onClose={() => setIsAdminPanelOpen(false)}
         sheetsData={data}
-        isRefreshing={isRefreshing}
-        onRefreshSheets={() => fetchData(true)}
       />
     </div>
   );

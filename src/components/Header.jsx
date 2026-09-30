@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  RefreshCw,
   Database,
   Zap,
   LogOut,
@@ -10,13 +9,9 @@ import {
   Inbox,
 } from 'lucide-react';
 import { formatPhoneDisplay } from '../utils/helpers';
-import { GOOGLE_SHEETS_VIEW_URL } from '../services/dataService';
 
 export default function Header({
   lastUpdated,
-  isRefreshing,
-  onRefresh,
-  dataSource,
   totalStudents,
   onExportCSV,
   gatewayStatus,
@@ -65,56 +60,30 @@ export default function Header({
 
           {/* Action Bar */}
           <div className="flex items-center flex-wrap gap-2 sm:gap-3">
-            {/* Admin-only buttons */}
+            {/* Admin-only: Auto-Send Gateway Status */}
             {isAdmin && (
-              <>
-                {/* Auto-Send Gateway Status Button */}
-                <button
-                  onClick={onOpenGatewayModal}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all shadow-xs ${
-                    isGatewayConnected
-                      ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
-                      : 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-300 animate-pulse'
-                  }`}
-                  title="Klik untuk melihat status / scan QR Auto-Send WhatsApp"
-                >
-                  <Zap className={`w-3.5 h-3.5 ${isGatewayConnected ? 'text-emerald-600' : 'text-amber-600'}`} />
-                  {isGatewayConnected ? (
-                    <span>Auto-Send: {formatPhoneDisplay(gatewayStatus.connectedPhone || '6285768292580')}</span>
-                  ) : (
-                    <span>Hubungkan Auto-Send (Scan QR)</span>
-                  )}
-                </button>
-
-                {/* Sync Button */}
-                <button
-                  onClick={onRefresh}
-                  disabled={isRefreshing}
-                  className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-50 rounded-lg transition-all shadow-sm shadow-emerald-600/25 cursor-pointer"
-                  title="Perbarui database otomatis langsung dari Google Sheet terbaru"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-                  <span>{isRefreshing ? 'Menyinkronkan...' : 'Sinkronkan Google Sheet'}</span>
-                </button>
-              </>
+              <button
+                onClick={onOpenGatewayModal}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all shadow-xs ${
+                  isGatewayConnected
+                    ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+                    : 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-300 animate-pulse'
+                }`}
+                title="Klik untuk melihat status / scan QR Auto-Send WhatsApp"
+              >
+                <Zap className={`w-3.5 h-3.5 ${isGatewayConnected ? 'text-emerald-600' : 'text-amber-600'}`} />
+                {isGatewayConnected ? (
+                  <span>Auto-Send: {formatPhoneDisplay(gatewayStatus.connectedPhone || '6285768292580')}</span>
+                ) : (
+                  <span>Hubungkan Auto-Send (Scan QR)</span>
+                )}
+              </button>
             )}
 
-            {/* Google Sheets Status indicator */}
+            {/* Data source badge */}
             <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600">
-              {dataSource === 'google_sheets' ? (
-                <>
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                  </span>
-                  <span className="font-medium text-emerald-700">Live 3 Tab Sheets</span>
-                </>
-              ) : (
-                <>
-                  <Database className="w-3.5 h-3.5 text-amber-600" />
-                  <span className="font-medium text-amber-700">Data Cadangan</span>
-                </>
-              )}
+              <Database className="w-3.5 h-3.5 text-brand-600" />
+              <span className="font-medium text-brand-700">Data Lokal</span>
               <span className="text-slate-300">|</span>
               <span className="text-slate-500">{formatTime(lastUpdated)}</span>
             </div>

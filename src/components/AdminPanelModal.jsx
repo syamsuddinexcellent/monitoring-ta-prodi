@@ -38,7 +38,7 @@ function getDosenLaporanSummary() {
   } catch { return []; }
 }
 
-export default function AdminPanelModal({ isOpen, onClose, sheetsData, isRefreshing, onRefreshSheets }) {
+export default function AdminPanelModal({ isOpen, onClose, sheetsData }) {
   const [tab, setTab] = useState('akun');
   const [users, setUsers] = useState([]);
   const [reportsSummary, setReportsSummary] = useState({ students: 0, total: 0 });
@@ -425,14 +425,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, isRefresh
                         {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(sheetsData.lastUpdated)}
                       </span>
                     )}
-                    <button
-                      onClick={onRefreshSheets}
-                      disabled={isRefreshing}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-brand-600 hover:bg-brand-700 text-white disabled:opacity-60 transition-colors"
-                    >
-                      <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin' : ''}`} />
-                      {isRefreshing ? 'Menyinkronkan...' : 'Sinkronkan'}
-                    </button>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-200 font-semibold">Data Lokal</span>
                   </div>
                 </div>
 
