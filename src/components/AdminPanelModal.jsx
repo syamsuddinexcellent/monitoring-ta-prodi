@@ -8,7 +8,8 @@ import {
 } from 'lucide-react';
 import { getStoredUsersList, getStoredUsersWithPasswords, deleteStoredUser, resetPassword } from './AuthModal';
 import {
-  exportExcelAll, exportExcelPeriode, printRekapPeriode, printRekapAll,
+  exportExcelAll, exportExcelPeriode, exportExcelSemester,
+  printRekapPeriode, printRekapAll, printRekapSemester,
   getCustomPeriods, addCustomPeriod, deleteCustomPeriod, updateCustomPeriod,
   getLockedPeriods, lockPeriod, unlockPeriod,
   BUILTIN_SEMESTERS, getLocalSemesters, saveLocalSemesters,
@@ -143,6 +144,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   const [editPeriodLabel, setEditPeriodLabel] = useState(null);
   const [editPeriodDates, setEditPeriodDates] = useState({ start: '', end: '' });
   const [exportPeriodeIdx, setExportPeriodeIdx] = useState('');
+  const [exportSemesterKey, setExportSemesterKey] = useState('');
   const [localSemesters, setLocalSemesters] = useState([]);
   const [newSemesterLabel, setNewSemesterLabel] = useState('');
   const [expandedSemester, setExpandedSemester] = useState(BUILTIN_SEMESTERS[0]);
@@ -1348,7 +1350,53 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                     </div>
                   </div>
 
+                  <div className="border-t border-slate-100" />
+
+                  {/* Export per semester */}
+                  <div>
+                    <p className="text-xs font-semibold text-slate-700 mb-1.5">Rekap per Semester</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <select
+                        value={exportSemesterKey}
+                        onChange={e => setExportSemesterKey(e.target.value)}
+                        className="flex-1 text-[10px] font-semibold border border-slate-200 rounded-lg px-2 py-1.5 bg-white text-slate-600 outline-none focus:ring-1 focus:ring-brand-400"
+                      >
+                        <option value="">Pilih semester untuk export…</option>
+                        {allSemesters.map(sem => {
+                          const n = (periodsBySemester[sem] || []).length;
+                          return <option key={sem} value={sem}>{sem} ({n} periode)</option>;
+                        })}
+                      </select>
+                      <button
+                        onClick={() => {
+                          const weeks = (periodsBySemester[exportSemesterKey] || []).map(p => p.label);
+                          if (weeks.length && sheetsData?.students) exportExcelSemester(sheetsData.students, exportSemesterKey, weeks);
+                        }}
+                        disabled={!exportSemesterKey || !sheetsData?.students}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 disabled:opacity-40 transition-colors shrink-0"
+                      >
+                        <FileSpreadsheet className="w-3 h-3" />
+                        Excel
+                      </button>
+                      <button
+                        onClick={() => {
+                          const weeks = (periodsBySemester[exportSemesterKey] || []).map(p => p.label);
+                          if (weeks.length && sheetsData?.students) printRekapSemester(sheetsData.students, exportSemesterKey, weeks);
+                        }}
+                        disabled={!exportSemesterKey || !sheetsData?.students}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-slate-700 hover:bg-slate-800 text-white disabled:opacity-40 transition-colors shrink-0"
+                      >
+                        <Printer className="w-3 h-3" />
+                        PDF
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-slate-100" />
+
                   {/* Export per periode */}
+                  <div>
+                    <p className="text-xs font-semibold text-slate-700 mb-1.5">Rekap per Periode</p>
                   <div className="flex items-center gap-2 flex-wrap">
                     <select
                       value={exportPeriodeIdx}
@@ -1382,6 +1430,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                       <Printer className="w-3 h-3" />
                       PDF
                     </button>
+                  </div>
                   </div>
                 </div>
               </div>

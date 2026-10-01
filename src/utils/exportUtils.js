@@ -89,6 +89,154 @@ export function exportExcelAll(students, weekColumns) {
   XLSX.writeFile(wb, `Rekap_Monitoring_TA_Prodi_Sains_Data.xlsx`);
 }
 
+export function exportExcelSemester(students, semesterName, weekColumns) {
+  const wb = XLSX.utils.book_new();
+  const summaryHeader = [
+    'No', 'NIM', 'Nama', 'Angkatan', 'Pembimbing 1', 'Pembimbing 2',
+    'Penguji 1', 'Penguji 2', 'No WA', 'Status TA',
+    ...weekColumns.map((w, i) => `P${i + 1} – ${w}`),
+    'Total Lapor',
+  ];
+  const summaryRows = [
+    summaryHeader,
+    ...students.map((s, i) => {
+      const perPeriode = weekColumns.map(w => {
+        const upd = s.weeklyUpdates?.[w];
+        return upd?.reported ? upd.category : '-';
+      });
+      const total = weekColumns.filter(w => s.weeklyUpdates?.[w]?.reported).length;
+      return [
+        i + 1, s.nim, s.nama, s.angkatan,
+        s.pembimbing1 || '-', s.pembimbing2 || '-',
+        s.penguji1 || '-', s.penguji2 || '-',
+        s.phone || '-', s.statusTA || '-',
+        ...perPeriode,
+        `${total}/${weekColumns.length}`,
+      ];
+    }),
+  ];
+  const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
+  wsSummary['!cols'] = [4, 14, 28, 9, 22, 22, 18, 18, 14, 14,
+    ...weekColumns.map(() => ({ wch: 18 })), 10].map(w => (typeof w === 'number' ? { wch: w } : w));
+  XLSX.utils.book_append_sheet(wb, wsSummary, 'Rekap Semester');
+  weekColumns.forEach((week, idx) => {
+    const rows = [
+      ['No', 'NIM', 'Nama', 'Angkatan', 'Pembimbing 1', 'Pembimbing 2',
+        'Status Lapor', 'Kategori', 'Progres', 'Target'],
+      ...students.map((s, i) => {
+        const upd = s.weeklyUpdates?.[week] || {};
+        return [
+          i + 1, s.nim, s.nama, s.angkatan,
+          s.pembimbing1 || '-', s.pembimbing2 || '-',
+          upd.reported ? 'Sudah Lapor' : 'Belum Lapor',
+          upd.category || '-', upd.progress || '-', upd.next || '-',
+        ];
+      }),
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = [4, 14, 28, 9, 22, 22, 12, 16, 40, 30].map(w => ({ wch: w }));
+    XLSX.utils.book_append_sheet(wb, ws, `P${idx + 1}`);
+  });
+  const safeLabel = semesterName.replace(/[\/\\?*[\]]/g, '-');
+  XLSX.writeFile(wb, `Rekap_TA_${safeLabel}.xlsx`);
+}
+
+export function printRekapSemester(students, semesterName, weekColumns) {
+  const periodeSections = weekColumns.map((week, idx) => {
+    const sudah = students.filter(s => s.weeklyUpdates?.[week]?.reported).length;
+    const belum = students.length - sudah;
+    const rate = Math.round((sudah / (students.length || 1)) * 100);
+    const rows = students.map((s, i) => {
+      const upd = s.weeklyUpdates?.[week] || {};
+      const reported = upd.reported;
+      return `<tr style="${i % 2 === 0 ? '' : 'background:#f8fafc;'}">
+        <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;color:#64748b;font-size:11px;">${i + 1}</td>
+        <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-family:monospace;font-size:10px;">${s.nim}</td>
+        <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-weight:600;font-size:11px;">${s.nama}</td>
+        <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:10px;">${s.angkatan}</td>
+        <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;">
+          <span style="background:${reported ? '#d1fae5' : '#fee2e2'};color:${reported ? '#065f46' : '#991b1b'};padding:2px 7px;border-radius:9999px;font-size:10px;font-weight:700;">
+            ${reported ? 'Sudah' : 'Belum'}
+          </span>
+        </td>
+        <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:10px;">${upd.category || '-'}</td>
+        <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:10px;max-width:160px;">${upd.progress || '-'}</td>
+      </tr>`;
+    }).join('');
+    return `
+      <div style="break-inside:avoid;margin-bottom:32px;">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:2px solid #4f46e5;padding-bottom:6px;margin-bottom:10px;">
+          <div>
+            <span style="font-size:14px;font-weight:800;color:#1e293b;">Periode ${idx + 1}</span>
+            <span style="font-size:12px;color:#64748b;margin-left:8px;">${week}</span>
+          </div>
+          <div style="display:flex;gap:12px;font-size:11px;">
+            <span style="color:#059669;font-weight:700;">${sudah} lapor</span>
+            <span style="color:#e11d48;font-weight:700;">${belum} belum</span>
+            <span style="color:#4f46e5;font-weight:700;">${rate}%</span>
+          </div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          <thead><tr style="background:#f1f5f9;">
+            <th style="padding:5px 7px;text-align:left;font-size:10px;color:#64748b;border-bottom:2px solid #e2e8f0;">No</th>
+            <th style="padding:5px 7px;text-align:left;font-size:10px;color:#64748b;border-bottom:2px solid #e2e8f0;">NIM</th>
+            <th style="padding:5px 7px;text-align:left;font-size:10px;color:#64748b;border-bottom:2px solid #e2e8f0;">Nama</th>
+            <th style="padding:5px 7px;text-align:left;font-size:10px;color:#64748b;border-bottom:2px solid #e2e8f0;">Angk.</th>
+            <th style="padding:5px 7px;text-align:left;font-size:10px;color:#64748b;border-bottom:2px solid #e2e8f0;">Status</th>
+            <th style="padding:5px 7px;text-align:left;font-size:10px;color:#64748b;border-bottom:2px solid #e2e8f0;">Kategori</th>
+            <th style="padding:5px 7px;text-align:left;font-size:10px;color:#64748b;border-bottom:2px solid #e2e8f0;">Progres</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }).join('');
+
+  const overallSudah = weekColumns.length > 0
+    ? students.filter(s => weekColumns.some(w => s.weeklyUpdates?.[w]?.reported)).length
+    : 0;
+
+  const html = `<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8"/>
+<title>Rekap TA – ${semesterName}</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 24px; color: #1e293b; font-size: 12px; }
+  @media print { button { display: none !important; } body { padding: 12px; } }
+  @page { size: A4 landscape; margin: 14mm; }
+</style>
+</head><body>
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:12px;border-bottom:3px solid #4f46e5;">
+  <div>
+    <h1 style="font-size:20px;font-weight:900;margin:0 0 2px;">Rekap Monitoring Tugas Akhir</h1>
+    <div style="color:#64748b;font-size:12px;">Program Studi Sains Data · ${semesterName} · ${weekColumns.length} periode · ${students.length} mahasiswa</div>
+  </div>
+  <button onclick="window.print()" style="padding:8px 18px;background:#4f46e5;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">Cetak / Simpan PDF</button>
+</div>
+<div style="display:flex;gap:12px;margin-bottom:20px;">
+  <div style="flex:1;padding:10px 14px;border-radius:8px;border:1px solid #bfdbfe;background:#eff6ff;">
+    <div style="font-size:20px;font-weight:900;color:#1d4ed8;">${weekColumns.length}</div>
+    <div style="font-size:11px;color:#64748b;">Total Periode</div>
+  </div>
+  <div style="flex:1;padding:10px 14px;border-radius:8px;border:1px solid #e2e8f0;">
+    <div style="font-size:20px;font-weight:900;color:#1e293b;">${students.length}</div>
+    <div style="font-size:11px;color:#64748b;">Total Mahasiswa</div>
+  </div>
+  <div style="flex:1;padding:10px 14px;border-radius:8px;border:1px solid #bbf7d0;background:#f0fdf4;">
+    <div style="font-size:20px;font-weight:900;color:#059669;">${overallSudah}</div>
+    <div style="font-size:11px;color:#64748b;">Pernah Melapor</div>
+  </div>
+</div>
+${periodeSections}
+<div style="margin-top:16px;font-size:10px;color:#94a3b8;text-align:right;">
+  Dicetak dari Sistem Monitoring TA Prodi Sains Data · ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+</div>
+</body></html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+}
+
 // ─── PDF via print window ─────────────────────────────────────────────────────
 
 export function printStudentHistory(student, weekColumns, verifData = {}) {
