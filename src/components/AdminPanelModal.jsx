@@ -1051,11 +1051,15 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                         <th className="px-3 py-2 text-slate-500 font-semibold text-center">Bimbingan</th>
                         <th className="px-3 py-2 text-slate-500 font-semibold text-center">Penguji</th>
                         <th className="px-3 py-2 text-slate-500 font-semibold text-center">Akun</th>
+                        <th className="px-1 py-2 w-12"></th>
                       </tr>
                     </thead>
                     <tbody>
-                      {dosenStats.map((d, i) => (
-                        <tr key={d.nama} className="border-b border-slate-50 hover:bg-slate-50/60 transition-colors">
+                      {dosenStats.map((d, i) => {
+                        const dosenUser = users.find(u => u.role === 'dosen' && (u.lecturerName === d.nama || u.name === d.nama));
+                        const isConfirmingDosen = confirmDelete === dosenUser?.email;
+                        return (
+                        <tr key={d.nama} className="group border-b border-slate-50 hover:bg-slate-50/60 transition-colors">
                           <td className="px-3 py-2 text-slate-400">{i + 1}</td>
                           <td className="px-3 py-2 text-slate-700 font-medium">{d.nama}</td>
                           <td className="px-3 py-2 text-center">
@@ -1073,8 +1077,24 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                               ? <span className="px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-semibold">Terdaftar</span>
                               : <span className="px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-400 text-[10px]">Belum</span>}
                           </td>
+                          <td className="px-1 py-2 text-center">
+                            {dosenUser && (isConfirmingDosen ? (
+                              <div className="flex items-center gap-0.5">
+                                <button onClick={() => handleDeleteUser(dosenUser.email)}
+                                  className="text-[9px] px-1.5 py-0.5 rounded bg-rose-600 text-white font-semibold hover:bg-rose-700 transition-colors">Ya</button>
+                                <button onClick={() => setConfirmDelete(null)}
+                                  className="text-[9px] px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 hover:bg-slate-300 transition-colors">Tdk</button>
+                              </div>
+                            ) : (
+                              <button onClick={() => setConfirmDelete(dosenUser.email)}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-300 hover:text-rose-500 p-0.5 rounded">
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            ))}
+                          </td>
                         </tr>
-                      ))}
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
