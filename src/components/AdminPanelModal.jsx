@@ -255,6 +255,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
           pembimbing2: ov.pembimbing2 ?? s.pembimbing2,
           penguji1:    ov.penguji1    ?? s.penguji1,
           penguji2:    ov.penguji2    ?? s.penguji2,
+          phone:       ov.phone       ?? s.phone,
           statusTA:    ov.status_ta   ?? s.statusTA,
         };
       });
@@ -1012,9 +1013,32 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                                     </td>
                                   );
                                 })}
-                                <td className="px-2 py-2 whitespace-nowrap border-r border-slate-100">
-                                  {s.phone ? <span className="flex items-center gap-0.5 text-emerald-700"><Phone className="w-2.5 h-2.5" />{s.phone}</span> : <span className="text-slate-300">-</span>}
-                                </td>
+                                {(() => {
+                                  const isEditing = editingCell?.nim === s.nim && editingCell?.field === 'phone';
+                                  return (
+                                    <td className="px-2 py-2 whitespace-nowrap border-r border-slate-100">
+                                      {isEditing ? (
+                                        <input
+                                          type="text"
+                                          value={editingValue}
+                                          onChange={e => setEditingValue(e.target.value)}
+                                          onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
+                                          onBlur={saveEdit}
+                                          autoFocus
+                                          placeholder="08xx..."
+                                          className="w-full text-[10px] border border-brand-300 rounded px-1 py-0.5 outline-none focus:ring-1 focus:ring-brand-400 bg-white"
+                                        />
+                                      ) : (
+                                        <div className="flex items-center gap-0.5 group cursor-pointer" onClick={() => startEdit(s.nim, 'phone', s.phone)}>
+                                          {s.phone
+                                            ? <span className="flex items-center gap-0.5 text-emerald-700 text-[10px]"><Phone className="w-2.5 h-2.5" />{s.phone}</span>
+                                            : <span className="text-slate-300 group-hover:text-brand-400 text-[10px]">+ WA</span>}
+                                          <Pencil className="w-2 h-2 text-slate-200 group-hover:text-brand-400 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity ml-0.5" />
+                                        </div>
+                                      )}
+                                    </td>
+                                  );
+                                })()}
                                 {(() => {
                                   const isEditing = editingCell?.nim === s.nim && editingCell?.field === 'status_ta';
                                   const staCls = STATUS_TA_CLS[s.statusTA] || 'bg-slate-100 text-slate-600 border-slate-200';
