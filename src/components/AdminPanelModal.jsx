@@ -15,6 +15,7 @@ import {
   getVerifikasi, getPenolakan,
   getAllLaporanBimbingan, getLaporanMasukDatabase, tandaiMasukDatabase, batalMasukDatabase,
   getStudentOverrides, upsertStudentOverride, deleteStudentOverride,
+  getHiddenDosen, hideDosenName,
 } from '../utils/exportUtils';
 
 const _PM = {
@@ -157,6 +158,9 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   const _cancelEditRef = useRef(false);
   // Delete / hide student
   const [confirmDeleteStudent, setConfirmDeleteStudent] = useState(null); // nim
+  // Hide non-registered dosen
+  const [confirmHideDosen, setConfirmHideDosen] = useState(null); // nama
+  const [hiddenDosen, setHiddenDosen] = useState(() => getHiddenDosen());
   // Add student form
   const [addStudentOpen, setAddStudentOpen] = useState(false);
   const [addStudentForm, setAddStudentForm] = useState({ nim: '', nama: '', angkatan: '', pembimbing1: '', pembimbing2: '', penguji1: '', penguji2: '', phone: '', status_ta: '' });
@@ -470,6 +474,12 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     }
     setConfirmDeleteStudent(null);
     await _refreshStudentOverrides();
+  };
+
+  const handleHideDosen = (nama) => {
+    hideDosenName(nama);
+    setHiddenDosen(getHiddenDosen());
+    setConfirmHideDosen(null);
   };
 
   const handleAddStudent = async () => {
@@ -1040,7 +1050,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                 <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
                   <Users className="w-4 h-4 text-indigo-600" />
                   <span className="text-xs font-bold text-slate-700">Daftar Dosen</span>
-                  <span className="text-[10px] text-slate-400">({dosenStats.length} dosen)</span>
+                  <span className="text-[10px] text-slate-400">({dosenStats.filter(d => !hiddenDosen.has(d.nama)).length} dosen)</span>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-[11px]">
@@ -1055,9 +1065,10 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                       </tr>
                     </thead>
                     <tbody>
-                      {dosenStats.map((d, i) => {
+                      {dosenStats.filter(d => !hiddenDosen.has(d.nama)).map((d, i) => {
                         const dosenUser = users.find(u => u.role === 'dosen' && (u.lecturerName === d.nama || u.name === d.nama));
                         const isConfirmingDosen = confirmDelete === dosenUser?.email;
+                        const isConfirmingHide = confirmHideDosen === d.nama;
                         return (
                         <tr key={d.nama} className="group border-b border-slate-50 hover:bg-slate-50/60 transition-colors">
                           <td className="px-3 py-2 text-slate-400">{i + 1}</td>
@@ -1078,19 +1089,35 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                               : <span className="px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-400 text-[10px]">Belum</span>}
                           </td>
                           <td className="px-1 py-2 text-center">
-                            {dosenUser && (isConfirmingDosen ? (
-                              <div className="flex items-center gap-0.5">
-                                <button onClick={() => handleDeleteUser(dosenUser.email)}
-                                  className="text-[9px] px-1.5 py-0.5 rounded bg-rose-600 text-white font-semibold hover:bg-rose-700 transition-colors">Ya</button>
-                                <button onClick={() => setConfirmDelete(null)}
-                                  className="text-[9px] px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 hover:bg-slate-300 transition-colors">Tdk</button>
-                              </div>
+                            {dosenUser ? (
+                              isConfirmingDosen ? (
+                                <div className="flex items-center gap-0.5">
+                                  <button onClick={() => handleDeleteUser(dosenUser.email)}
+                                    className="text-[9px] px-1.5 py-0.5 rounded bg-rose-600 text-white font-semibold hover:bg-rose-700 transition-colors">Ya</button>
+                                  <button onClick={() => setConfirmDelete(null)}
+                                    className="text-[9px] px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 hover:bg-slate-300 transition-colors">Tdk</button>
+                                </div>
+                              ) : (
+                                <button onClick={() => setConfirmDelete(dosenUser.email)}
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-300 hover:text-rose-500 p-0.5 rounded">
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
+                              )
                             ) : (
-                              <button onClick={() => setConfirmDelete(dosenUser.email)}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-300 hover:text-rose-500 p-0.5 rounded">
-                                <Trash2 className="w-3 h-3" />
-                              </button>
-                            ))}
+                              isConfirmingHide ? (
+                                <div className="flex items-center gap-0.5">
+                                  <button onClick={() => handleHideDosen(d.nama)}
+                                    className="text-[9px] px-1.5 py-0.5 rounded bg-rose-600 text-white font-semibold hover:bg-rose-700 transition-colors">Ya</button>
+                                  <button onClick={() => setConfirmHideDosen(null)}
+                                    className="text-[9px] px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 hover:bg-slate-300 transition-colors">Tdk</button>
+                                </div>
+                              ) : (
+                                <button onClick={() => setConfirmHideDosen(d.nama)}
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-300 hover:text-rose-500 p-0.5 rounded">
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
+                              )
+                            )}
                           </td>
                         </tr>
                         );

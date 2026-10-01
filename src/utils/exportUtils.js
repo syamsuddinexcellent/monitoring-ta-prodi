@@ -606,6 +606,22 @@ export async function deleteStudentOverride(nim) {
   } catch {}
 }
 
+// ─── Hidden dosen helpers (localStorage) ──────────────────────────────────────
+
+const HIDDEN_DOSEN_KEY = 'hidden_dosen';
+
+export function getHiddenDosen() {
+  try { return new Set(JSON.parse(localStorage.getItem(HIDDEN_DOSEN_KEY) || '[]')); } catch { return new Set(); }
+}
+
+export function hideDosenName(nama) {
+  try {
+    const s = getHiddenDosen();
+    s.add(nama);
+    localStorage.setItem(HIDDEN_DOSEN_KEY, JSON.stringify([...s]));
+  } catch {}
+}
+
 // ─── Locked periods helpers (Supabase-backed) ─────────────────────────────────
 
 const LOCAL_LOCKED_KEY = 'locked_periods';
