@@ -606,6 +606,45 @@ export async function deleteStudentOverride(nim) {
   } catch {}
 }
 
+// ─── Extra dosen helpers (Supabase / localStorage) ────────────────────────────
+
+const EXTRA_DOSEN_KEY = 'extra_dosen';
+
+export async function getExtraDosen() {
+  if (supabase) {
+    const { data, error } = await supabase.from('extra_dosen').select('nama').order('nama');
+    if (!error && data) {
+      const names = data.map(r => r.nama);
+      try { localStorage.setItem(EXTRA_DOSEN_KEY, JSON.stringify(names)); } catch {}
+      return names;
+    }
+  }
+  try { return JSON.parse(localStorage.getItem(EXTRA_DOSEN_KEY) || '[]'); } catch { return []; }
+}
+
+export async function addExtraDosenName(nama) {
+  if (supabase) {
+    await supabase.from('extra_dosen').upsert({ nama }, { onConflict: 'nama' });
+    return;
+  }
+  try {
+    const arr = JSON.parse(localStorage.getItem(EXTRA_DOSEN_KEY) || '[]');
+    if (!arr.includes(nama)) arr.push(nama);
+    localStorage.setItem(EXTRA_DOSEN_KEY, JSON.stringify(arr));
+  } catch {}
+}
+
+export async function removeExtraDosenName(nama) {
+  if (supabase) {
+    await supabase.from('extra_dosen').delete().eq('nama', nama);
+    return;
+  }
+  try {
+    const arr = JSON.parse(localStorage.getItem(EXTRA_DOSEN_KEY) || '[]');
+    localStorage.setItem(EXTRA_DOSEN_KEY, JSON.stringify(arr.filter(n => n !== nama)));
+  } catch {}
+}
+
 // ─── Hidden dosen helpers (localStorage) ──────────────────────────────────────
 
 const HIDDEN_DOSEN_KEY = 'hidden_dosen';
