@@ -15,7 +15,7 @@ import {
   getVerifikasi, getPenolakan,
   getAllLaporanBimbingan, getLaporanMasukDatabase, tandaiMasukDatabase, batalMasukDatabase,
   getStudentOverrides, upsertStudentOverride, deleteStudentOverride,
-  getHiddenDosen, hideDosenName,
+  getHiddenDosen, hideDosenName, unhideDosenName,
 } from '../utils/exportUtils';
 
 const _PM = {
@@ -161,6 +161,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   // Hide non-registered dosen
   const [confirmHideDosen, setConfirmHideDosen] = useState(null); // nama
   const [hiddenDosen, setHiddenDosen] = useState(new Set());
+  const [showHiddenDosen, setShowHiddenDosen] = useState(false);
   // Add student form
   const [addStudentOpen, setAddStudentOpen] = useState(false);
   const [addStudentForm, setAddStudentForm] = useState({ nim: '', nama: '', angkatan: '', pembimbing1: '', pembimbing2: '', penguji1: '', penguji2: '', phone: '', status_ta: '' });
@@ -481,6 +482,11 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     await hideDosenName(nama);
     setHiddenDosen(await getHiddenDosen());
     setConfirmHideDosen(null);
+  };
+
+  const handleRestoreDosen = async (nama) => {
+    await unhideDosenName(nama);
+    setHiddenDosen(await getHiddenDosen());
   };
 
   const handleAddStudent = async () => {
@@ -1052,6 +1058,15 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                   <Users className="w-4 h-4 text-indigo-600" />
                   <span className="text-xs font-bold text-slate-700">Daftar Dosen</span>
                   <span className="text-[10px] text-slate-400">({dosenStats.filter(d => !hiddenDosen.has(d.nama)).length} dosen)</span>
+                  {hiddenDosen.size > 0 && (
+                    <button
+                      onClick={() => setShowHiddenDosen(v => !v)}
+                      className={`ml-auto flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border transition-colors ${showHiddenDosen ? 'bg-amber-100 border-amber-300 text-amber-700' : 'bg-slate-100 border-slate-200 text-slate-500 hover:bg-amber-50 hover:text-amber-600'}`}
+                    >
+                      <EyeOff className="w-3 h-3" />
+                      {hiddenDosen.size} tersembunyi
+                    </button>
+                  )}
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-[11px]">
@@ -1126,6 +1141,25 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                     </tbody>
                   </table>
                 </div>
+                {showHiddenDosen && hiddenDosen.size > 0 && (
+                  <div className="border-t border-slate-200 bg-amber-50/40 px-4 py-3">
+                    <p className="text-[10px] font-semibold text-amber-700 mb-2">Dosen Tersembunyi</p>
+                    <div className="space-y-1">
+                      {[...hiddenDosen].map(nama => (
+                        <div key={nama} className="flex items-center justify-between gap-2 py-1 px-2 rounded-lg hover:bg-amber-100/60 transition-colors">
+                          <span className="text-[11px] text-slate-600">{nama}</span>
+                          <button
+                            onClick={() => handleRestoreDosen(nama)}
+                            className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-white border border-emerald-200 text-emerald-700 hover:bg-emerald-50 transition-colors"
+                          >
+                            <RotateCcw className="w-3 h-3" />
+                            Tampilkan
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* ── Export ── */}

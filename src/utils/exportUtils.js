@@ -622,6 +622,18 @@ export async function getHiddenDosen() {
   try { return new Set(JSON.parse(localStorage.getItem(HIDDEN_DOSEN_KEY) || '[]')); } catch { return new Set(); }
 }
 
+export async function unhideDosenName(nama) {
+  if (supabase) {
+    await supabase.from('hidden_dosen').delete().eq('nama', nama);
+    return;
+  }
+  try {
+    const s = new Set(JSON.parse(localStorage.getItem(HIDDEN_DOSEN_KEY) || '[]'));
+    s.delete(nama);
+    localStorage.setItem(HIDDEN_DOSEN_KEY, JSON.stringify([...s]));
+  } catch {}
+}
+
 export async function hideDosenName(nama) {
   if (supabase) {
     await supabase.from('hidden_dosen').upsert({ nama }, { onConflict: 'nama' });
