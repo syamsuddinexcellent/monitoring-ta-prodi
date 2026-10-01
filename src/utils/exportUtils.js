@@ -610,13 +610,25 @@ export async function deleteStudentOverride(nim) {
 
 const HIDDEN_DOSEN_KEY = 'hidden_dosen';
 
-export function getHiddenDosen() {
+export async function getHiddenDosen() {
+  if (supabase) {
+    const { data, error } = await supabase.from('hidden_dosen').select('nama');
+    if (!error && data) {
+      const names = data.map(r => r.nama);
+      try { localStorage.setItem(HIDDEN_DOSEN_KEY, JSON.stringify(names)); } catch {}
+      return new Set(names);
+    }
+  }
   try { return new Set(JSON.parse(localStorage.getItem(HIDDEN_DOSEN_KEY) || '[]')); } catch { return new Set(); }
 }
 
-export function hideDosenName(nama) {
+export async function hideDosenName(nama) {
+  if (supabase) {
+    await supabase.from('hidden_dosen').upsert({ nama }, { onConflict: 'nama' });
+    return;
+  }
   try {
-    const s = getHiddenDosen();
+    const s = new Set(JSON.parse(localStorage.getItem(HIDDEN_DOSEN_KEY) || '[]'));
     s.add(nama);
     localStorage.setItem(HIDDEN_DOSEN_KEY, JSON.stringify([...s]));
   } catch {}

@@ -160,7 +160,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   const [confirmDeleteStudent, setConfirmDeleteStudent] = useState(null); // nim
   // Hide non-registered dosen
   const [confirmHideDosen, setConfirmHideDosen] = useState(null); // nama
-  const [hiddenDosen, setHiddenDosen] = useState(() => getHiddenDosen());
+  const [hiddenDosen, setHiddenDosen] = useState(new Set());
   // Add student form
   const [addStudentOpen, setAddStudentOpen] = useState(false);
   const [addStudentForm, setAddStudentForm] = useState({ nim: '', nama: '', angkatan: '', pembimbing1: '', pembimbing2: '', penguji1: '', penguji2: '', phone: '', status_ta: '' });
@@ -190,6 +190,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     const fromSupabase = getDosenSummaryFromLaporan(laporan);
     setDosenSummary(fromSupabase.length > 0 ? fromSupabase : getDosenLaporanSummary());
     setStudentOverrides(await getStudentOverrides());
+    setHiddenDosen(await getHiddenDosen());
   };
 
   const _refreshStudentOverrides = async () => {
@@ -476,9 +477,9 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     await _refreshStudentOverrides();
   };
 
-  const handleHideDosen = (nama) => {
-    hideDosenName(nama);
-    setHiddenDosen(getHiddenDosen());
+  const handleHideDosen = async (nama) => {
+    await hideDosenName(nama);
+    setHiddenDosen(await getHiddenDosen());
     setConfirmHideDosen(null);
   };
 
