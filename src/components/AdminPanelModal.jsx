@@ -711,7 +711,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                     <button
                       disabled={addDosenLoading}
                       onClick={async () => {
-                        setAddDosenErrorState('');
+                        setAddDosenFormError('');
                         setAddDosenLoading(true);
                         const result = await registerUser(
                           addDosenForm.email.trim(),
