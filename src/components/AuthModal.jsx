@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Lock, X, Eye, EyeOff, ShieldCheck, AlertCircle, UserPlus, LogIn, Mail, Search, GraduationCap, BookOpen, KeyRound, ArrowLeft, CheckCircle2, RefreshCw } from 'lucide-react';
+import { Lock, X, Eye, EyeOff, ShieldCheck, AlertCircle, UserPlus, LogIn, Mail, Search, GraduationCap, BookOpen, KeyRound, ArrowLeft, CheckCircle2, RefreshCw, MessageCircle, Copy, Check } from 'lucide-react';
 import { STUDENT_NIM_MAP } from '../utils/studentDatabase';
 import { supabase } from '../lib/supabase';
 
@@ -290,6 +290,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
   );
   const [forgotSuccess, setForgotSuccess] = useState('');
   const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotResetLink, setForgotResetLink] = useState('');
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const nimToName = useMemo(() => buildNimToName(), []);
 
@@ -304,6 +306,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
     setForgotEmail(''); setForgotStep(1);
     setForgotNewPass(''); setForgotConfirm('');
     setForgotError(''); setForgotSuccess('');
+    setForgotResetLink(''); setLinkCopied(false);
   };
 
   const handleClose = () => {
@@ -319,30 +322,54 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
   const sendResetLink = async (email) => {
     let found;
     if (supabase) {
-      const { data } = await supabase.from('app_users').select('name').eq('email', email).maybeSingle();
+      const { data } = await supabase.from('app_users')
+        .select('name, role, nim, lecturer_name')
+        .eq('email', email).maybeSingle();
       found = data;
     } else {
       const users = getLocalUsers();
-      found = users.find(u => u.email === email);
+      const u = users.find(u => u.email === email);
+      if (u) found = { name: u.name, role: u.role, nim: u.nim, lecturer_name: u.lecturerName };
     }
     if (!found) return { error: 'Email tidak terdaftar di sistem. Silakan daftar akun baru.' };
+
+    // Look up WA number from student_overrides or dosen_info
+    let phone = null;
+    if (supabase) {
+      if (found.role === 'mahasiswa' && found.nim) {
+        const { data } = await supabase.from('student_overrides')
+          .select('phone').eq('nim', found.nim).maybeSingle();
+        phone = data?.phone || null;
+      } else if (found.role === 'dosen' && found.lecturer_name) {
+        const { data } = await supabase.from('dosen_info')
+          .select('phone').eq('nama', found.lecturer_name).maybeSingle();
+        phone = data?.phone || null;
+      }
+    } else {
+      if (found.role === 'mahasiswa' && found.nim) {
+        try { phone = JSON.parse(localStorage.getItem('student_overrides') || '{}')[found.nim]?.phone || null; } catch {}
+      } else if (found.role === 'dosen' && found.lecturer_name) {
+        try { phone = JSON.parse(localStorage.getItem('dosen_info_cache') || '{}')[found.lecturer_name]?.phone || null; } catch {}
+      }
+    }
+
+    if (!phone) {
+      return { error: 'Nomor WhatsApp belum terdaftar untuk akun ini. Hubungi admin prodi untuk mendaftarkan nomor WA Anda.' };
+    }
+
+    // Normalize phone → international format (628xx)
+    let wa = phone.replace(/[\s\-().]/g, '');
+    if (wa.startsWith('+')) wa = wa.slice(1);
+    if (wa.startsWith('0')) wa = '62' + wa.slice(1);
+
     const token = generateToken();
     storeResetToken(email, token);
     const resetLink = `${window.location.origin}/?reset_token=${token}`;
-    const res = await fetch('/api/send-reset-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email,
-        resetLink,
-        userName: found.name || email.split('@')[0],
-      }),
-    });
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      throw new Error(data.error || 'Gagal mengirim email.');
-    }
-    return { success: true };
+    const userName = found.name || email.split('@')[0];
+    const msg = `Halo ${userName},\n\nAnda meminta reset password akun *Monitoring TA Prodi Sains Data*.\n\nKlik link berikut untuk membuat password baru (berlaku 1 jam):\n\n${resetLink}\n\nAbaikan pesan ini jika tidak merasa meminta reset password.`;
+
+    window.open(`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`, '_blank');
+    return { success: true, resetLink };
   };
 
   const handleForgotStep1 = async (e) => {
@@ -354,9 +381,9 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
     try {
       const result = await sendResetLink(email);
       if (result.error) { setForgotError(result.error); }
-      else { setForgotStep(2); }
+      else { setForgotResetLink(result.resetLink || ''); setForgotStep(2); }
     } catch (err) {
-      setForgotError(err.message || 'Gagal mengirim email. Periksa koneksi internet.');
+      setForgotError(err.message || 'Gagal membuka WhatsApp. Periksa koneksi internet.');
     } finally {
       setForgotLoading(false);
     }
@@ -386,9 +413,9 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
     try {
       const result = await sendResetLink(forgotEmail.trim().toLowerCase());
       if (result.error) setForgotError(result.error);
-      else setForgotError('');
+      else { setForgotResetLink(result.resetLink || ''); }
     } catch (err) {
-      setForgotError(err.message || 'Gagal mengirim ulang. Coba lagi.');
+      setForgotError(err.message || 'Gagal membuka WhatsApp. Coba lagi.');
     } finally {
       setForgotLoading(false);
     }
@@ -569,7 +596,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
             {forgotStep === 1 && (
               <form onSubmit={handleForgotStep1} className="space-y-4">
                 <div className="px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-600 leading-relaxed">
-                  Masukkan email ITERA yang terdaftar. Kami akan mengirimkan link reset password ke email tersebut.
+                  Masukkan email ITERA yang terdaftar. Link reset password akan dikirim via <span className="font-semibold text-emerald-700">WhatsApp</span> ke nomor yang terdaftar di sistem.
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Email terdaftar</label>
@@ -589,30 +616,55 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
                 <button type="submit" disabled={forgotLoading}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 disabled:opacity-60 rounded-lg transition-all shadow-sm">
                   {forgotLoading
-                    ? <><RefreshCw className="w-4 h-4 animate-spin" />Mengirim link...</>
-                    : <><Mail className="w-4 h-4" />Kirim Link Reset Password</>
+                    ? <><RefreshCw className="w-4 h-4 animate-spin" />Membuka WhatsApp...</>
+                    : <><MessageCircle className="w-4 h-4" />Kirim via WhatsApp</>
                   }
                 </button>
               </form>
             )}
 
-            {/* Step 1 success: link sent */}
+            {/* Step 1 success: WA opened */}
             {forgotStep === 2 && !resetToken && !forgotSuccess && (
               <div className="space-y-4">
                 <div className="px-4 py-4 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-800 text-center space-y-2">
                   <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mx-auto">
-                    <Mail className="w-5 h-5 text-emerald-600" />
+                    <MessageCircle className="w-5 h-5 text-emerald-600" />
                   </div>
-                  <p className="font-semibold">Link reset dikirim!</p>
+                  <p className="font-semibold">WhatsApp terbuka!</p>
                   <p className="text-xs text-emerald-700">
-                    Cek email <span className="font-semibold">{forgotEmail}</span> dan klik link di dalamnya. Berlaku 1 jam.
+                    Pesan berisi link reset password telah disiapkan di WhatsApp. Kirim pesan tersebut ke nomor admin prodi. Berlaku <span className="font-semibold">1 jam</span>.
                   </p>
-                  <p className="text-[11px] text-emerald-600">Jika tidak ada di kotak masuk, periksa folder <span className="font-semibold">Spam</span>.</p>
                 </div>
+                {forgotResetLink && (
+                  <div className="space-y-1.5">
+                    <p className="text-[11px] text-slate-500 font-medium">Atau salin link reset password:</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        readOnly
+                        value={forgotResetLink}
+                        className="flex-1 text-[10px] border border-slate-200 rounded-lg px-2.5 py-2 bg-slate-50 text-slate-600 outline-none select-all truncate"
+                        onClick={e => e.target.select()}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(forgotResetLink).then(() => {
+                            setLinkCopied(true);
+                            setTimeout(() => setLinkCopied(false), 2000);
+                          });
+                        }}
+                        className="shrink-0 flex items-center gap-1 px-2.5 py-2 text-xs font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition-colors"
+                      >
+                        {linkCopied ? <><Check className="w-3.5 h-3.5" />Tersalin</> : <><Copy className="w-3.5 h-3.5" />Salin</>}
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <button type="button" onClick={handleResendLink} disabled={forgotLoading}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium text-slate-600 hover:text-brand-600 bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-300 rounded-lg transition-colors disabled:opacity-50">
-                  {forgotLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-                  Kirim ulang link
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium text-slate-600 hover:text-emerald-700 bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg transition-colors disabled:opacity-50">
+                  {forgotLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <MessageCircle className="w-3.5 h-3.5" />}
+                  Buka ulang WhatsApp
                 </button>
               </div>
             )}
