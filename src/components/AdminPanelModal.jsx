@@ -17,6 +17,7 @@ import {
   getStudentOverrides, upsertStudentOverride, deleteStudentOverride,
   getHiddenDosen, hideDosenName, unhideDosenName,
   getExtraDosen, addExtraDosenName, removeExtraDosenName,
+  getDosenInfo, upsertDosenInfo,
 } from '../utils/exportUtils';
 
 const _PM = {
@@ -167,6 +168,11 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   const [showAddDosen, setShowAddDosen] = useState(false);
   const [addDosenNama, setAddDosenNama] = useState('');
   const [addDosenError, setAddDosenError] = useState('');
+  // Dosen info (email, phone, nidn)
+  const [dosenInfo, setDosenInfo] = useState({});
+  const [editingDosenField, setEditingDosenField] = useState(null); // { nama, field }
+  const [editingDosenValue, setEditingDosenValue] = useState('');
+  const _cancelDosenEditRef = useRef(false);
   // Add student form
   const [addStudentOpen, setAddStudentOpen] = useState(false);
   const [addStudentForm, setAddStudentForm] = useState({ nim: '', nama: '', angkatan: '', pembimbing1: '', pembimbing2: '', penguji1: '', penguji2: '', phone: '', status_ta: '' });
@@ -198,6 +204,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     setStudentOverrides(await getStudentOverrides());
     setHiddenDosen(await getHiddenDosen());
     setExtraDosen(await getExtraDosen());
+    setDosenInfo(await getDosenInfo());
   };
 
   const _refreshStudentOverrides = async () => {
@@ -508,6 +515,29 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     setAddDosenNama('');
     setAddDosenError('');
     setShowAddDosen(false);
+  };
+
+  const startDosenEdit = (nama, field, currentValue) => {
+    _cancelDosenEditRef.current = false;
+    setEditingDosenField({ nama, field });
+    setEditingDosenValue(currentValue || '');
+  };
+
+  const saveDosenField = async () => {
+    if (_cancelDosenEditRef.current) { _cancelDosenEditRef.current = false; return; }
+    if (!editingDosenField) return;
+    const { nama, field } = editingDosenField;
+    setEditingDosenField(null);
+    const current = { email: '', phone: '', nidn: '', ...(dosenInfo[nama] || {}) };
+    const updated = { ...current, [field]: editingDosenValue.trim() };
+    await upsertDosenInfo(nama, updated);
+    setDosenInfo(await getDosenInfo());
+  };
+
+  const cancelDosenEdit = () => {
+    _cancelDosenEditRef.current = true;
+    setEditingDosenField(null);
+    setEditingDosenValue('');
   };
 
   const handleAddStudent = async () => {
@@ -1126,11 +1156,14 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                   <table className="w-full text-[11px]">
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-100 text-left">
-                        <th className="px-3 py-2 text-slate-500 font-semibold w-8">No</th>
-                        <th className="px-3 py-2 text-slate-500 font-semibold">Nama Dosen</th>
-                        <th className="px-3 py-2 text-slate-500 font-semibold text-center">Bimbingan</th>
-                        <th className="px-3 py-2 text-slate-500 font-semibold text-center">Penguji</th>
-                        <th className="px-3 py-2 text-slate-500 font-semibold text-center">Akun</th>
+                        <th className="px-3 py-2 text-slate-500 font-semibold w-8 text-[10px]">No</th>
+                        <th className="px-3 py-2 text-slate-500 font-semibold text-[10px]">Nama Dosen</th>
+                        <th className="px-3 py-2 text-slate-500 font-semibold text-[10px] w-40">Email</th>
+                        <th className="px-3 py-2 text-slate-500 font-semibold text-[10px] w-28">HP/WA</th>
+                        <th className="px-3 py-2 text-slate-500 font-semibold text-[10px] w-28">NIDN</th>
+                        <th className="px-3 py-2 text-slate-500 font-semibold text-center text-[10px]">Bimbingan</th>
+                        <th className="px-3 py-2 text-slate-500 font-semibold text-center text-[10px]">Penguji</th>
+                        <th className="px-3 py-2 text-slate-500 font-semibold text-center text-[10px]">Akun</th>
                         <th className="px-1 py-2 w-12"></th>
                       </tr>
                     </thead>
@@ -1141,8 +1174,48 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                         const isConfirmingHide = confirmHideDosen === d.nama;
                         return (
                         <tr key={d.nama} className="group border-b border-slate-50 hover:bg-slate-50/60 transition-colors">
-                          <td className="px-3 py-2 text-slate-400">{i + 1}</td>
-                          <td className="px-3 py-2 text-slate-700 font-medium">{d.nama}</td>
+                          <td className="px-3 py-2 text-slate-400 text-[10px]">{i + 1}</td>
+                          <td className="px-3 py-2 text-slate-700 font-medium text-[11px] max-w-[180px]">
+                            <span className="line-clamp-2">{d.nama}</span>
+                          </td>
+                          {/* Email, HP/WA, NIDN editable cells */}
+                          {[
+                            { field: 'email', placeholder: '+ email', fallback: users.find(u => u.role === 'dosen' && (u.lecturerName === d.nama || u.name === d.nama))?.email },
+                            { field: 'phone', placeholder: '+ HP/WA', fallback: null },
+                            { field: 'nidn',  placeholder: '+ NIDN',  fallback: null },
+                          ].map(({ field, placeholder, fallback }) => {
+                            const stored = dosenInfo[d.nama]?.[field] || '';
+                            const display = stored || fallback || '';
+                            const isFromAccount = !stored && !!fallback;
+                            const isEditing = editingDosenField?.nama === d.nama && editingDosenField?.field === field;
+                            return (
+                              <td key={field} className="px-3 py-2 border-r border-slate-50 max-w-[160px]">
+                                {isEditing ? (
+                                  <input
+                                    type="text"
+                                    value={editingDosenValue}
+                                    onChange={e => setEditingDosenValue(e.target.value)}
+                                    onKeyDown={e => { if (e.key === 'Enter') saveDosenField(); if (e.key === 'Escape') cancelDosenEdit(); }}
+                                    onBlur={saveDosenField}
+                                    autoFocus
+                                    className="w-full text-[10px] border border-indigo-300 rounded px-1.5 py-0.5 outline-none focus:ring-1 focus:ring-indigo-400 bg-white"
+                                  />
+                                ) : (
+                                  <div
+                                    className="flex items-center gap-0.5 group/cell cursor-pointer"
+                                    onClick={() => startDosenEdit(d.nama, field, stored || fallback || '')}
+                                  >
+                                    {display ? (
+                                      <span className={`text-[10px] truncate flex-1 ${isFromAccount ? 'text-slate-400 italic' : 'text-slate-600'}`}>{display}</span>
+                                    ) : (
+                                      <span className="text-[10px] text-slate-300 group-hover/cell:text-indigo-400 transition-colors">{placeholder}</span>
+                                    )}
+                                    <Pencil className="w-2 h-2 text-slate-200 group-hover/cell:text-indigo-400 shrink-0 opacity-0 group-hover/cell:opacity-100 transition-opacity ml-0.5" />
+                                  </div>
+                                )}
+                              </td>
+                            );
+                          })}
                           <td className="px-3 py-2 text-center">
                             {d.bimbingan > 0
                               ? <span className="px-1.5 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-200 text-[10px] font-semibold">{d.bimbingan} mhs</span>

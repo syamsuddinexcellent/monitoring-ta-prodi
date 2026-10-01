@@ -685,6 +685,38 @@ export async function hideDosenName(nama) {
   } catch {}
 }
 
+// ─── Dosen info helpers (Supabase / localStorage) ────────────────────────────
+
+const DOSEN_INFO_KEY = 'dosen_info_cache';
+
+export async function getDosenInfo() {
+  if (supabase) {
+    const { data, error } = await supabase.from('dosen_info').select('*');
+    if (!error && data) {
+      const map = {};
+      data.forEach(r => { map[r.nama] = { email: r.email || '', phone: r.phone || '', nidn: r.nidn || '' }; });
+      try { localStorage.setItem(DOSEN_INFO_KEY, JSON.stringify(map)); } catch {}
+      return map;
+    }
+  }
+  try { return JSON.parse(localStorage.getItem(DOSEN_INFO_KEY) || '{}'); } catch { return {}; }
+}
+
+export async function upsertDosenInfo(nama, { email = '', phone = '', nidn = '' }) {
+  if (supabase) {
+    await supabase.from('dosen_info').upsert(
+      { nama, email: email || null, phone: phone || null, nidn: nidn || null },
+      { onConflict: 'nama' }
+    );
+    return;
+  }
+  try {
+    const map = JSON.parse(localStorage.getItem(DOSEN_INFO_KEY) || '{}');
+    map[nama] = { email, phone, nidn };
+    localStorage.setItem(DOSEN_INFO_KEY, JSON.stringify(map));
+  } catch {}
+}
+
 // ─── Locked periods helpers (Supabase-backed) ─────────────────────────────────
 
 const LOCAL_LOCKED_KEY = 'locked_periods';
