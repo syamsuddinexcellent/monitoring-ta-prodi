@@ -275,11 +275,11 @@ export default function App() {
     return getWeeklyMetrics(data.students, selectedWeek);
   }, [data, selectedWeek]);
 
-  // Dosen's own students (P1 or P2)
+  // Dosen's own students (P1 or P2) — handles pipe-separated lecturerName for shared accounts
   const dosenStudents = useMemo(() => {
     if (!data || loggedInUser?.role !== 'dosen' || !loggedInUser?.lecturerName) return [];
-    const name = loggedInUser.lecturerName;
-    return data.students.filter(s => s.pembimbing1 === name || s.pembimbing2 === name);
+    const names = new Set(loggedInUser.lecturerName.split('|').map(n => n.trim()).filter(Boolean));
+    return data.students.filter(s => names.has(s.pembimbing1) || names.has(s.pembimbing2));
   }, [data, loggedInUser]);
 
   // Dosen-scoped metrics
@@ -361,11 +361,10 @@ export default function App() {
         return false;
       }
 
-      // Lecturer (Pembimbing 1 or 2)
+      // Lecturer (Pembimbing 1 or 2) — handles pipe-separated filter for shared dosen accounts
       if (lecturerFilter !== 'all') {
-        const matchP1 = student.pembimbing1 === lecturerFilter;
-        const matchP2 = student.pembimbing2 === lecturerFilter;
-        if (!matchP1 && !matchP2) return false;
+        const filterNames = new Set(lecturerFilter.split('|').map(n => n.trim()).filter(Boolean));
+        if (!filterNames.has(student.pembimbing1) && !filterNames.has(student.pembimbing2)) return false;
       }
 
       return true;
@@ -622,7 +621,7 @@ export default function App() {
                   <span className="text-slate-400"> (Periode berikutnya: {nextWeek})</span>
                 )}
                 {lecturerFilter !== 'all' && (
-                  <span className="ml-1 text-indigo-600 font-medium">• Dosen: {lecturerFilter.split(',')[0]}</span>
+                  <span className="ml-1 text-indigo-600 font-medium">• Dosen: {lecturerFilter.includes('|') ? lecturerFilter.split('|').map(n => n.split(',')[0].trim()).join(', ') : lecturerFilter.split(',')[0]}</span>
                 )}
               </div>
 
