@@ -17,6 +17,7 @@ const LECTURER_EMAIL_MAP = {
   'dewi.setiawan@sd.itera.ac.id':          'Dewi Indra Setiawan, S.Si., M.Si.',
   'dimas.randa@sd.itera.ac.id':            'Dimas Dwi Randa, S.Kom., M.Kom.',
   'koordinator.ta@itera.ac.id':            'Dr. Koordinator TA',
+  'dosenluar@itera.ac.id':                 'Budi Santoso, S.T., M.T.|Dr. Esa Prakasa, S.T., M.T.|Lita Lianti, S.T., M.Sc.|Rumadi, S.T., M.T.|Triyana Muliawati, S.Si., M.Si.',
   'fajri.farid@sd.itera.ac.id':            'Fajri Farid, S.Si., M.Sc.',
   'febri.dwi@sd.itera.ac.id':              'Febri Dwi Irawati, S.Si., M.Si.',
   'fitri.nurjanah@sd.itera.ac.id':         'Fitri Nurjanah, S.Si., M.Mat.',
@@ -114,8 +115,8 @@ export async function registerUser(email, password, overrideName = null, overrid
   const role = overrideRole || classifyEmail(emailLower);
   if (!role) return { error: 'Hanya email ITERA yang diizinkan (@sd.itera.ac.id, @student.itera.ac.id, dll.).' };
   if (password.length < 6) return { error: 'Password minimal 6 karakter.' };
-  if (role === 'dosen' && emailLower.split('@')[1] !== 'sd.itera.ac.id') {
-    return { error: 'Akun dosen hanya dapat didaftarkan dengan email @sd.itera.ac.id.' };
+  if (role === 'dosen' && !DOSEN_DOMAINS.includes(emailLower.split('@')[1])) {
+    return { error: 'Akun dosen hanya dapat didaftarkan dengan email ITERA dosen (@sd.itera.ac.id, @itera.ac.id, dll.).' };
   }
   if (role === 'mahasiswa' && emailLower.split('@')[1] !== 'student.itera.ac.id') {
     return { error: 'Akun mahasiswa hanya dapat didaftarkan dengan email @student.itera.ac.id.' };
@@ -341,15 +342,21 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
           .select('phone').eq('nim', found.nim).maybeSingle();
         phone = data?.phone || null;
       } else if (found.role === 'dosen' && found.lecturer_name) {
-        const { data } = await supabase.from('dosen_info')
-          .select('phone').eq('nama', found.lecturer_name).maybeSingle();
-        phone = data?.phone || null;
+        const names = found.lecturer_name.split('|').map(n => n.trim()).filter(Boolean);
+        for (const n of names) {
+          const { data } = await supabase.from('dosen_info').select('phone').eq('nama', n).maybeSingle();
+          if (data?.phone) { phone = data.phone; break; }
+        }
       }
     } else {
       if (found.role === 'mahasiswa' && found.nim) {
         try { phone = JSON.parse(localStorage.getItem('student_overrides') || '{}')[found.nim]?.phone || null; } catch {}
       } else if (found.role === 'dosen' && found.lecturer_name) {
-        try { phone = JSON.parse(localStorage.getItem('dosen_info_cache') || '{}')[found.lecturer_name]?.phone || null; } catch {}
+        try {
+          const cache = JSON.parse(localStorage.getItem('dosen_info_cache') || '{}');
+          const names = found.lecturer_name.split('|').map(n => n.trim()).filter(Boolean);
+          for (const n of names) { if (cache[n]?.phone) { phone = cache[n].phone; break; } }
+        } catch {}
       }
     }
 

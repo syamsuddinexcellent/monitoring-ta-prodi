@@ -91,6 +91,7 @@ export async function getLocalReportsForNim(nim) {
 }
 
 export async function getDosenLaporan(dosenName) {
+  const dosenNames = dosenName.split('|').map(n => n.trim()).filter(Boolean);
   if (supabase) {
     const { data, error } = await supabase
       .from('laporan_bimbingan')
@@ -99,10 +100,10 @@ export async function getDosenLaporan(dosenName) {
     if (!error && data) {
       const inbox = JSON.parse(localStorage.getItem('dosen_laporan') || '{}');
       const readKeys = new Set(
-        (inbox[dosenName] || []).filter(r => r.read).map(r => `${r.nim}|${r.week}`)
+        dosenNames.flatMap(n => (inbox[n] || []).filter(r => r.read).map(r => `${r.nim}|${r.week}`))
       );
       return data
-        .filter(r => normalizeDosenHadir(r.dosen_hadir).list.some(d => d.name === dosenName))
+        .filter(r => normalizeDosenHadir(r.dosen_hadir).list.some(d => dosenNames.includes(d.name)))
         .map(r => ({
           nim: r.nim, nama: r.nama, week: r.week,
           category: r.category, progress: r.progress,

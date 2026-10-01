@@ -6,7 +6,7 @@ import {
   ChevronUp, ChevronDown, Phone, FileSpreadsheet, Printer, Plus, Pencil,
   Eye, EyeOff, KeyRound, Lock, Unlock
 } from 'lucide-react';
-import { getStoredUsersList, getStoredUsersWithPasswords, deleteStoredUser, resetPassword } from './AuthModal';
+import { getStoredUsersList, getStoredUsersWithPasswords, deleteStoredUser, resetPassword, registerUser } from './AuthModal';
 import {
   exportExcelAll, exportExcelPeriode, exportExcelSemester,
   printRekapPeriode, printRekapAll, printRekapSemester,
@@ -182,6 +182,11 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   // password show/hide & reset per user (keyed by email)
   const [showPass, setShowPass] = useState({});
   const [resetForm, setResetForm] = useState({}); // { [email]: { open, value, error } }
+  // Buat akun dosen
+  const [addDosenOpen, setAddDosenOpen] = useState(false);
+  const [addDosenForm, setAddDosenForm] = useState({ email: '', name: '', lecturerName: '', password: '' });
+  const [addDosenError, setAddDosenErrorState] = useState('');
+  const [addDosenLoading, setAddDosenLoading] = useState(false);
 
   const refresh = async () => {
     setUsers(await getStoredUsersWithPasswords());
@@ -640,7 +645,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
           {tab === 'akun' && (
             <div className="p-5 space-y-5">
               {/* Summary chips */}
-              <div className="flex gap-3 flex-wrap">
+              <div className="flex items-center gap-3 flex-wrap">
                 <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs">
                   <Users className="w-4 h-4 text-slate-500" />
                   <span className="text-slate-600">Total:</span>
@@ -654,7 +659,82 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                   <GraduationCap className="w-4 h-4 text-emerald-600" />
                   <span className="text-emerald-700 font-semibold">{mahasiswaUsers.length} Mahasiswa</span>
                 </div>
+                <button
+                  onClick={() => { setAddDosenOpen(v => !v); setAddDosenErrorState(''); setAddDosenForm({ email: '', name: '', lecturerName: '', password: '' }); }}
+                  className="ml-auto flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-colors shrink-0"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Buat Akun Dosen
+                </button>
               </div>
+
+              {/* Form buat akun dosen */}
+              {addDosenOpen && (
+                <div className="rounded-xl border border-indigo-200 bg-indigo-50/40 p-4 space-y-3">
+                  <p className="text-xs font-bold text-indigo-700">Buat Akun Dosen Baru</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-[10px] font-semibold text-slate-500 mb-0.5 block">Email</label>
+                      <input type="email" value={addDosenForm.email}
+                        onChange={e => setAddDosenForm(f => ({ ...f, email: e.target.value }))}
+                        placeholder="dosenluar@itera.ac.id"
+                        className="w-full text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 outline-none focus:ring-1 focus:ring-indigo-400 bg-white" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-semibold text-slate-500 mb-0.5 block">Nama Tampilan</label>
+                      <input type="text" value={addDosenForm.name}
+                        onChange={e => setAddDosenForm(f => ({ ...f, name: e.target.value }))}
+                        placeholder="Dosen Luar ITERA"
+                        className="w-full text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 outline-none focus:ring-1 focus:ring-indigo-400 bg-white" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-semibold text-slate-500 mb-0.5 block">Password</label>
+                      <input type="text" value={addDosenForm.password}
+                        onChange={e => setAddDosenForm(f => ({ ...f, password: e.target.value }))}
+                        placeholder="Minimal 6 karakter"
+                        className="w-full text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 outline-none focus:ring-1 focus:ring-indigo-400 bg-white font-mono" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-semibold text-slate-500 mb-0.5 block">Nama Dosen (pipe | untuk multi)</label>
+                      <input type="text" value={addDosenForm.lecturerName}
+                        onChange={e => setAddDosenForm(f => ({ ...f, lecturerName: e.target.value }))}
+                        placeholder="Nama Dosen, S.T.|Nama Lain, M.T."
+                        className="w-full text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 outline-none focus:ring-1 focus:ring-indigo-400 bg-white" />
+                    </div>
+                  </div>
+                  {addDosenError && <p className="text-[10px] text-rose-600 font-medium">{addDosenError}</p>}
+                  <div className="flex gap-2 justify-end">
+                    <button onClick={() => setAddDosenOpen(false)}
+                      className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 font-semibold">
+                      Batal
+                    </button>
+                    <button
+                      disabled={addDosenLoading}
+                      onClick={async () => {
+                        setAddDosenErrorState('');
+                        setAddDosenLoading(true);
+                        const result = await registerUser(
+                          addDosenForm.email.trim(),
+                          addDosenForm.password,
+                          addDosenForm.name.trim() || null,
+                          'dosen',
+                          null,
+                          addDosenForm.lecturerName.trim() || null,
+                        );
+                        setAddDosenLoading(false);
+                        if (result.error) { setAddDosenErrorState(result.error); return; }
+                        setAddDosenOpen(false);
+                        setAddDosenForm({ email: '', name: '', lecturerName: '', password: '' });
+                        showFlash('Akun dosen berhasil dibuat.');
+                        refresh();
+                      }}
+                      className="text-xs px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold disabled:opacity-50 transition-colors"
+                    >
+                      {addDosenLoading ? 'Menyimpan…' : 'Buat Akun'}
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {users.length === 0 ? (
                 <div className="text-center py-10 text-slate-400">
