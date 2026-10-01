@@ -257,8 +257,8 @@ function PasswordInput({ value, onChange, placeholder }) {
   );
 }
 
-export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = null }) {
-  const [tab, setTab] = useState('login');
+export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = null, resetEmail = null }) {
+  const [tab, setTab] = useState(resetToken ? 'forgot' : 'login');
   const [regRole, setRegRole] = useState('dosen');
 
   const [loginEmail, setLoginEmail] = useState('');
@@ -279,15 +279,15 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
   const [regNimError, setRegNimError] = useState('');
 
   // Forgot password
-  // If resetToken prop provided (from URL), resolve email immediately
+  // resetToken from URL; tokenData from localStorage (same device only)
+  // resetEmail from URL param (works cross-device)
   const tokenData = resetToken ? validateResetToken(resetToken) : null;
-  const [forgotEmail, setForgotEmail] = useState(tokenData?.email || '');
-  const [forgotStep, setForgotStep] = useState(tokenData ? 2 : 1); // 1=enter email, 2=set new password
+  const effectiveEmail = tokenData?.email || resetEmail || '';
+  const [forgotEmail, setForgotEmail] = useState(effectiveEmail);
+  const [forgotStep, setForgotStep] = useState((tokenData || resetEmail) ? 2 : 1);
   const [forgotNewPass, setForgotNewPass] = useState('');
   const [forgotConfirm, setForgotConfirm] = useState('');
-  const [forgotError, setForgotError] = useState(
-    resetToken && !tokenData ? 'Link reset sudah kedaluwarsa atau tidak valid. Silakan minta link baru.' : ''
-  );
+  const [forgotError, setForgotError] = useState('');
   const [forgotSuccess, setForgotSuccess] = useState('');
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotResetLink, setForgotResetLink] = useState('');
@@ -364,7 +364,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
 
     const token = generateToken();
     storeResetToken(email, token);
-    const resetLink = `${window.location.origin}/?reset_token=${token}`;
+    const resetLink = `${window.location.origin}/?reset_token=${token}&rse=${btoa(email)}`;
     const userName = found.name || email.split('@')[0];
     const msg = `Halo ${userName},\n\nAnda meminta reset password akun *Monitoring TA Prodi Sains Data*.\n\nKlik link berikut untuk membuat password baru (berlaku 1 jam):\n\n${resetLink}\n\nAbaikan pesan ini jika tidak merasa meminta reset password.`;
 

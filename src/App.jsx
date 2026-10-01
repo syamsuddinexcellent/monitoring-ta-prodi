@@ -102,6 +102,7 @@ export default function App() {
   const isAdmin = loggedInUser?.role === 'admin';
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [resetToken, setResetToken] = useState(null);
+  const [resetEmail, setResetEmail] = useState(null);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -177,12 +178,16 @@ export default function App() {
     fetchData();
   }, []);
 
-  // Detect reset_token in URL (from password reset email link)
+  // Detect reset_token in URL (from password reset WA link)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('reset_token');
-    if (token && validateResetToken(token)) {
+    if (token) {
+      const rse = params.get('rse');
+      let decodedEmail = null;
+      if (rse) { try { decodedEmail = atob(rse); } catch {} }
       setResetToken(token);
+      setResetEmail(decodedEmail);
       setIsLoginModalOpen(true);
       window.history.replaceState({}, '', window.location.pathname);
     }
@@ -483,9 +488,10 @@ export default function App() {
         </main>
         <AuthModal
           isOpen={isLoginModalOpen}
-          onClose={() => { setIsLoginModalOpen(false); setResetToken(null); }}
+          onClose={() => { setIsLoginModalOpen(false); setResetToken(null); setResetEmail(null); }}
           onSuccess={(user) => { setLoggedInUser(user); try { sessionStorage.setItem('auth_session', JSON.stringify(user)); } catch {} }}
           resetToken={resetToken}
+          resetEmail={resetEmail}
         />
       </div>
     );
@@ -735,7 +741,7 @@ export default function App() {
       {/* Auth Modal (Login + Register) */}
       <AuthModal
         isOpen={isLoginModalOpen}
-        onClose={() => { setIsLoginModalOpen(false); setResetToken(null); }}
+        onClose={() => { setIsLoginModalOpen(false); setResetToken(null); setResetEmail(null); }}
         onSuccess={(user) => {
           setLoggedInUser(user);
           if (user.role === 'dosen' && user.lecturerName) {
@@ -743,6 +749,7 @@ export default function App() {
           }
         }}
         resetToken={resetToken}
+        resetEmail={resetEmail}
       />
 
       {/* Laporan Masuk Modal (dosen) */}
