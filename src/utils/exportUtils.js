@@ -594,6 +594,18 @@ export async function upsertStudentOverride(nim, fields) {
   } catch {}
 }
 
+export async function deleteStudentOverride(nim) {
+  if (supabase) {
+    await supabase.from('student_overrides').delete().eq('nim', nim);
+    return;
+  }
+  try {
+    const all = JSON.parse(localStorage.getItem(STUDENT_OV_KEY) || '{}');
+    delete all[nim];
+    localStorage.setItem(STUDENT_OV_KEY, JSON.stringify(all));
+  } catch {}
+}
+
 // ─── Locked periods helpers (Supabase-backed) ─────────────────────────────────
 
 const LOCAL_LOCKED_KEY = 'locked_periods';

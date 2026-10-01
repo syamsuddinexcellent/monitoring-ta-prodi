@@ -14,7 +14,7 @@ import {
   BUILTIN_SEMESTERS, getLocalSemesters, saveLocalSemesters,
   getVerifikasi, getPenolakan,
   getAllLaporanBimbingan, getLaporanMasukDatabase, tandaiMasukDatabase, batalMasukDatabase,
-  getStudentOverrides, upsertStudentOverride,
+  getStudentOverrides, upsertStudentOverride, deleteStudentOverride,
 } from '../utils/exportUtils';
 
 const _PM = {
@@ -155,6 +155,8 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   const [editingCell, setEditingCell] = useState(null); // { nim, field }
   const [editingValue, setEditingValue] = useState('');
   const _cancelEditRef = useRef(false);
+  // Delete / hide student
+  const [confirmDeleteStudent, setConfirmDeleteStudent] = useState(null); // nim
   // Add student form
   const [addStudentOpen, setAddStudentOpen] = useState(false);
   const [addStudentForm, setAddStudentForm] = useState({ nim: '', nama: '', angkatan: '', pembimbing1: '', pembimbing2: '', penguji1: '', penguji2: '', phone: '', status_ta: '' });
@@ -224,17 +226,19 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   // sheetsData students merged with admin overrides
   const mergedStudents = useMemo(() => {
     const sheetNims = new Set(sheetsData?.students?.map(s => s.nim) ?? []);
-    const fromSheets = (sheetsData?.students ?? []).map(s => {
-      const ov = studentOverrides[s.nim] || {};
-      return {
-        ...s,
-        pembimbing1: ov.pembimbing1 ?? s.pembimbing1,
-        pembimbing2: ov.pembimbing2 ?? s.pembimbing2,
-        penguji1:    ov.penguji1    ?? s.penguji1,
-        penguji2:    ov.penguji2    ?? s.penguji2,
-        statusTA:    ov.status_ta   ?? s.statusTA,
-      };
-    });
+    const fromSheets = (sheetsData?.students ?? [])
+      .filter(s => !studentOverrides[s.nim]?.hidden)
+      .map(s => {
+        const ov = studentOverrides[s.nim] || {};
+        return {
+          ...s,
+          pembimbing1: ov.pembimbing1 ?? s.pembimbing1,
+          pembimbing2: ov.pembimbing2 ?? s.pembimbing2,
+          penguji1:    ov.penguji1    ?? s.penguji1,
+          penguji2:    ov.penguji2    ?? s.penguji2,
+          statusTA:    ov.status_ta   ?? s.statusTA,
+        };
+      });
     const customStudents = Object.values(studentOverrides)
       .filter(ov => ov.is_custom && !sheetNims.has(ov.nim))
       .map(ov => ({
@@ -456,6 +460,16 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     _cancelEditRef.current = true;
     setEditingCell(null);
     setEditingValue('');
+  };
+
+  const handleDeleteStudent = async (nim, isCustom) => {
+    if (isCustom) {
+      await deleteStudentOverride(nim);
+    } else {
+      await upsertStudentOverride(nim, { hidden: true });
+    }
+    setConfirmDeleteStudent(null);
+    await _refreshStudentOverrides();
   };
 
   const handleAddStudent = async () => {
@@ -866,6 +880,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                                 </span>
                               </th>
                             ))}
+                            <th className="px-2 py-2 text-left font-bold text-slate-600 border-b border-r border-slate-200 bg-slate-100 w-10"></th>
                             {/* Per-periode columns — terbaru di kiri */}
                             {[...weeks].reverse().map((w) => {
                               const realIdx = weeks.indexOf(w);
@@ -885,7 +900,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                           ) : filteredStudents.map((s, i) => {
                             const reportedCount = weeks.filter(w => s.weeklyUpdates?.[w]?.reported).length;
                             return (
-                              <tr key={s.nim} className={`${i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'} hover:bg-brand-50/30 transition-colors`}>
+                              <tr key={s.nim} className={`group ${i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'} hover:bg-brand-50/30 transition-colors`}>
                                 <td className="px-2 py-2 text-slate-400 font-mono border-r border-slate-100">{i + 1}</td>
                                 <td className="px-2 py-2 text-slate-700 font-mono font-semibold whitespace-nowrap border-r border-slate-100">{s.nim}</td>
                                 <td className="px-2 py-2 text-slate-800 font-medium border-r border-slate-100 max-w-[160px]">
@@ -962,6 +977,28 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                                 <td className="px-2 py-2 text-center whitespace-nowrap border-r border-slate-200 bg-slate-50">
                                   <span className={`font-black text-xs ${reportedCount === weeks.length && weeks.length > 0 ? 'text-emerald-600' : reportedCount > 0 ? 'text-amber-600' : 'text-rose-400'}`}>{reportedCount}</span>
                                   <span className="text-slate-400">/{weeks.length}</span>
+                                </td>
+                                {/* Delete cell */}
+                                <td className="px-1 py-2 border-r border-slate-100 text-center">
+                                  {confirmDeleteStudent === s.nim ? (
+                                    <div className="flex items-center gap-0.5">
+                                      <button
+                                        onClick={() => handleDeleteStudent(s.nim, s._isCustom)}
+                                        className="text-[9px] px-1.5 py-0.5 rounded bg-rose-600 text-white font-semibold hover:bg-rose-700 transition-colors"
+                                      >Ya</button>
+                                      <button
+                                        onClick={() => setConfirmDeleteStudent(null)}
+                                        className="text-[9px] px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 hover:bg-slate-300 transition-colors"
+                                      >Tdk</button>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      onClick={() => setConfirmDeleteStudent(s.nim)}
+                                      className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-300 hover:text-rose-500 p-0.5 rounded"
+                                    >
+                                      <Trash2 className="w-3 h-3" />
+                                    </button>
+                                  )}
                                 </td>
                                 {/* Per-periode cells — terbaru di kiri */}
                                 {[...weeks].reverse().map(w => {
