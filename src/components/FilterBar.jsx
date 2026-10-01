@@ -21,7 +21,7 @@ function LecturerDropdown({ lecturerFilter, onLecturerFilterChange, availableLec
 
   const label = isFiltered ? lecturerFilter : 'Mahasiswa Bimbingan';
   const shortLabel = isFiltered
-    ? lecturerFilter.split(',')[0]
+    ? (lecturerFilter.includes('|') ? 'Dosen Luar' : lecturerFilter.split(',')[0])
     : 'Mahasiswa Bimbingan';
 
   return (
@@ -155,7 +155,7 @@ export default function FilterBar({
         {isDosen ? (
           <div className="inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg border bg-indigo-600 text-white border-indigo-700 shadow-xs shrink-0">
             <UserCheck className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate max-w-[160px] text-left">{lecturerFilter !== 'all' ? lecturerFilter.split(',')[0] : 'Mahasiswa Bimbingan'}</span>
+            <span className="truncate max-w-[160px] text-left">{lecturerFilter !== 'all' ? (lecturerFilter.includes('|') ? 'Dosen Luar' : lecturerFilter.split(',')[0]) : 'Mahasiswa Bimbingan'}</span>
           </div>
         ) : (
           <LecturerDropdown
