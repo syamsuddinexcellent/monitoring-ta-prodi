@@ -182,10 +182,10 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   // password show/hide & reset per user (keyed by email)
   const [showPass, setShowPass] = useState({});
   const [resetForm, setResetForm] = useState({}); // { [email]: { open, value, error } }
-  // Buat akun dosen
+  // Buat akun dosen (shared account)
   const [addDosenOpen, setAddDosenOpen] = useState(false);
   const [addDosenForm, setAddDosenForm] = useState({ email: '', name: '', lecturerName: '', password: '' });
-  const [addDosenError, setAddDosenErrorState] = useState('');
+  const [addDosenFormError, setAddDosenFormError] = useState('');
   const [addDosenLoading, setAddDosenLoading] = useState(false);
 
   const refresh = async () => {
@@ -660,7 +660,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                   <span className="text-emerald-700 font-semibold">{mahasiswaUsers.length} Mahasiswa</span>
                 </div>
                 <button
-                  onClick={() => { setAddDosenOpen(v => !v); setAddDosenErrorState(''); setAddDosenForm({ email: '', name: '', lecturerName: '', password: '' }); }}
+                  onClick={() => { setAddDosenOpen(v => !v); setAddDosenFormError(''); setAddDosenForm({ email: '', name: '', lecturerName: '', password: '' }); }}
                   className="ml-auto flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-colors shrink-0"
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -702,7 +702,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                         className="w-full text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 outline-none focus:ring-1 focus:ring-indigo-400 bg-white" />
                     </div>
                   </div>
-                  {addDosenError && <p className="text-[10px] text-rose-600 font-medium">{addDosenError}</p>}
+                  {addDosenFormError && <p className="text-[10px] text-rose-600 font-medium">{addDosenFormError}</p>}
                   <div className="flex gap-2 justify-end">
                     <button onClick={() => setAddDosenOpen(false)}
                       className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 font-semibold">
@@ -722,7 +722,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                           addDosenForm.lecturerName.trim() || null,
                         );
                         setAddDosenLoading(false);
-                        if (result.error) { setAddDosenErrorState(result.error); return; }
+                        if (result.error) { setAddDosenFormError(result.error); return; }
                         setAddDosenOpen(false);
                         setAddDosenForm({ email: '', name: '', lecturerName: '', password: '' });
                         showFlash('Akun dosen berhasil dibuat.');
