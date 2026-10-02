@@ -505,7 +505,8 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
                                 <ShieldCheck className="w-3.5 h-3.5" />
                                 Sudah diverifikasi · tidak dapat diedit
                               </span>
-                            ) : isFromApp ? (
+                            ) : null}
+                            {isFromApp ? (
                               <>
                                 {sessions.length <= 1 && (
                                   <button
