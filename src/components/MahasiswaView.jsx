@@ -549,11 +549,11 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
                           {isLocked ? 'Periode ini dikunci oleh admin.' : 'Belum ada laporan bimbingan untuk periode ini.'}
                         </p>
                         <div className="flex items-center gap-2 ml-2 shrink-0">
-                          {isTolak && (
+                          {(isTolak || weekVerified) && (
                             confirmDelete?.type === 'week' && confirmDelete.week === week ? (
                               <span className="flex items-center gap-1">
                                 <span className="text-[11px] text-rose-600 font-semibold">Hapus status?</span>
-                                <button onClick={async () => { setConfirmDelete(null); await cancelPenolakan(nim, week); getPenolakan().then(all => setTolkData(all[nim] || {})); }} className="text-[10px] font-bold text-white bg-rose-500 hover:bg-rose-600 px-1.5 py-0.5 rounded">Ya</button>
+                                <button onClick={async () => { setConfirmDelete(null); await Promise.all([cancelPenolakan(nim, week), cancelVerifikasi(nim, week)]); const [nv, np] = await Promise.all([getVerifikasi(), getPenolakan()]); setVerifData(nv[nim] || {}); setTolkData(np[nim] || {}); }} className="text-[10px] font-bold text-white bg-rose-500 hover:bg-rose-600 px-1.5 py-0.5 rounded">Ya</button>
                                 <button onClick={() => setConfirmDelete(null)} className="text-[10px] font-semibold text-slate-500 hover:text-slate-700 px-1.5 py-0.5 rounded border border-slate-200">Batal</button>
                               </span>
                             ) : (
