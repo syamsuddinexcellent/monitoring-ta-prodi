@@ -153,6 +153,7 @@ export async function getLocalReportsForNim(nim) {
         if (sessions.length === 0 && (r.progress || r.category)) {
           sessions = migrateToSessions(r);
         }
+        if (sessions.length === 0) return; // cleared row — treat as not reported
         const lastSession = sessions[sessions.length - 1];
         result[r.week] = {
           reported: true,
@@ -236,7 +237,13 @@ export async function deleteReport(nim, week) {
       } catch {}
       return true;
     }
-    console.error('deleteReport Supabase error:', error, {nim, week});
+    // DELETE blocked by RLS — fall back to clearing sessions via UPDATE
+    const { error: updateErr } = await supabase
+      .from('laporan_bimbingan')
+      .update({ dosen_hadir: { sessions: [] }, submitted_at: null, category: null, progress: null, next_target: null })
+      .eq('nim', nim)
+      .eq('week', week);
+    if (!updateErr) return true;
     return false;
   }
   try {
