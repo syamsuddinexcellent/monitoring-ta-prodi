@@ -618,6 +618,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
           {[
             { key: 'akun', label: 'Kontrol Akun', icon: Users },
             { key: 'data', label: 'Kontrol Data', icon: Database },
+            { key: 'laporan', label: 'Laporan', icon: Inbox },
           ].map(({ key, label, icon: Icon }) => (
             <button
               key={key}
@@ -1747,231 +1748,6 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                 </div>
               </div>
 
-              {/* ── Laporan Mahasiswa (online) ── */}
-              {(() => {
-                const masukDbSet = new Set(masukDbList.map(r => `${r.nim}|${r.week}`));
-                const getLaporanStatus = (nim, week) => {
-                  if (masukDbSet.has(`${nim}|${week}`)) return 'masuk_database';
-                  if (verifData[nim]?.[week]) return 'diverifikasi';
-                  if (penolakanData[nim]?.[week]) return 'ditolak';
-                  return 'menunggu';
-                };
-                const statusCounts = allLaporan.reduce((acc, l) => {
-                  acc[getLaporanStatus(l.nim, l.week)] = (acc[getLaporanStatus(l.nim, l.week)] || 0) + 1;
-                  return acc;
-                }, {});
-                const filtered = laporanFilter === 'semua'
-                  ? allLaporan
-                  : allLaporan.filter(l => getLaporanStatus(l.nim, l.week) === laporanFilter);
-
-                const STATUS_META = {
-                  menunggu:       { label: 'Menunggu Verifikasi', cls: 'bg-amber-50 text-amber-700 border-amber-200' },
-                  diverifikasi:   { label: 'Diverifikasi Dosen',   cls: 'bg-blue-50 text-blue-700 border-blue-200' },
-                  ditolak:        { label: 'Ditolak Dosen',        cls: 'bg-rose-50 text-rose-700 border-rose-200' },
-                  masuk_database: { label: 'Masuk Database',       cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-                };
-                const FILTERS = [
-                  { key: 'semua',         label: 'Semua',         count: allLaporan.length },
-                  { key: 'menunggu',      label: 'Menunggu',      count: statusCounts.menunggu || 0 },
-                  { key: 'diverifikasi',  label: 'Diverifikasi',  count: statusCounts.diverifikasi || 0 },
-                  { key: 'ditolak',       label: 'Ditolak',       count: statusCounts.ditolak || 0 },
-                  { key: 'masuk_database',label: 'Masuk DB',      count: statusCounts.masuk_database || 0 },
-                ];
-
-                return (
-                  <div className="rounded-xl border border-slate-200 overflow-hidden">
-                    {/* Header */}
-                    <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
-                      <div className="flex items-center gap-2">
-                        <GraduationCap className="w-4 h-4 text-brand-600" />
-                        <span className="text-xs font-bold text-slate-700">Laporan Mahasiswa</span>
-                        <span className="text-[10px] text-slate-400">{allLaporan.length} laporan</span>
-                      </div>
-                      <button onClick={refresh} className="p-1 text-slate-400 hover:text-brand-600 transition-colors" title="Refresh">
-                        <RefreshCw className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-
-                    {/* Stats bar */}
-                    <div className="grid grid-cols-4 divide-x divide-slate-100 border-b border-slate-100 bg-white">
-                      {[
-                        { label: 'Menunggu',    count: statusCounts.menunggu || 0,      color: 'text-amber-600' },
-                        { label: 'Diverifikasi',count: statusCounts.diverifikasi || 0,  color: 'text-blue-600' },
-                        { label: 'Ditolak',     count: statusCounts.ditolak || 0,       color: 'text-rose-600' },
-                        { label: 'Masuk DB',    count: statusCounts.masuk_database || 0,color: 'text-emerald-600' },
-                      ].map(({ label, count, color }) => (
-                        <div key={label} className="flex flex-col items-center py-2.5 px-2 text-center">
-                          <span className={`text-base font-black ${color}`}>{count}</span>
-                          <span className="text-[9px] text-slate-400 mt-0.5">{label}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Filter tabs */}
-                    <div className="flex gap-1 px-3 py-2 bg-slate-50 border-b border-slate-100 overflow-x-auto">
-                      {FILTERS.map(f => (
-                        <button
-                          key={f.key}
-                          onClick={() => setLaporanFilter(f.key)}
-                          className={`shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold transition-colors ${
-                            laporanFilter === f.key
-                              ? 'bg-brand-600 text-white'
-                              : 'bg-white text-slate-500 border border-slate-200 hover:border-brand-300'
-                          }`}
-                        >
-                          {f.label}
-                          <span className={`px-1 rounded-full text-[9px] font-bold ${laporanFilter === f.key ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}`}>
-                            {f.count}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* List */}
-                    <div className="divide-y divide-slate-100 max-h-72 overflow-y-auto">
-                      {filtered.length === 0 ? (
-                        <p className="px-4 py-5 text-xs text-slate-400 italic text-center">
-                          {allLaporan.length === 0 ? 'Belum ada laporan masuk.' : 'Tidak ada laporan dengan status ini.'}
-                        </p>
-                      ) : (
-                        filtered.map(l => {
-                          const status = getLaporanStatus(l.nim, l.week);
-                          const meta = STATUS_META[status];
-                          const verif = verifData[l.nim]?.[l.week];
-                          const penolakan = penolakanData[l.nim]?.[l.week];
-                          const submittedDate = l.submitted_at ? new Date(l.submitted_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: '2-digit' }) : '-';
-                          return (
-                            <div key={`${l.nim}|${l.week}`} className="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 transition-colors">
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="text-[10px] font-bold text-slate-700">{l.nama || l.nim}</span>
-                                  <span className="text-[9px] text-slate-400">{l.nim}</span>
-                                  <span className={`text-[9px] px-1.5 py-0.5 rounded-full border font-semibold ${meta.cls}`}>{meta.label}</span>
-                                </div>
-                                <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                                  <span className="text-[10px] text-indigo-600 font-medium">{displayLabel(l.week)}</span>
-                                  {l.category && <span className="text-[9px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">{l.category}</span>}
-                                  <span className="text-[9px] text-slate-400">{submittedDate}</span>
-                                </div>
-                                {status === 'ditolak' && penolakan?.alasan && (
-                                  <p className="text-[9px] text-rose-600 mt-0.5 italic">Alasan: {penolakan.alasan}</p>
-                                )}
-                                {(status === 'diverifikasi' || status === 'masuk_database') && verif?.dosenName && (
-                                  <p className="text-[9px] text-blue-600 mt-0.5">Diverifikasi oleh: {verif.dosenName.split(',')[0]}</p>
-                                )}
-                              </div>
-                              {/* Action */}
-                              <div className="shrink-0">
-                                {status === 'diverifikasi' && (
-                                  <button
-                                    onClick={async () => { await tandaiMasukDatabase(l.nim, l.week); await refresh(); }}
-                                    className="px-2 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition-colors whitespace-nowrap"
-                                  >
-                                    ✓ Masuk DB
-                                  </button>
-                                )}
-                                {status === 'masuk_database' && (
-                                  <button
-                                    onClick={async () => { await batalMasukDatabase(l.nim, l.week); await refresh(); }}
-                                    className="px-2 py-1 rounded-lg text-[10px] font-semibold bg-slate-50 text-slate-500 hover:bg-slate-100 border border-slate-200 transition-colors whitespace-nowrap"
-                                  >
-                                    Batal
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })
-                      )}
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* ── Inbox Dosen ── */}
-              {(() => {
-                const mdbSet = new Set(masukDbList.map(r => `${r.nim}|${r.week}`));
-                const getInboxStatus = (nim, week) => {
-                  if (mdbSet.has(`${nim}|${week}`)) return 'masuk_database';
-                  if (verifData[nim]?.[week]) return 'diverifikasi';
-                  if (penolakanData[nim]?.[week]) return 'ditolak';
-                  return 'menunggu';
-                };
-                return (
-                  <div className="rounded-xl border border-slate-200 overflow-hidden">
-                    <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
-                      <div className="flex items-center gap-2">
-                        <Inbox className="w-4 h-4 text-indigo-600" />
-                        <span className="text-xs font-bold text-slate-700">Inbox Laporan Dosen</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-[10px] text-slate-400">{dosenSummary.length} dosen</span>
-                        <button
-                          onClick={handleClearDosenInbox}
-                          disabled={dosenSummary.length === 0}
-                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                          Hapus Semua
-                        </button>
-                      </div>
-                    </div>
-                    <div className="divide-y divide-slate-100 max-h-52 overflow-y-auto">
-                      {dosenSummary.length === 0 ? (
-                        <p className="px-4 py-3 text-xs text-slate-400 italic">Inbox dosen kosong.</p>
-                      ) : (
-                        dosenSummary.map(({ dosen, total }) => {
-                          const dosenLaporan = allLaporan.filter(l => {
-                            const list = l.dosen_hadir?.list || (Array.isArray(l.dosen_hadir) ? l.dosen_hadir : []);
-                            return list.some(d => d.name === dosen);
-                          });
-                          const nVerif = dosenLaporan.filter(l => {
-                            const s = getInboxStatus(l.nim, l.week);
-                            return s === 'diverifikasi' || s === 'masuk_database';
-                          }).length;
-                          const nDitolak = dosenLaporan.filter(l => getInboxStatus(l.nim, l.week) === 'ditolak').length;
-                          const nMenunggu = dosenLaporan.filter(l => getInboxStatus(l.nim, l.week) === 'menunggu').length;
-                          const nDibaca = nVerif + nDitolak;
-                          const count = dosenLaporan.length || total;
-                          return (
-                            <div key={dosen} className="px-4 py-2.5">
-                              <div className="flex items-center justify-between gap-2">
-                                <p className="text-xs text-slate-700 font-medium truncate flex-1">{dosen}</p>
-                                <span className="text-[10px] text-slate-400 shrink-0">{count} laporan</span>
-                              </div>
-                              {dosenLaporan.length > 0 && (
-                                <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                                  {nMenunggu > 0 && (
-                                    <span className="px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-semibold">
-                                      {nMenunggu} menunggu
-                                    </span>
-                                  )}
-                                  {nDibaca > 0 && (
-                                    <span className="px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-semibold">
-                                      {nDibaca} sudah dibaca
-                                    </span>
-                                  )}
-                                  {nVerif > 0 && (
-                                    <span className="px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-semibold">
-                                      {nVerif} diverifikasi
-                                    </span>
-                                  )}
-                                  {nDitolak > 0 && (
-                                    <span className="px-1.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-semibold">
-                                      {nDitolak} menolak
-                                    </span>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })
-                      )}
-                    </div>
-                  </div>
-                );
-              })()}
-
               {/* ── Token Reset ── */}
               <div className="rounded-xl border border-slate-200 overflow-hidden">
                 <div className="flex items-center justify-between px-4 py-3 bg-slate-50">
@@ -1995,6 +1771,236 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                   Data lokal disimpan di perangkat ini saja. Menghapus data tidak dapat dibatalkan dan tidak memengaruhi Google Sheets.
                 </p>
               </div>
+            </div>
+          )}
+
+          {/* === LAPORAN === */}
+          {tab === 'laporan' && (
+            <div className="p-5 space-y-5">
+          {/* ── Laporan Mahasiswa (online) ── */}
+          {(() => {
+            const masukDbSet = new Set(masukDbList.map(r => `${r.nim}|${r.week}`));
+            const getLaporanStatus = (nim, week) => {
+              if (masukDbSet.has(`${nim}|${week}`)) return 'masuk_database';
+              if (verifData[nim]?.[week]) return 'diverifikasi';
+              if (penolakanData[nim]?.[week]) return 'ditolak';
+              return 'menunggu';
+            };
+            const statusCounts = allLaporan.reduce((acc, l) => {
+              acc[getLaporanStatus(l.nim, l.week)] = (acc[getLaporanStatus(l.nim, l.week)] || 0) + 1;
+              return acc;
+            }, {});
+            const filtered = laporanFilter === 'semua'
+              ? allLaporan
+              : allLaporan.filter(l => getLaporanStatus(l.nim, l.week) === laporanFilter);
+
+            const STATUS_META = {
+              menunggu:       { label: 'Menunggu Verifikasi', cls: 'bg-amber-50 text-amber-700 border-amber-200' },
+              diverifikasi:   { label: 'Diverifikasi Dosen',   cls: 'bg-blue-50 text-blue-700 border-blue-200' },
+              ditolak:        { label: 'Ditolak Dosen',        cls: 'bg-rose-50 text-rose-700 border-rose-200' },
+              masuk_database: { label: 'Masuk Database',       cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+            };
+            const FILTERS = [
+              { key: 'semua',         label: 'Semua',         count: allLaporan.length },
+              { key: 'menunggu',      label: 'Menunggu',      count: statusCounts.menunggu || 0 },
+              { key: 'diverifikasi',  label: 'Diverifikasi',  count: statusCounts.diverifikasi || 0 },
+              { key: 'ditolak',       label: 'Ditolak',       count: statusCounts.ditolak || 0 },
+              { key: 'masuk_database',label: 'Masuk DB',      count: statusCounts.masuk_database || 0 },
+            ];
+
+            return (
+              <div className="rounded-xl border border-slate-200 overflow-hidden">
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
+                  <div className="flex items-center gap-2">
+                    <GraduationCap className="w-4 h-4 text-brand-600" />
+                    <span className="text-xs font-bold text-slate-700">Laporan Mahasiswa</span>
+                    <span className="text-[10px] text-slate-400">{allLaporan.length} laporan</span>
+                  </div>
+                  <button onClick={refresh} className="p-1 text-slate-400 hover:text-brand-600 transition-colors" title="Refresh">
+                    <RefreshCw className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                {/* Stats bar */}
+                <div className="grid grid-cols-4 divide-x divide-slate-100 border-b border-slate-100 bg-white">
+                  {[
+                    { label: 'Menunggu',    count: statusCounts.menunggu || 0,      color: 'text-amber-600' },
+                    { label: 'Diverifikasi',count: statusCounts.diverifikasi || 0,  color: 'text-blue-600' },
+                    { label: 'Ditolak',     count: statusCounts.ditolak || 0,       color: 'text-rose-600' },
+                    { label: 'Masuk DB',    count: statusCounts.masuk_database || 0,color: 'text-emerald-600' },
+                  ].map(({ label, count, color }) => (
+                    <div key={label} className="flex flex-col items-center py-2.5 px-2 text-center">
+                      <span className={`text-base font-black ${color}`}>{count}</span>
+                      <span className="text-[9px] text-slate-400 mt-0.5">{label}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Filter tabs */}
+                <div className="flex gap-1 px-3 py-2 bg-slate-50 border-b border-slate-100 overflow-x-auto">
+                  {FILTERS.map(f => (
+                    <button
+                      key={f.key}
+                      onClick={() => setLaporanFilter(f.key)}
+                      className={`shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold transition-colors ${
+                        laporanFilter === f.key
+                          ? 'bg-brand-600 text-white'
+                          : 'bg-white text-slate-500 border border-slate-200 hover:border-brand-300'
+                      }`}
+                    >
+                      {f.label}
+                      <span className={`px-1 rounded-full text-[9px] font-bold ${laporanFilter === f.key ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                        {f.count}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* List */}
+                <div className="divide-y divide-slate-100 max-h-72 overflow-y-auto">
+                  {filtered.length === 0 ? (
+                    <p className="px-4 py-5 text-xs text-slate-400 italic text-center">
+                      {allLaporan.length === 0 ? 'Belum ada laporan masuk.' : 'Tidak ada laporan dengan status ini.'}
+                    </p>
+                  ) : (
+                    filtered.map(l => {
+                      const status = getLaporanStatus(l.nim, l.week);
+                      const meta = STATUS_META[status];
+                      const verif = verifData[l.nim]?.[l.week];
+                      const penolakan = penolakanData[l.nim]?.[l.week];
+                      const submittedDate = l.submitted_at ? new Date(l.submitted_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: '2-digit' }) : '-';
+                      return (
+                        <div key={`${l.nim}|${l.week}`} className="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 transition-colors">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-[10px] font-bold text-slate-700">{l.nama || l.nim}</span>
+                              <span className="text-[9px] text-slate-400">{l.nim}</span>
+                              <span className={`text-[9px] px-1.5 py-0.5 rounded-full border font-semibold ${meta.cls}`}>{meta.label}</span>
+                            </div>
+                            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                              <span className="text-[10px] text-indigo-600 font-medium">{displayLabel(l.week)}</span>
+                              {l.category && <span className="text-[9px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">{l.category}</span>}
+                              <span className="text-[9px] text-slate-400">{submittedDate}</span>
+                            </div>
+                            {status === 'ditolak' && penolakan?.alasan && (
+                              <p className="text-[9px] text-rose-600 mt-0.5 italic">Alasan: {penolakan.alasan}</p>
+                            )}
+                            {(status === 'diverifikasi' || status === 'masuk_database') && verif?.dosenName && (
+                              <p className="text-[9px] text-blue-600 mt-0.5">Diverifikasi oleh: {verif.dosenName.split(',')[0]}</p>
+                            )}
+                          </div>
+                          {/* Action */}
+                          <div className="shrink-0">
+                            {status === 'diverifikasi' && (
+                              <button
+                                onClick={async () => { await tandaiMasukDatabase(l.nim, l.week); await refresh(); }}
+                                className="px-2 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition-colors whitespace-nowrap"
+                              >
+                                ✓ Masuk DB
+                              </button>
+                            )}
+                            {status === 'masuk_database' && (
+                              <button
+                                onClick={async () => { await batalMasukDatabase(l.nim, l.week); await refresh(); }}
+                                className="px-2 py-1 rounded-lg text-[10px] font-semibold bg-slate-50 text-slate-500 hover:bg-slate-100 border border-slate-200 transition-colors whitespace-nowrap"
+                              >
+                                Batal
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* ── Inbox Dosen ── */}
+          {(() => {
+            const mdbSet = new Set(masukDbList.map(r => `${r.nim}|${r.week}`));
+            const getInboxStatus = (nim, week) => {
+              if (mdbSet.has(`${nim}|${week}`)) return 'masuk_database';
+              if (verifData[nim]?.[week]) return 'diverifikasi';
+              if (penolakanData[nim]?.[week]) return 'ditolak';
+              return 'menunggu';
+            };
+            return (
+              <div className="rounded-xl border border-slate-200 overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
+                  <div className="flex items-center gap-2">
+                    <Inbox className="w-4 h-4 text-indigo-600" />
+                    <span className="text-xs font-bold text-slate-700">Inbox Laporan Dosen</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] text-slate-400">{dosenSummary.length} dosen</span>
+                    <button
+                      onClick={handleClearDosenInbox}
+                      disabled={dosenSummary.length === 0}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      Hapus Semua
+                    </button>
+                  </div>
+                </div>
+                <div className="divide-y divide-slate-100 max-h-52 overflow-y-auto">
+                  {dosenSummary.length === 0 ? (
+                    <p className="px-4 py-3 text-xs text-slate-400 italic">Inbox dosen kosong.</p>
+                  ) : (
+                    dosenSummary.map(({ dosen, total }) => {
+                      const dosenLaporan = allLaporan.filter(l => {
+                        const list = l.dosen_hadir?.list || (Array.isArray(l.dosen_hadir) ? l.dosen_hadir : []);
+                        return list.some(d => d.name === dosen);
+                      });
+                      const nVerif = dosenLaporan.filter(l => {
+                        const s = getInboxStatus(l.nim, l.week);
+                        return s === 'diverifikasi' || s === 'masuk_database';
+                      }).length;
+                      const nDitolak = dosenLaporan.filter(l => getInboxStatus(l.nim, l.week) === 'ditolak').length;
+                      const nMenunggu = dosenLaporan.filter(l => getInboxStatus(l.nim, l.week) === 'menunggu').length;
+                      const nDibaca = nVerif + nDitolak;
+                      const count = dosenLaporan.length || total;
+                      return (
+                        <div key={dosen} className="px-4 py-2.5">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-xs text-slate-700 font-medium truncate flex-1">{dosen}</p>
+                            <span className="text-[10px] text-slate-400 shrink-0">{count} laporan</span>
+                          </div>
+                          {dosenLaporan.length > 0 && (
+                            <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                              {nMenunggu > 0 && (
+                                <span className="px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-semibold">
+                                  {nMenunggu} menunggu
+                                </span>
+                              )}
+                              {nDibaca > 0 && (
+                                <span className="px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-semibold">
+                                  {nDibaca} sudah dibaca
+                                </span>
+                              )}
+                              {nVerif > 0 && (
+                                <span className="px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-semibold">
+                                  {nVerif} diverifikasi
+                                </span>
+                              )}
+                              {nDitolak > 0 && (
+                                <span className="px-1.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-semibold">
+                                  {nDitolak} menolak
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            );
+          })()}
             </div>
           )}
         </div>
