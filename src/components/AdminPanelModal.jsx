@@ -155,6 +155,10 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   const [penolakanData, setPenolakanData] = useState({});
   const [masukDbList, setMasukDbList] = useState([]);
   const [laporanFilter, setLaporanFilter] = useState('semua');
+  // Kontrol Akun password gate
+  const [akunUnlocked, setAkunUnlocked] = useState(false);
+  const [akunPasswordInput, setAkunPasswordInput] = useState('');
+  const [akunError, setAkunError] = useState(false);
   // Student dosen overrides
   const [studentOverrides, setStudentOverrides] = useState({});
   const [editingCell, setEditingCell] = useState(null); // { nim, field }
@@ -218,7 +222,10 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
     setStudentOverrides(await getStudentOverrides());
   };
 
-  useEffect(() => { if (isOpen) { refresh(); setConfirmDelete(null); setFlash(''); } }, [isOpen]);
+  useEffect(() => {
+    if (isOpen) { refresh(); setConfirmDelete(null); setFlash(''); }
+    else { setAkunUnlocked(false); setAkunPasswordInput(''); setAkunError(false); }
+  }, [isOpen]);
 
   const allSemesters = useMemo(() => [...BUILTIN_SEMESTERS, ...localSemesters], [localSemesters]);
 
@@ -641,8 +648,39 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
         {/* Body */}
         <div className="flex-1 overflow-y-auto">
 
+          {/* === KONTROL AKUN — password gate === */}
+          {tab === 'akun' && !akunUnlocked && (
+            <div className="flex flex-col items-center justify-center py-20 gap-5">
+              <div className="w-16 h-16 rounded-2xl bg-brand-600 flex items-center justify-center shadow-lg">
+                <ShieldCheck className="w-8 h-8 text-white" />
+              </div>
+              <div className="text-center">
+                <h3 className="text-sm font-bold text-slate-800">Kontrol Akun</h3>
+                <p className="text-xs text-slate-500 mt-1">Masukkan password untuk melanjutkan</p>
+              </div>
+              <div className="flex flex-col items-center gap-2 w-64">
+                <input
+                  type="password"
+                  value={akunPasswordInput}
+                  onChange={e => { setAkunPasswordInput(e.target.value); setAkunError(false); }}
+                  onKeyDown={e => { if (e.key === 'Enter') { if (akunPasswordInput === 'wisnubroto14') { setAkunUnlocked(true); setAkunPasswordInput(''); } else { setAkunError(true); } } }}
+                  placeholder="Password..."
+                  autoFocus
+                  className={`w-full px-3 py-2 text-sm border rounded-lg outline-none transition-colors ${akunError ? 'border-red-400 bg-red-50' : 'border-slate-300 focus:border-brand-500'}`}
+                />
+                {akunError && <p className="text-xs text-red-500">Password salah. Coba lagi.</p>}
+                <button
+                  onClick={() => { if (akunPasswordInput === 'wisnubroto14') { setAkunUnlocked(true); setAkunPasswordInput(''); } else { setAkunError(true); } }}
+                  className="w-full px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg transition-colors"
+                >
+                  Masuk
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* === KONTROL AKUN === */}
-          {tab === 'akun' && (
+          {tab === 'akun' && akunUnlocked && (
             <div className="p-5 space-y-5">
               {/* Summary chips */}
               <div className="flex items-center gap-3 flex-wrap">
