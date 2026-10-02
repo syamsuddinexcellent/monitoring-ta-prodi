@@ -5,7 +5,7 @@ import {
   PlusCircle, ShieldCheck, PencilLine, Trash2, XCircle, RefreshCw, CalendarDays, Lock, Plus
 } from 'lucide-react';
 import { getCategoryBadgeStyle } from '../utils/helpers';
-import LaporanModal, { getLocalReportsForNim, parseWeekRange, deleteReport, getSessions, getSessionCount, MAX_SESSIONS } from './LaporanModal';
+import LaporanModal, { getLocalReportsForNim, parseWeekRange, deleteReport, deleteSession, getSessions, getSessionCount, MAX_SESSIONS } from './LaporanModal';
 import { getVerifikasi, getPenolakan } from '../utils/exportUtils';
 
 function ProgressRing({ pct }) {
@@ -81,6 +81,14 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
   const handleDelete = async (week) => {
     if (!window.confirm(`Hapus semua laporan untuk periode ini? Tindakan ini tidak dapat dibatalkan.`)) return;
     const ok = await deleteReport(nim, week);
+    if (ok) {
+      getLocalReportsForNim(nim).then(setLocalReports);
+    }
+  };
+
+  const handleDeleteSession = async (week, ke) => {
+    if (!window.confirm(`Hapus Bimbingan ke-${ke}? Tindakan ini tidak dapat dibatalkan.`)) return;
+    const ok = await deleteSession(nim, week, ke);
     if (ok) {
       getLocalReportsForNim(nim).then(setLocalReports);
     }
@@ -372,12 +380,23 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
                                         {sess.category}
                                       </span>
                                     )}
-                                    {sessVerified && (
-                                      <span className="flex items-center gap-0.5 text-[10px] font-semibold text-emerald-700 ml-auto">
-                                        <ShieldCheck className="w-3 h-3" />
-                                        Verified
-                                      </span>
-                                    )}
+                                    <div className="ml-auto flex items-center gap-2">
+                                      {sessVerified ? (
+                                        <span className="flex items-center gap-0.5 text-[10px] font-semibold text-emerald-700">
+                                          <ShieldCheck className="w-3 h-3" />
+                                          Verified
+                                        </span>
+                                      ) : sessions.length > 1 && isFromApp && (
+                                        <button
+                                          onClick={() => handleDeleteSession(week, sess.ke || si + 1)}
+                                          className="flex items-center gap-0.5 text-[10px] font-semibold text-rose-500 hover:text-rose-600"
+                                          title="Hapus sesi ini"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                          Hapus
+                                        </button>
+                                      )}
+                                    </div>
                                   </div>
                                   {sess.tanggal && (
                                     <div className="flex items-center gap-1 text-slate-400 mb-1">

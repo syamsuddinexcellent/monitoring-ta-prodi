@@ -247,6 +247,47 @@ export async function deleteReport(nim, week) {
   } catch { return false; }
 }
 
+// Delete a single unverified session from dosen_hadir.sessions
+export async function deleteSession(nim, week, ke) {
+  if (!supabase) return false;
+  const { data: existing } = await supabase
+    .from('laporan_bimbingan')
+    .select('*')
+    .eq('nim', nim)
+    .eq('week', week)
+    .maybeSingle();
+  if (!existing) return false;
+  let sessions = getSessions(existing.dosen_hadir);
+  const idx = sessions.findIndex(s => s.ke === ke);
+  if (idx < 0) return false;
+  if (sessions[idx].verified_at) return false; // cannot delete verified session
+  sessions = sessions.filter((_, i) => i !== idx);
+  // re-number ke
+  sessions = sessions.map((s, i) => ({ ...s, ke: i + 1 }));
+  if (sessions.length === 0) {
+    // no sessions left — delete the whole row
+    const { error } = await supabase
+      .from('laporan_bimbingan')
+      .delete()
+      .eq('nim', nim)
+      .eq('week', week);
+    return !error;
+  }
+  const last = sessions[sessions.length - 1];
+  const { error } = await supabase
+    .from('laporan_bimbingan')
+    .update({
+      dosen_hadir: { sessions },
+      category: last.category,
+      progress: last.progress,
+      next_target: last.next,
+      submitted_at: last.submitted_at,
+    })
+    .eq('nim', nim)
+    .eq('week', week);
+  return !error;
+}
+
 // Save verification for a specific session inline in dosen_hadir
 export async function saveVerifikasiSession(nim, week, ke, dosenName) {
   if (supabase) {
