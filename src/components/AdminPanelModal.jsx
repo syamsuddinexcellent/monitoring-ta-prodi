@@ -155,6 +155,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   const [penolakanData, setPenolakanData] = useState({});
   const [masukDbList, setMasukDbList] = useState([]);
   const [laporanFilter, setLaporanFilter] = useState('semua');
+  const [roleFilter, setRoleFilter] = useState('all');
   // Kontrol Akun password gate
   const [akunUnlocked, setAkunUnlocked] = useState(false);
   const [akunPasswordInput, setAkunPasswordInput] = useState('');
@@ -585,6 +586,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
 
   const dosenUsers = users.filter(u => u.role === 'dosen');
   const mahasiswaUsers = users.filter(u => u.role === 'mahasiswa');
+  const displayedUsers = roleFilter === 'all' ? users : users.filter(u => u.role === roleFilter);
 
   return (
     <>
@@ -689,14 +691,28 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                   <span className="text-slate-600">Total:</span>
                   <span className="font-bold text-slate-900">{users.length} akun</span>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-indigo-50 border border-indigo-200 text-xs">
-                  <User className="w-4 h-4 text-indigo-500" />
-                  <span className="text-indigo-700 font-semibold">{dosenUsers.length} Dosen</span>
-                </div>
-                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-xs">
-                  <GraduationCap className="w-4 h-4 text-emerald-600" />
-                  <span className="text-emerald-700 font-semibold">{mahasiswaUsers.length} Mahasiswa</span>
-                </div>
+                <button
+                  onClick={() => setRoleFilter(f => f === 'dosen' ? 'all' : 'dosen')}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-semibold transition-colors ${
+                    roleFilter === 'dosen'
+                      ? 'bg-indigo-600 border-indigo-600 text-white'
+                      : 'bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100'
+                  }`}
+                >
+                  <User className="w-4 h-4" />
+                  {dosenUsers.length} Dosen
+                </button>
+                <button
+                  onClick={() => setRoleFilter(f => f === 'mahasiswa' ? 'all' : 'mahasiswa')}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-semibold transition-colors ${
+                    roleFilter === 'mahasiswa'
+                      ? 'bg-emerald-600 border-emerald-600 text-white'
+                      : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
+                  }`}
+                >
+                  <GraduationCap className="w-4 h-4" />
+                  {mahasiswaUsers.length} Mahasiswa
+                </button>
                 <button
                   onClick={() => { setAddDosenOpen(v => !v); setAddDosenFormError(''); setAddDosenForm({ email: '', name: '', lecturerName: '', password: '' }); }}
                   className="ml-auto flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-colors shrink-0"
@@ -774,14 +790,14 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                 </div>
               )}
 
-              {users.length === 0 ? (
+              {displayedUsers.length === 0 ? (
                 <div className="text-center py-10 text-slate-400">
                   <Users className="w-10 h-10 mx-auto mb-2 opacity-30" />
-                  <p className="text-sm">Belum ada akun terdaftar</p>
+                  <p className="text-sm">{users.length === 0 ? 'Belum ada akun terdaftar' : 'Tidak ada akun dengan filter ini'}</p>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {users.map(u => {
+                  {displayedUsers.map(u => {
                     const { label, cls } = getRoleLabel(u.role);
                     const isConfirming = confirmDelete === u.email;
                     return (
