@@ -548,14 +548,30 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
                         <p className="text-xs text-slate-400 italic">
                           {isLocked ? 'Periode ini dikunci oleh admin.' : 'Belum ada laporan bimbingan untuk periode ini.'}
                         </p>
-                        {!isLocked && canAddSession(week) && (
-                          <button
-                            onClick={() => openAddSession(week)}
-                            className="text-[11px] font-semibold text-brand-600 hover:text-brand-700 hover:underline ml-2 shrink-0"
-                          >
-                            + Lapor
-                          </button>
-                        )}
+                        <div className="flex items-center gap-2 ml-2 shrink-0">
+                          {isTolak && (
+                            confirmDelete?.type === 'week' && confirmDelete.week === week ? (
+                              <span className="flex items-center gap-1">
+                                <span className="text-[11px] text-rose-600 font-semibold">Hapus status?</span>
+                                <button onClick={async () => { setConfirmDelete(null); await cancelPenolakan(nim, week); getPenolakan().then(all => setTolkData(all[nim] || {})); }} className="text-[10px] font-bold text-white bg-rose-500 hover:bg-rose-600 px-1.5 py-0.5 rounded">Ya</button>
+                                <button onClick={() => setConfirmDelete(null)} className="text-[10px] font-semibold text-slate-500 hover:text-slate-700 px-1.5 py-0.5 rounded border border-slate-200">Batal</button>
+                              </span>
+                            ) : (
+                              <button onClick={() => setConfirmDelete({ type: 'week', week })} className="flex items-center gap-1 text-[11px] font-semibold text-rose-500 hover:text-rose-600 hover:underline">
+                                <Trash2 className="w-3.5 h-3.5" />
+                                Hapus Status
+                              </button>
+                            )
+                          )}
+                          {!isLocked && canAddSession(week) && (
+                            <button
+                              onClick={() => openAddSession(week)}
+                              className="text-[11px] font-semibold text-brand-600 hover:text-brand-700 hover:underline"
+                            >
+                              + Lapor
+                            </button>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
