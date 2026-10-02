@@ -2,10 +2,10 @@ import React, { useMemo, useState, useEffect } from 'react';
 import {
   GraduationCap, BookOpen, CheckCircle2, AlertCircle,
   ArrowRight, UserCheck, Calendar, TrendingUp, Clock,
-  PlusCircle, ShieldCheck, PencilLine, Trash2, XCircle, RefreshCw, CalendarDays, Lock
+  PlusCircle, ShieldCheck, PencilLine, Trash2, XCircle, RefreshCw, CalendarDays, Lock, Plus
 } from 'lucide-react';
 import { getCategoryBadgeStyle } from '../utils/helpers';
-import LaporanModal, { getLocalReportsForNim, parseWeekRange, deleteReport } from './LaporanModal';
+import LaporanModal, { getLocalReportsForNim, parseWeekRange, deleteReport, getSessions, getSessionCount, MAX_SESSIONS } from './LaporanModal';
 import { getVerifikasi, getPenolakan } from '../utils/exportUtils';
 
 function ProgressRing({ pct }) {
@@ -28,26 +28,39 @@ function ProgressRing({ pct }) {
   );
 }
 
+function formatTanggal(str) {
+  if (!str) return null;
+  return new Date(str + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
 export default function MahasiswaView({ student, weekColumns, loggedInUser, lockedPeriods = [] }) {
-  const [isLaporanOpen, setIsLaporanOpen] = useState(false);
-  const [editWeek, setEditWeek] = useState('');
-  const [localReports, setLocalReports] = useState({});
-  const [verifData, setVerifData] = useState({});
-  const [tolkData, setTolkData] = useState({});
+  const [isLaporanOpen, setIsLaporanOpen]     = useState(false);
+  const [laporanForceWeek, setLaporanForceWeek] = useState('');
+  const [laporanEditMode, setLaporanEditMode]   = useState(false);
+  const [localReports, setLocalReports]         = useState({});
+  const [verifData, setVerifData]               = useState({});
+  const [tolkData, setTolkData]                 = useState({});
+
+  const openAddSession = (weekStr = '') => {
+    setLaporanForceWeek(weekStr);
+    setLaporanEditMode(false);
+    setIsLaporanOpen(true);
+  };
 
   const openEdit = (weekStr) => {
-    setEditWeek(weekStr);
+    setLaporanForceWeek(weekStr);
+    setLaporanEditMode(true);
     setIsLaporanOpen(true);
   };
 
   const handleClose = () => {
     setIsLaporanOpen(false);
-    setEditWeek('');
+    setLaporanForceWeek('');
+    setLaporanEditMode(false);
   };
 
   const nim = student?.nim || loggedInUser?.nim || '';
 
-  // Reload reports & verifikasi from Supabase when modal closes (after save)
   useEffect(() => {
     if (nim) {
       getLocalReportsForNim(nim).then(setLocalReports);
@@ -56,28 +69,32 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
     }
   }, [nim, isLaporanOpen]);
 
-  const isVerifiedByDosen = (week) => verifData[week]?.verified === true;
+  // Check if a week has any verified session (from inline session data OR verifikasi_laporan)
+  const isWeekVerified = (week) => {
+    // Check verifikasi_laporan table (period-level)
+    if (verifData[week]?.verified) return true;
+    // Check inline session verification
+    const sessions = mergedUpdates[week]?.sessions || [];
+    return sessions.some(s => s.verified_at);
+  };
 
   const handleDelete = async (week) => {
-    if (!window.confirm(`Hapus laporan Periode ini? Tindakan ini tidak dapat dibatalkan.`)) return;
+    if (!window.confirm(`Hapus semua laporan untuk periode ini? Tindakan ini tidak dapat dibatalkan.`)) return;
     const ok = await deleteReport(nim, week);
     if (ok) {
       getLocalReportsForNim(nim).then(setLocalReports);
     }
   };
 
-  // Merged weekly data: app reports (Supabase/_appReport) take priority over sheet data
   const mergedUpdates = useMemo(() => {
     if (!student) return {};
     const merged = {};
     weekColumns.forEach(w => {
       const sheet = student.weeklyUpdates?.[w];
       const local = localReports[w];
-      // Prefer local (Supabase) report if it exists
       if (local?.reported) {
         merged[w] = { ...local, _appReport: true };
       } else if (sheet?.reported) {
-        // Sheet data that came from mergeSupabaseReports also has _appReport
         merged[w] = { ...sheet };
       } else {
         merged[w] = sheet || {};
@@ -107,6 +124,16 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
   const latestWeek = [...weekColumns].reverse().find(w => mergedUpdates[w]?.reported);
   const latestUpdate = latestWeek ? mergedUpdates[latestWeek] : null;
 
+  // Check if a period can have more sessions added
+  const canAddSession = (week) => {
+    if (lockedPeriods.includes(week)) return false;
+    const cnt = getSessionCount(mergedUpdates[week]);
+    if (cnt >= MAX_SESSIONS) return false;
+    const range = parseWeekRange(week);
+    if (range && new Date() > range.end) return false;
+    return true;
+  };
+
   return (
     <>
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
@@ -133,9 +160,8 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
                   </span>
                 )}
               </div>
-              {/* Laporan button below name on mobile */}
               <button
-                onClick={() => setIsLaporanOpen(true)}
+                onClick={() => openAddSession()}
                 className="mt-3 flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow transition-all sm:hidden"
               >
                 <PlusCircle className="w-4 h-4" />
@@ -144,9 +170,8 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
             </div>
             <div className="flex flex-col items-center gap-3 shrink-0">
               <ProgressRing pct={pct} />
-              {/* Laporan button below ring on desktop */}
               <button
-                onClick={() => setIsLaporanOpen(true)}
+                onClick={() => openAddSession()}
                 className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow transition-all"
               >
                 <PlusCircle className="w-4 h-4" />
@@ -158,7 +183,6 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
 
         {/* Supervisor + Stats row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Supervisors */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-5 space-y-3">
             <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
               <UserCheck className="w-3.5 h-3.5" />
@@ -184,7 +208,6 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
             )}
           </div>
 
-          {/* Stats */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-5 space-y-4">
             <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
               <TrendingUp className="w-3.5 h-3.5" />
@@ -225,7 +248,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
                 <BookOpen className="w-3.5 h-3.5" />
                 Update Terbaru — {latestWeek}
               </h3>
-              {isVerifiedByDosen(latestWeek) && (
+              {isWeekVerified(latestWeek) && (
                 <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
                   <ShieldCheck className="w-3 h-3" />
                   Terverifikasi
@@ -241,7 +264,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
                 <div className="bg-white rounded-xl p-3.5 border border-indigo-100 flex items-start gap-2">
                   <ArrowRight className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
                   <div>
-                    <span className="text-[10px] font-bold text-brand-700 uppercase block mb-0.5">Target Periode Depan</span>
+                    <span className="text-[10px] font-bold text-brand-700 uppercase block mb-0.5">Target Berikutnya</span>
                     <p className="text-sm text-slate-800 font-semibold">{latestUpdate.next}</p>
                   </div>
                 </div>
@@ -261,28 +284,31 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
               const upd = mergedUpdates[week];
               const isReported = upd?.reported;
               const isFromApp = upd?._appReport === true;
-              const isVerified = isVerifiedByDosen(week);
+              const weekVerified = isWeekVerified(week);
               const penolakanInfo = tolkData[week];
-              const isTolak = !!penolakanInfo && !isVerified;
+              const isTolak = !!penolakanInfo && !weekVerified;
               const isResubmitted = isTolak && upd?.submittedAt && penolakanInfo?.at &&
                 new Date(upd.submittedAt) > new Date(penolakanInfo.at);
-              const badge = getCategoryBadgeStyle(upd?.category);
               const isLocked = lockedPeriods.includes(week);
+              const sessions = upd?.sessions || [];
+              const hasMultiSession = sessions.length > 1;
+
               return (
                 <div key={week} className="relative group">
                   <div className={`absolute -left-[31px] top-1 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center ${
-                    isReported ? (isVerified ? 'bg-emerald-500 ring-4 ring-emerald-100' : (isTolak && !isResubmitted) ? 'bg-red-400 ring-4 ring-red-100' : 'bg-brand-500 ring-4 ring-brand-100') : 'bg-slate-200'
+                    isReported ? (weekVerified ? 'bg-emerald-500 ring-4 ring-emerald-100' : (isTolak && !isResubmitted) ? 'bg-red-400 ring-4 ring-red-100' : 'bg-brand-500 ring-4 ring-brand-100') : 'bg-slate-200'
                   }`} />
-                  <div className={`rounded-xl p-4 border transition-colors ${
+                  <div className={`rounded-xl border transition-colors ${
                     isReported
                       ? 'bg-slate-50 border-slate-200 group-hover:bg-white'
                       : 'bg-rose-50/40 border-rose-100'
                   }`}>
-                    <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
+                    {/* Period header */}
+                    <div className="flex items-center justify-between gap-2 flex-wrap px-4 pt-3 pb-2">
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-bold text-slate-900">Periode {idx + 1}</span>
                         <span className="text-xs text-slate-400">({week})</span>
-                        {isVerified && (
+                        {weekVerified && (
                           <span className="flex items-center gap-0.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
                             <ShieldCheck className="w-2.5 h-2.5" />
                             Terverifikasi
@@ -302,9 +328,8 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
                         )}
                       </div>
                       {isReported ? (
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold border ${badge.bg} ${badge.text} ${badge.border}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
-                          {upd.category}
+                        <span className="text-[10px] font-semibold text-indigo-600 bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 rounded-full">
+                          {sessions.length || 1}/{MAX_SESSIONS} sesi
                         </span>
                       ) : isLocked ? (
                         <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 text-slate-500 border border-slate-200">
@@ -318,47 +343,100 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
                         </span>
                       )}
                     </div>
+
+                    {/* Sessions */}
                     {isReported ? (
-                      <div className="space-y-2 text-xs">
-                        <div className="bg-white rounded-lg p-2.5 border border-slate-100">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase block mb-0.5">Progres</span>
-                          <p className="text-slate-800 font-medium leading-relaxed">{upd.progress}</p>
-                        </div>
-                        {upd.tanggalBimbingan && (
-                          <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
-                            <CalendarDays className="w-3.5 h-3.5 text-slate-400" />
-                            <span>Tanggal bimbingan: <span className="font-semibold text-slate-700">{new Date(upd.tanggalBimbingan + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></span>
+                      <div className="px-4 pb-3 space-y-3">
+                        {/* Multi-session display */}
+                        {sessions.length > 0 ? (
+                          <div className="space-y-2">
+                            {sessions.map((sess, si) => {
+                              const badge = getCategoryBadgeStyle(sess.category);
+                              const sessVerified = !!sess.verified_at;
+                              return (
+                                <div key={sess.ke || si} className={`rounded-lg border p-3 text-xs ${
+                                  sessVerified ? 'bg-emerald-50/60 border-emerald-200' : 'bg-white border-slate-100'
+                                }`}>
+                                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                                    <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-1.5 py-0.5 rounded-full">
+                                      Bimbingan ke-{sess.ke || si + 1}
+                                    </span>
+                                    {sess.dosen && (
+                                      <span className="text-[11px] bg-slate-100 border border-slate-200 text-slate-600 font-semibold px-2 py-0.5 rounded-full">
+                                        {sess.dosen.label} · {sess.dosen.name.split(',')[0]}
+                                      </span>
+                                    )}
+                                    {sess.category && (
+                                      <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold border ${badge.bg} ${badge.text} ${badge.border}`}>
+                                        <span className={`w-1 h-1 rounded-full ${badge.dot}`} />
+                                        {sess.category}
+                                      </span>
+                                    )}
+                                    {sessVerified && (
+                                      <span className="flex items-center gap-0.5 text-[10px] font-semibold text-emerald-700 ml-auto">
+                                        <ShieldCheck className="w-3 h-3" />
+                                        Verified
+                                      </span>
+                                    )}
+                                  </div>
+                                  {sess.tanggal && (
+                                    <div className="flex items-center gap-1 text-slate-400 mb-1">
+                                      <CalendarDays className="w-3 h-3" />
+                                      <span>{formatTanggal(sess.tanggal)}</span>
+                                    </div>
+                                  )}
+                                  <p className="text-slate-800 font-medium leading-relaxed">{sess.progress}</p>
+                                  {sess.next && (
+                                    <div className="flex items-start gap-1 mt-1.5 text-brand-700">
+                                      <ArrowRight className="w-3 h-3 shrink-0 mt-0.5" />
+                                      <span className="font-semibold">{sess.next}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          // Old format (no sessions array): show single entry
+                          <div className="space-y-2 text-xs">
+                            <div className="bg-white rounded-lg p-2.5 border border-slate-100">
+                              <span className="text-[10px] font-bold text-slate-400 uppercase block mb-0.5">Progres</span>
+                              <p className="text-slate-800 font-medium leading-relaxed">{upd.progress}</p>
+                            </div>
+                            {upd.tanggalBimbingan && (
+                              <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                                <CalendarDays className="w-3.5 h-3.5 text-slate-400" />
+                                <span>Tanggal: <span className="font-semibold text-slate-700">{formatTanggal(upd.tanggalBimbingan)}</span></span>
+                              </div>
+                            )}
+                            {upd.dosenHadir?.length > 0 && (
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <UserCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                {upd.dosenHadir.map(d => (
+                                  <span key={d.label} className="text-[11px] bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
+                                    {d.label} · {d.name.split(',')[0]}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            {upd.next && (
+                              <div className="flex items-start gap-1.5 bg-brand-50/60 p-2.5 rounded-lg border border-brand-100">
+                                <ArrowRight className="w-3.5 h-3.5 text-brand-600 shrink-0 mt-0.5" />
+                                <p className="text-slate-800 font-semibold">{upd.next}</p>
+                              </div>
+                            )}
                           </div>
                         )}
-                        {upd.dosenHadir?.length > 0 && (
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <UserCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                            <span className="text-[11px] text-slate-500">Bimbingan dengan:</span>
-                            {upd.dosenHadir.map(d => (
-                              <span key={d.label} className="text-[11px] bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
-                                {d.label} · {d.name.split(',')[0]}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                        {upd.next && (
-                          <div className="flex items-start gap-1.5 bg-brand-50/60 p-2.5 rounded-lg border border-brand-100">
-                            <ArrowRight className="w-3.5 h-3.5 text-brand-600 shrink-0 mt-0.5" />
-                            <p className="text-slate-800 font-semibold">{upd.next}</p>
-                          </div>
-                        )}
+
+                        {/* Rejection / Resubmission notices */}
                         {isTolak && !isResubmitted && (
                           <div className="bg-red-50 border border-red-200 rounded-lg p-2.5 space-y-0.5">
                             <div className="flex items-center gap-1 text-[10px] font-bold text-red-600 uppercase tracking-wider">
                               <XCircle className="w-3 h-3" />
                               Laporan Ditolak Dosen
                             </div>
-                            <p className="text-xs text-red-800 font-medium leading-relaxed">
-                              {penolakanInfo.alasan || '—'}
-                            </p>
-                            <p className="text-[10px] text-red-400">
-                              Silakan edit dan kirim ulang laporan Anda.
-                            </p>
+                            <p className="text-xs text-red-800 font-medium leading-relaxed">{penolakanInfo.alasan || '—'}</p>
+                            <p className="text-[10px] text-red-400">Silakan edit dan kirim ulang laporan Anda.</p>
                           </div>
                         )}
                         {isResubmitted && (
@@ -372,40 +450,58 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
                             </p>
                           </div>
                         )}
-                        <div className="flex items-center justify-end gap-3 pt-1">
-                          {isVerified ? (
-                            <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
-                              <ShieldCheck className="w-3.5 h-3.5" />
-                              Sudah diverifikasi dosen · tidak dapat diedit
-                            </span>
-                          ) : isFromApp ? (
-                            <>
+
+                        {/* Action buttons */}
+                        <div className="flex items-center justify-between gap-2 pt-1">
+                          <div className="flex items-center gap-2">
+                            {/* Add session button */}
+                            {canAddSession(week) && (
                               <button
-                                onClick={() => openEdit(week)}
+                                onClick={() => openAddSession(week)}
                                 className="flex items-center gap-1 text-[11px] font-semibold text-brand-600 hover:text-brand-700 hover:underline"
                               >
-                                <PencilLine className="w-3.5 h-3.5" />
-                                Edit Laporan
+                                <Plus className="w-3.5 h-3.5" />
+                                + Lapor Bimbingan
                               </button>
-                              <button
-                                onClick={() => handleDelete(week)}
-                                className="flex items-center gap-1 text-[11px] font-semibold text-rose-500 hover:text-rose-600 hover:underline"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                                Hapus
-                              </button>
-                            </>
-                          ) : null}
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3">
+                            {weekVerified ? (
+                              <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
+                                <ShieldCheck className="w-3.5 h-3.5" />
+                                Sudah diverifikasi · tidak dapat diedit
+                              </span>
+                            ) : isFromApp ? (
+                              <>
+                                {sessions.length <= 1 && (
+                                  <button
+                                    onClick={() => openEdit(week)}
+                                    className="flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-brand-600 hover:underline"
+                                  >
+                                    <PencilLine className="w-3.5 h-3.5" />
+                                    Edit
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => handleDelete(week)}
+                                  className="flex items-center gap-1 text-[11px] font-semibold text-rose-500 hover:text-rose-600 hover:underline"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                  Hapus Semua
+                                </button>
+                              </>
+                            ) : null}
+                          </div>
                         </div>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-between mt-1">
+                      <div className="flex items-center justify-between px-4 pb-3 mt-1">
                         <p className="text-xs text-slate-400 italic">
                           {isLocked ? 'Periode ini dikunci oleh admin.' : 'Belum ada laporan bimbingan untuk periode ini.'}
                         </p>
-                        {!isLocked && (
+                        {!isLocked && canAddSession(week) && (
                           <button
-                            onClick={() => setIsLaporanOpen(true)}
+                            onClick={() => openAddSession(week)}
                             className="text-[11px] font-semibold text-brand-600 hover:text-brand-700 hover:underline ml-2 shrink-0"
                           >
                             + Lapor
@@ -432,8 +528,9 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
         pembimbing2={student.pembimbing2 || ''}
         penguji1={student.penguji1 || ''}
         penguji2={student.penguji2 || ''}
-        forceWeek={editWeek}
+        forceWeek={laporanForceWeek}
         lockedPeriods={lockedPeriods}
+        editMode={laporanEditMode}
       />
     </>
   );
