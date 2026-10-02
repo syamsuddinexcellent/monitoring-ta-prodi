@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { getCategoryBadgeStyle } from '../utils/helpers';
 import LaporanModal, { getLocalReportsForNim, parseWeekRange, deleteReport, deleteSession, getSessions, getSessionCount, MAX_SESSIONS } from './LaporanModal';
-import { getVerifikasi, getPenolakan } from '../utils/exportUtils';
+import { getVerifikasi, getPenolakan, cancelVerifikasi, cancelPenolakan } from '../utils/exportUtils';
 
 function ProgressRing({ pct }) {
   const r = 36, circ = 2 * Math.PI * r;
@@ -84,7 +84,13 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
     if (confirmDelete?.type === 'week' && confirmDelete.week === week) {
       setConfirmDelete(null);
       const ok = await deleteReport(nim, week);
-      if (ok) getLocalReportsForNim(nim).then(setLocalReports);
+      if (ok) {
+        await Promise.all([cancelVerifikasi(nim, week), cancelPenolakan(nim, week)]);
+        getLocalReportsForNim(nim).then(setLocalReports);
+        const [newVerif, newTolk] = await Promise.all([getVerifikasi(), getPenolakan()]);
+        setVerifData(newVerif[nim] || {});
+        setTolkData(newTolk[nim] || {});
+      }
     } else {
       setConfirmDelete({ type: 'week', week });
     }
