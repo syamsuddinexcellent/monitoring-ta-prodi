@@ -236,6 +236,8 @@ export async function deleteReport(nim, week) {
       } catch {}
       return true;
     }
+    console.error('deleteReport Supabase error:', error, {nim, week});
+    return false;
   }
   try {
     const all = JSON.parse(localStorage.getItem('mahasiswa_reports') || '{}');
