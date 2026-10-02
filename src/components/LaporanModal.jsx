@@ -360,6 +360,13 @@ const MONTH_ID = {
   juli: 6, agustus: 7, september: 8, oktober: 9, november: 10, desember: 11,
 };
 
+export function getSubmitDeadline(end) {
+  const d = new Date(end);
+  d.setDate(d.getDate() + 2);
+  d.setHours(23, 59, 59, 999);
+  return d;
+}
+
 export function parseWeekRange(weekStr) {
   const match = weekStr.match(/^(\d+)\s*-\s*(\d+)\s+(\w+)\s+(\d+)/);
   if (!match) return null;
@@ -397,7 +404,7 @@ function getPeriodsWithRoom(weekColumns, existingData, lockedPeriods, forceWeek)
     const sessionCount = getSessionCount(existingData?.[w]);
     if (sessionCount >= MAX_SESSIONS) return false;
     const range = parseWeekRange(w);
-    if (range && today > range.end) return false;
+    if (range && new Date() > getSubmitDeadline(range.end)) return false;
     return true;
   });
 }

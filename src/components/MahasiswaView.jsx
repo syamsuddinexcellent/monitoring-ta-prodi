@@ -5,7 +5,7 @@ import {
   PlusCircle, ShieldCheck, PencilLine, Trash2, XCircle, RefreshCw, CalendarDays, Lock, Plus
 } from 'lucide-react';
 import { getCategoryBadgeStyle } from '../utils/helpers';
-import LaporanModal, { getLocalReportsForNim, parseWeekRange, deleteReport, deleteSession, getSessions, getSessionCount, MAX_SESSIONS } from './LaporanModal';
+import LaporanModal, { getLocalReportsForNim, parseWeekRange, getSubmitDeadline, deleteReport, deleteSession, getSessions, getSessionCount, MAX_SESSIONS } from './LaporanModal';
 import { getVerifikasi, getPenolakan, cancelVerifikasi, cancelPenolakan } from '../utils/exportUtils';
 
 function ProgressRing({ pct }) {
@@ -150,7 +150,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
     const cnt = getSessionCount(mergedUpdates[week]);
     if (cnt >= MAX_SESSIONS) return false;
     const range = parseWeekRange(week);
-    if (range && new Date() > range.end) return false;
+    if (range && new Date() > getSubmitDeadline(range.end)) return false;
     return true;
   };
 
