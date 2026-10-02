@@ -78,19 +78,25 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
     return sessions.some(s => s.verified_at);
   };
 
+  const [confirmDelete, setConfirmDelete] = useState(null); // { type: 'week'|'session', week, ke }
+
   const handleDelete = async (week) => {
-    if (!window.confirm(`Hapus semua laporan untuk periode ini? Tindakan ini tidak dapat dibatalkan.`)) return;
-    const ok = await deleteReport(nim, week);
-    if (ok) {
-      getLocalReportsForNim(nim).then(setLocalReports);
+    if (confirmDelete?.type === 'week' && confirmDelete.week === week) {
+      setConfirmDelete(null);
+      const ok = await deleteReport(nim, week);
+      if (ok) getLocalReportsForNim(nim).then(setLocalReports);
+    } else {
+      setConfirmDelete({ type: 'week', week });
     }
   };
 
   const handleDeleteSession = async (week, ke) => {
-    if (!window.confirm(`Hapus Bimbingan ke-${ke}? Tindakan ini tidak dapat dibatalkan.`)) return;
-    const ok = await deleteSession(nim, week, ke);
-    if (ok) {
-      getLocalReportsForNim(nim).then(setLocalReports);
+    if (confirmDelete?.type === 'session' && confirmDelete.week === week && confirmDelete.ke === ke) {
+      setConfirmDelete(null);
+      const ok = await deleteSession(nim, week, ke);
+      if (ok) getLocalReportsForNim(nim).then(setLocalReports);
+    } else {
+      setConfirmDelete({ type: 'session', week, ke });
     }
   };
 
@@ -386,16 +392,25 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
                                           <ShieldCheck className="w-3 h-3" />
                                           Verified
                                         </span>
-                                      ) : sessions.length > 1 && isFromApp && (
-                                        <button
-                                          onClick={() => handleDeleteSession(week, sess.ke || si + 1)}
-                                          className="flex items-center gap-0.5 text-[10px] font-semibold text-rose-500 hover:text-rose-600"
-                                          title="Hapus sesi ini"
-                                        >
-                                          <Trash2 className="w-3 h-3" />
-                                          Hapus
-                                        </button>
-                                      )}
+                                      ) : sessions.length > 1 && isFromApp && (() => {
+                                        const ke = sess.ke || si + 1;
+                                        const isConfirming = confirmDelete?.type === 'session' && confirmDelete.week === week && confirmDelete.ke === ke;
+                                        return isConfirming ? (
+                                          <span className="flex items-center gap-1">
+                                            <span className="text-[10px] text-rose-600 font-semibold">Yakin?</span>
+                                            <button onClick={() => handleDeleteSession(week, ke)} className="text-[10px] font-bold text-white bg-rose-500 hover:bg-rose-600 px-1.5 py-0.5 rounded">Ya</button>
+                                            <button onClick={() => setConfirmDelete(null)} className="text-[10px] font-semibold text-slate-500 hover:text-slate-700 px-1.5 py-0.5 rounded border border-slate-200">Batal</button>
+                                          </span>
+                                        ) : (
+                                          <button
+                                            onClick={() => handleDeleteSession(week, ke)}
+                                            className="flex items-center gap-0.5 text-[10px] font-semibold text-rose-500 hover:text-rose-600"
+                                          >
+                                            <Trash2 className="w-3 h-3" />
+                                            Hapus
+                                          </button>
+                                        );
+                                      })()}
                                     </div>
                                   </div>
                                   {sess.tanggal && (
@@ -501,13 +516,21 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
                                     Edit
                                   </button>
                                 )}
-                                <button
-                                  onClick={() => handleDelete(week)}
-                                  className="flex items-center gap-1 text-[11px] font-semibold text-rose-500 hover:text-rose-600 hover:underline"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                  Hapus Semua
-                                </button>
+                                {confirmDelete?.type === 'week' && confirmDelete.week === week ? (
+                                  <span className="flex items-center gap-1">
+                                    <span className="text-[11px] text-rose-600 font-semibold">Hapus semua?</span>
+                                    <button onClick={() => handleDelete(week)} className="text-[10px] font-bold text-white bg-rose-500 hover:bg-rose-600 px-1.5 py-0.5 rounded">Ya</button>
+                                    <button onClick={() => setConfirmDelete(null)} className="text-[10px] font-semibold text-slate-500 hover:text-slate-700 px-1.5 py-0.5 rounded border border-slate-200">Batal</button>
+                                  </span>
+                                ) : (
+                                  <button
+                                    onClick={() => handleDelete(week)}
+                                    className="flex items-center gap-1 text-[11px] font-semibold text-rose-500 hover:text-rose-600 hover:underline"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                    Hapus Semua
+                                  </button>
+                                )}
                               </>
                             ) : null}
                           </div>
