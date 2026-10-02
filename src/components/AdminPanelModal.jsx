@@ -1748,29 +1748,6 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                 </div>
               </div>
 
-              {/* ── Token Reset ── */}
-              <div className="rounded-xl border border-slate-200 overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-3 bg-slate-50">
-                  <div className="flex items-center gap-2">
-                    <RotateCcw className="w-4 h-4 text-amber-600" />
-                    <span className="text-xs font-bold text-slate-700">Token Reset Password</span>
-                  </div>
-                  <button
-                    onClick={handleClearResetTokens}
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 transition-colors"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                    Bersihkan
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200">
-                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                <p className="text-[11px] text-amber-800">
-                  Data lokal disimpan di perangkat ini saja. Menghapus data tidak dapat dibatalkan dan tidak memengaruhi Google Sheets.
-                </p>
-              </div>
             </div>
           )}
 
