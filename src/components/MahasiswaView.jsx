@@ -177,11 +177,10 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
       if (!verified) return [];
       const allSessions = update ? getSessions(update) : [];
       const num = idx + 1;
-      const adminVerif = verifData[week]?.verified;
-
-      const verifiedSessions = adminVerif
-        ? allSessions
-        : allSessions.filter(s => s.verified_at);
+      const hasSessionVerif = allSessions.some(s => s.verified_at);
+      const verifiedSessions = hasSessionVerif
+        ? allSessions.filter(s => s.verified_at)
+        : verifData[week]?.verified ? allSessions : [];
 
       if (verifiedSessions.length === 0) {
         const lastSession = allSessions[allSessions.length - 1];
