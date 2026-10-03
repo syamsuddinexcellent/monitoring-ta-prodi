@@ -801,6 +801,7 @@ export default function App() {
                 gatewayStatus={gatewayStatus}
                 onOpenGatewayModal={() => setIsGatewayModalOpen(true)}
                 isAdmin={isAdmin}
+                isDosen={isDosen}
               />
             )}
           </div>

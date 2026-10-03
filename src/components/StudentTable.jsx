@@ -25,7 +25,8 @@ export default function StudentTable({
   nextWeek = '',
   gatewayStatus,
   onOpenGatewayModal,
-  isAdmin = false
+  isAdmin = false,
+  isDosen = false,
 }) {
   const [sendingNim, setSendingNim] = useState(null);
   const [sentNim, setSentNim] = useState(null);
@@ -71,7 +72,7 @@ export default function StudentTable({
               <th className="py-3.5 px-4 min-w-[190px]">Mahasiswa</th>
               <th className="py-3.5 px-4 min-w-[170px]">Pembimbing</th>
               <th className="py-3.5 px-4 min-w-[130px]">Status TA</th>
-              <th className="py-3.5 px-4 min-w-[130px]">WhatsApp</th>
+              {(isAdmin || isDosen) && <th className="py-3.5 px-4 min-w-[130px]">WhatsApp</th>}
               <th className="py-3.5 px-4 min-w-[90px]">Lapor</th>
               <th className="py-3.5 px-4 min-w-[140px]">Tahapan</th>
               <th className="py-3.5 px-4 min-w-[220px]">Progres Periode Ini</th>
@@ -168,21 +169,23 @@ export default function StudentTable({
                     )}
                   </td>
 
-                  {/* WhatsApp */}
-                  <td className="py-3.5 px-4">
-                    {student.phone && !update.reported ? (
-                      <button
-                        onClick={handleDirectWA}
-                        className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-mono font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors"
-                        title="Klik untuk buka di WhatsApp Web"
-                      >
-                        <Phone className="w-3 h-3 text-emerald-600" />
-                        <span>{phoneDisplay}</span>
-                      </button>
-                    ) : (
-                      <span className="text-slate-400 text-xs italic">{student.phone ? phoneDisplay : '-'}</span>
-                    )}
-                  </td>
+                  {/* WhatsApp — hanya untuk admin & dosen */}
+                  {(isAdmin || isDosen) && (
+                    <td className="py-3.5 px-4">
+                      {student.phone && !update.reported ? (
+                        <button
+                          onClick={handleDirectWA}
+                          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-mono font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors"
+                          title="Klik untuk buka di WhatsApp Web"
+                        >
+                          <Phone className="w-3 h-3 text-emerald-600" />
+                          <span>{phoneDisplay}</span>
+                        </button>
+                      ) : (
+                        <span className="text-slate-400 text-xs italic">{student.phone ? phoneDisplay : '-'}</span>
+                      )}
+                    </td>
+                  )}
 
                   {/* Status Lapor */}
                   <td className="py-3.5 px-4">
