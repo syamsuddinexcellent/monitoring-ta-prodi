@@ -653,7 +653,7 @@ export default function LaporanModal({
                   <option value="">-- Pilih Dosen --</option>
                   {dosenList.map(d => (
                     <option key={d.key} value={d.key}>
-                      {d.label} · {d.name.split(',')[0]}
+                      {d.label} · {d.name}
                     </option>
                   ))}
                 </select>

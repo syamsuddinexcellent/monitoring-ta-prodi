@@ -291,7 +291,7 @@ export default function StudentCard({
                 ? new Date(last.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
                 : null;
               const dosenLabel = last.dosen?.label || '';
-              const dosenShort = last.dosen?.name?.split(',')[0] || '';
+              const dosenShort = last.dosen?.name || '';
               return (
                 <div className="flex items-center gap-2 flex-wrap pt-0.5">
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-indigo-100 text-indigo-700 border border-indigo-200">
@@ -319,7 +319,7 @@ export default function StudentCard({
                   <UserCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   {update.dosenHadir.map(d => (
                     <span key={d.label} className="text-[11px] bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
-                      {d.label} · {d.name.split(',')[0]}
+                      {d.label} · {d.name}
                     </span>
                   ))}
                   {update.tanggalBimbingan && (

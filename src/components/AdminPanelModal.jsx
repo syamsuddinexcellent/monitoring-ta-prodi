@@ -1815,7 +1815,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                               <p className="text-[9px] text-rose-600 mt-0.5 italic">Alasan: {penolakan.alasan}</p>
                             )}
                             {(status === 'diverifikasi' || status === 'masuk_database') && verif?.dosenName && (
-                              <p className="text-[9px] text-blue-600 mt-0.5">Diverifikasi oleh: {verif.dosenName.split(',')[0]}</p>
+                              <p className="text-[9px] text-blue-600 mt-0.5">Diverifikasi oleh: {verif.dosenName}</p>
                             )}
                           </div>
                           {/* Action */}

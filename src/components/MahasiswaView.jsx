@@ -189,7 +189,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
         const cat = lastSession?.category ? `<div class="cat-text">${lastSession.category}</div>` : '';
         const progres = lastSession?.progress || '<span class="text-muted">-</span>';
         const target = lastSession?.next || '<span class="text-muted">-</span>';
-        const dosenName = verifData[week]?.dosenName?.split(',')[0] || lastSession?.dosen?.name || '';
+        const dosenName = verifData[week]?.dosenName || lastSession?.dosen?.name || '';
         return [`<tr>
           <td><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>
           <td>${badge}${cat}</td>
@@ -206,7 +206,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
         const keBadge = rowCount > 1 ? `<div class="ke-text">Bimbingan ke-${s.ke ?? si + 1}</div>` : '';
         const progres = s.progress || '<span class="text-muted">-</span>';
         const target = s.next || '<span class="text-muted">-</span>';
-        const dosenName = s.dosen?.name?.split(',')[0] || verifData[week]?.dosenName?.split(',')[0] || '';
+        const dosenName = s.dosen?.name || verifData[week]?.dosenName || '';
         const periodCell = si === 0
           ? `<td rowspan="${rowCount}" style="vertical-align:top"><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>`
           : '';
@@ -559,7 +559,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
                                     </span>
                                     {sess.dosen && (
                                       <span className="text-[11px] bg-slate-100 border border-slate-200 text-slate-600 font-semibold px-2 py-0.5 rounded-full">
-                                        {sess.dosen.label} · {sess.dosen.name.split(',')[0]}
+                                        {sess.dosen.label} · {sess.dosen.name}
                                       </span>
                                     )}
                                     {sess.category && (
@@ -630,7 +630,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
                                 <UserCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                                 {upd.dosenHadir.map(d => (
                                   <span key={d.label} className="text-[11px] bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
-                                    {d.label} · {d.name.split(',')[0]}
+                                    {d.label} · {d.name}
                                   </span>
                                 ))}
                               </div>

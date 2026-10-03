@@ -58,7 +58,7 @@ function SessionCard({ sess, nim, week, dosenName, isVerifiedPeriod, onVerifChan
         </span>
         {sess.dosen && (
           <span className="text-[11px] bg-slate-100 border border-slate-200 text-slate-600 font-semibold px-2 py-0.5 rounded-full">
-            {sess.dosen.label} · {sess.dosen.name?.split(',')[0]}
+            {sess.dosen.label} · {sess.dosen.name}
           </span>
         )}
         {sess.category && (
@@ -269,7 +269,7 @@ function LaporanCard({ item, dosenName, onRead, verifData, tolkData, onVerifChan
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bimbingan dengan:</span>
                 {item.dosenHadir.map(d => (
                   <span key={d.label} className="text-xs bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
-                    {d.label} · {d.name.split(',')[0]}
+                    {d.label} · {d.name}
                   </span>
                 ))}
               </div>
@@ -295,8 +295,8 @@ function LaporanCard({ item, dosenName, onRead, verifData, tolkData, onVerifChan
             <div className="bg-red-50/80 border border-red-100 rounded-lg p-2 space-y-0.5">
               <p className="text-[10px] font-bold text-red-500 uppercase tracking-wider">Alasan Penolakan Sebelumnya</p>
               <p className="text-xs text-red-700 font-medium">{penolakanInfo.alasan || '—'}</p>
-              <p className="text-[10px] text-red-400">oleh {penolakanInfo.dosenName?.split(',')[0]} · {formatDate(penolakanInfo.at)}</p>
-            </div>
+              <p className="text-[10px] text-red-400">oleh {penolakanInfo.dosenName} · {formatDate(penolakanInfo.at)}</p>
+</div>
           </div>
         )}
 
