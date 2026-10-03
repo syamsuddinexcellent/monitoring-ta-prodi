@@ -304,6 +304,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
           penguji2:    ov.penguji2    ?? s.penguji2,
           phone:       ov.phone       ?? s.phone,
           statusTA:    ov.status_ta   ?? s.statusTA,
+          target:      ov.target      ?? s.target,
         };
       });
     const customStudents = Object.values(studentOverrides)
@@ -318,6 +319,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
         penguji2:    ov.penguji2    || null,
         phone:       ov.phone       || null,
         statusTA:    ov.status_ta   || null,
+        target:      ov.target      || null,
         weeklyUpdates: {},
         _isCustom: true,
       }));
@@ -995,7 +997,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                 {/* Table */}
                 {(() => {
                   const weeks = sheetsData?.weekColumns || [];
-                  const totalCols = 11 + weeks.length;
+                  const totalCols = 12 + weeks.length;
                   const catCls = (cat) => {
                     if (!cat || cat === 'Belum Lapor') return null;
                     const map = {
@@ -1024,6 +1026,7 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                               { col: 'penguji2',     label: 'Pj2',   w: 'w-28' },
                               { col: 'phone',        label: 'WA',    w: 'w-24' },
                               { col: 'statusTA',     label: 'Status',w: 'w-20' },
+                              { col: 'target',       label: 'Target',w: 'w-28' },
                               { col: 'laporan',      label: 'Total', w: 'w-14' },
                             ].map(({ col, label, w }) => (
                               <th key={label} onClick={col ? () => handleSort(col) : undefined}
@@ -1164,6 +1167,12 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                                     </td>
                                   );
                                 })()}
+                                <td className="px-2 py-2 border-r border-slate-100 max-w-[112px]">
+                                  {s.target
+                                    ? <span className="text-[10px] text-slate-600 line-clamp-2">{s.target}</span>
+                                    : <span className="text-slate-300 text-[9px]">—</span>
+                                  }
+                                </td>
                                 <td className="px-2 py-2 text-center whitespace-nowrap border-r border-slate-200 bg-slate-50">
                                   <span className={`font-black text-xs ${reportedCount === weeks.length && weeks.length > 0 ? 'text-emerald-600' : reportedCount > 0 ? 'text-amber-600' : 'text-rose-400'}`}>{reportedCount}</span>
                                   <span className="text-slate-400">/{weeks.length}</span>
