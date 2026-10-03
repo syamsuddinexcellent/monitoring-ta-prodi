@@ -189,7 +189,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
         const cat = lastSession?.category ? `<div class="cat-text">${lastSession.category}</div>` : '';
         const progres = lastSession?.progress || '<span class="text-muted">-</span>';
         const target = lastSession?.next || '<span class="text-muted">-</span>';
-        const dosenName = verifData[week]?.dosenName || lastSession?.dosen?.name || '';
+        const dosenName = verifData[week]?.dosenName || lastSession?.verified_by || lastSession?.dosen?.name || '';
         return [`<tr>
           <td><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>
           <td>${badge}${cat}</td>
@@ -206,7 +206,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
         const keBadge = rowCount > 1 ? `<div class="ke-text">Bimbingan ke-${s.ke ?? si + 1}</div>` : '';
         const progres = s.progress || '<span class="text-muted">-</span>';
         const target = s.next || '<span class="text-muted">-</span>';
-        const dosenName = s.dosen?.name || verifData[week]?.dosenName || '';
+        const dosenName = s.verified_by || verifData[week]?.dosenName || s.dosen?.name || '';
         const periodCell = si === 0
           ? `<td rowspan="${rowCount}" style="vertical-align:top"><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>`
           : '';

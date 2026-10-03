@@ -263,7 +263,7 @@ export function printStudentHistory(student, weekColumns, verifData = {}) {
       const progres = upd.progress || '<span class="text-muted">-</span>';
       const target = upd.next || '<span class="text-muted">-</span>';
       const category = upd.category || '';
-      const dosenName = verif?.dosenName || '';
+      const dosenName = verif?.dosenName || upd.sessions?.[0]?.verified_by || '';
       return [`<tr>
         <td><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>
         <td><span class="badge badge-verified">&#10003; Terverifikasi</span>${category ? `<div class="cat-text">${category}</div>` : ''}</td>
@@ -278,7 +278,7 @@ export function printStudentHistory(student, weekColumns, verifData = {}) {
       const progres = s.progress || '<span class="text-muted">-</span>';
       const target = s.next || '<span class="text-muted">-</span>';
       const category = s.category || '';
-      const dosenName = s.dosen?.name || verif?.dosenName || '';
+      const dosenName = s.verified_by || verif?.dosenName || s.dosen?.name || '';
       const keBadge = rowCount > 1 ? `<div class="ke-text">Bimbingan ke-${s.ke ?? si + 1}</div>` : '';
       const periodCell = si === 0
         ? `<td rowspan="${rowCount}" style="vertical-align:top"><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>`
