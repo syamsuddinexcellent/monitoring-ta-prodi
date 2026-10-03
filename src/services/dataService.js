@@ -474,15 +474,19 @@ export async function mergeSupabaseReports(students) {
             sessionVerified,
           };
         });
+        // Supabase is the sole source of truth for reported status.
+        // Reset all Google Sheets weeks to reported: false, then overlay Supabase data.
         return students.map(student => {
-          const reports = byNim[student.nim];
-          if (!reports) return student;
-          const mergedUpdates = { ...student.weeklyUpdates };
-          Object.entries(reports).forEach(([week, report]) => {
-            if (!mergedUpdates[week]?.reported) {
-              mergedUpdates[week] = { ...report, _appReport: true };
-            }
+          const mergedUpdates = {};
+          Object.entries(student.weeklyUpdates || {}).forEach(([week, update]) => {
+            mergedUpdates[week] = { ...update, reported: false };
           });
+          const reports = byNim[student.nim];
+          if (reports) {
+            Object.entries(reports).forEach(([week, report]) => {
+              mergedUpdates[week] = { ...(mergedUpdates[week] || {}), ...report };
+            });
+          }
           return { ...student, weeklyUpdates: mergedUpdates };
         });
       }
