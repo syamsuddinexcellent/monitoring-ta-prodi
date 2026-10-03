@@ -228,7 +228,7 @@ export default function StudentDetailModal({
                                     <div className="flex items-center gap-1.5 flex-wrap flex-1">
                                       {s.dosen && (
                                         <span className="text-[11px] bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
-                                          {s.dosen.label} · {s.dosen.name.split(',')[0]}
+                                          {s.dosen.label} · {s.dosen.name}
                                         </span>
                                       )}
                                       {s.tanggal && (
@@ -290,7 +290,7 @@ export default function StudentDetailModal({
                                 <span className="text-[11px] text-slate-500">Bimbingan dengan:</span>
                                 {update.dosenHadir.map(d => (
                                   <span key={d.label} className="text-[11px] bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
-                                    {d.label} · {d.name.split(',')[0]}
+                                    {d.label} · {d.name}
                                   </span>
                                 ))}
                               </div>
