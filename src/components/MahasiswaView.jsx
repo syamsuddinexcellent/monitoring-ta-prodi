@@ -151,7 +151,15 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
     const cnt = getSessionCount(mergedUpdates[week]);
     if (cnt >= MAX_SESSIONS) return false;
     const range = parseWeekRange(week);
-    if (range && new Date() > getSubmitDeadline(range.end)) return false;
+    if (range) {
+      // Angkatan 2023: extended deadline for Periode 2-4 until Oct 11 2026 23:59
+      const EXTENDED_WEEKS_2023 = ['07 - 11 September 26', '14 - 18 September 26', '21 - 25 September 26'];
+      if (student?.angkatan === '2023' && EXTENDED_WEEKS_2023.includes(week)) {
+        if (new Date() > new Date(2026, 9, 11, 23, 59, 59, 999)) return false;
+      } else {
+        if (new Date() > getSubmitDeadline(range.end)) return false;
+      }
+    }
     return true;
   };
 
