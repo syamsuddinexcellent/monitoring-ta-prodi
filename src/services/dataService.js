@@ -478,8 +478,8 @@ export async function mergeSupabaseReports(students) {
         // Reset all Google Sheets weeks to reported: false, then overlay Supabase data.
         return students.map(student => {
           const mergedUpdates = {};
-          Object.entries(student.weeklyUpdates || {}).forEach(([week, update]) => {
-            mergedUpdates[week] = { ...update, reported: false };
+          Object.entries(student.weeklyUpdates || {}).forEach(([week]) => {
+            mergedUpdates[week] = { reported: false };
           });
           const reports = byNim[student.nim];
           if (reports) {
