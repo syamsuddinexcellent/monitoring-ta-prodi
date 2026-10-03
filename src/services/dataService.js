@@ -37,6 +37,7 @@ export const TABS_CONFIG = [
 ];
 
 export const ORDERED_DEFAULT_WEEKS = [
+  '30 - 04 September 26',
   '07 - 11 September 26',
   '14 - 18 September 26',
   '21 - 25 September 26',
@@ -445,7 +446,7 @@ export function mergeLocalReports(students) {
 }
 
 // Merge laporan dari Supabase ke data mahasiswa (async, fallback ke localStorage).
-// Hanya laporan yang sudah diverifikasi dosen yang masuk ke tampilan utama.
+// Semua laporan (terverifikasi maupun belum) masuk ke tampilan utama; verified ditandai via verifData.
 export async function mergeSupabaseReports(students) {
   if (supabase) {
     try {
@@ -460,7 +461,6 @@ export async function mergeSupabaseReports(students) {
           const inVerifikasi = verifiedSet.has(`${r.nim}:${r.week}`);
           const rawSessions = r.dosen_hadir?.sessions;
           const sessionVerified = !inVerifikasi && Array.isArray(rawSessions) && rawSessions.some(s => s.verified_at);
-          if (!inVerifikasi && !sessionVerified) return;
           if (!byNim[r.nim]) byNim[r.nim] = {};
           byNim[r.nim][r.week] = {
             reported: true,
