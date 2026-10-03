@@ -78,7 +78,7 @@ export default function StudentTable({
               <th className="py-3.5 px-3 w-10 text-center">No</th>
               <th className="py-3.5 px-4 min-w-[190px]">Mahasiswa</th>
               <th className="py-3.5 px-4 min-w-[170px]">Pembimbing</th>
-              <th className="py-3.5 px-4 min-w-[130px]">Status TA</th>
+              <th className="py-3.5 px-4 min-w-[130px]">Status / Target</th>
               {(isAdmin || isDosen) && <th className="py-3.5 px-4 min-w-[130px]">WhatsApp</th>}
               <th className="py-3.5 px-4 min-w-[90px]">Lapor</th>
               <th className="py-3.5 px-4 min-w-[140px]">Tahapan</th>
@@ -226,10 +226,10 @@ export default function StudentTable({
                     )}
                   </td>
 
-                  {/* WhatsApp — hanya untuk admin & dosen */}
+                  {/* WhatsApp — hanya untuk admin & dosen P1 */}
                   {(isAdmin || isDosen) && (
                     <td className="py-3.5 px-4">
-                      {student.phone && !update.reported ? (
+                      {(isAdmin || student.pembimbing1 === dosenName) && student.phone && !update.reported ? (
                         <button
                           onClick={handleDirectWA}
                           className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-mono font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors"
@@ -328,6 +328,26 @@ export default function StudentTable({
                           <span>{isSentThis ? 'Terkirim!' : 'Auto'}</span>
                         </button>
                       )}
+
+                      {/* WA Reminder — dosen P1 only */}
+                      {isDosen && student.phone && !update.reported && student.pembimbing1 === dosenName && (() => {
+                        const msg = encodeURIComponent(
+                          `Halo ${student.nama}, mohon segera melakukan bimbingan dengan saya selaku Pembimbing 1 (P1) terkait progres Tugas Akhir periode ini. Jika sudah melakukan bimbingan selain dengan saya selaku Pembimbing 1 (P1), maka hiraukan pesan ini. Terima kasih 🙏`
+                        );
+                        return (
+                          <a
+                            href={`https://wa.me/${student.phone?.replace(/\D/g, '')}?text=${msg}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-2 py-1 rounded-md text-xs font-semibold flex items-center gap-1 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 transition-colors"
+                            title="Kirim pengingat WhatsApp ke mahasiswa"
+                            onClick={e => e.stopPropagation()}
+                          >
+                            <MessageCircle className="w-3 h-3" />
+                            <span>WA</span>
+                          </a>
+                        );
+                      })()}
 
                       {/* Format modal button — admin only */}
                       {isAdmin && (

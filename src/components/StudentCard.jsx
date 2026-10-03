@@ -276,8 +276,8 @@ export default function StudentCard({
             <span>{update.category}</span>
           </span>
 
-          {/* WhatsApp Direct Badge — admin & dosen only, hanya Belum Lapor */}
-          {(isAdmin || isDosen) && (hasPhone && !update.reported ? (
+          {/* WhatsApp Direct Badge — admin & dosen P1 only, hanya Belum Lapor */}
+          {(isAdmin || (isDosen && student.pembimbing1 === dosenName)) && (hasPhone && !update.reported ? (
             <div className="inline-flex items-center gap-1 text-xs bg-emerald-50/80 border border-emerald-200/80 text-emerald-800 rounded-md px-2 py-0.5 font-medium">
               <Phone className="w-3 h-3 text-emerald-600" />
               <button
