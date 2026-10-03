@@ -237,6 +237,19 @@ export default function StudentDetailModal({
                                           {new Date(s.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                                         </span>
                                       )}
+                                      {isMulti && (
+                                        s.verified_at ? (
+                                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <ShieldCheck className="w-3 h-3" />
+                                            Terverifikasi
+                                          </span>
+                                        ) : (
+                                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                            <Clock className="w-3 h-3" />
+                                            Belum
+                                          </span>
+                                        )
+                                      )}
                                     </div>
                                   </div>
                                   {/* Per-session progress + next (only when multi-session) */}
