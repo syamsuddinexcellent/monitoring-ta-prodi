@@ -393,7 +393,7 @@ export default function LaporanMasukModal({ isOpen, onClose, dosenName }) {
 
   if (!isOpen) return null;
 
-  const unread = laporan.filter(r => !r.read).length;
+  const unread = laporan.filter(r => !r.read && !verifData[r.nim]?.[r.week]?.verified).length;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">

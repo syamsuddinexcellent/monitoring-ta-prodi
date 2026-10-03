@@ -123,8 +123,13 @@ export default function App() {
   const refreshLaporanCount = useCallback(async () => {
     if (loggedInUser?.role === 'dosen' && loggedInUser?.lecturerName) {
       try {
-        const list = await getDosenLaporan(loggedInUser.lecturerName);
-        setLaporanMasukCount(list.filter(r => !r.read).length);
+        const [list, verif] = await Promise.all([
+          getDosenLaporan(loggedInUser.lecturerName),
+          getVerifikasi(),
+        ]);
+        setLaporanMasukCount(
+          list.filter(r => !r.read && !verif[r.nim]?.[r.week]?.verified).length
+        );
       } catch {}
     } else {
       setLaporanMasukCount(0);
