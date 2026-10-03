@@ -276,8 +276,8 @@ export default function StudentCard({
             <span>{update.category}</span>
           </span>
 
-          {/* WhatsApp Direct Badge — admin & dosen only */}
-          {(isAdmin || isDosen) && (hasPhone ? (
+          {/* WhatsApp Direct Badge — admin & dosen only, hanya Belum Lapor */}
+          {(isAdmin || isDosen) && (hasPhone && !update.reported ? (
             <div className="inline-flex items-center gap-1 text-xs bg-emerald-50/80 border border-emerald-200/80 text-emerald-800 rounded-md px-2 py-0.5 font-medium">
               <Phone className="w-3 h-3 text-emerald-600" />
               <button
@@ -299,6 +299,8 @@ export default function StudentCard({
                 )}
               </button>
             </div>
+          ) : hasPhone ? (
+            <span className="font-mono text-[11px] text-slate-500">{phoneDisplay}</span>
           ) : (
             <span className="text-[11px] text-slate-400 italic">
               Nomor WA belum ada
@@ -409,7 +411,7 @@ export default function StudentCard({
 
         <div className="flex items-center gap-1.5">
           {/* Quick Auto Send Button */}
-          {isGatewayConnected && hasPhone && !update.reported && (
+          {isAdmin && isGatewayConnected && hasPhone && !update.reported && (
             <button
               onClick={handleQuickAutoSend}
               disabled={autoSending}
@@ -438,7 +440,7 @@ export default function StudentCard({
           )}
 
           {/* WA Reminder Button — dosen only */}
-          {isDosen && hasPhone && !update.reported && (() => {
+          {isDosen && hasPhone && !update.reported && student.pembimbing1 === dosenName && (() => {
             const role = dosenName
               ? student.pembimbing1 === dosenName ? 'Pembimbing 1 (P1)'
               : student.pembimbing2 === dosenName ? 'Pembimbing 2 (P2)'

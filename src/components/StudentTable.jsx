@@ -159,13 +159,15 @@ export default function StudentTable({
 
                   {/* Status / Target */}
                   <td className="py-3.5 px-4 text-xs">
-                    <span className="font-medium text-slate-700 block">
-                      {student.statusTA || '-'}
-                    </span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-slate-400 font-normal shrink-0">Status:</span>
+                      <span className="font-medium text-slate-700">{student.statusTA || '-'}</span>
+                    </div>
                     {student.target && (
-                      <span className="text-[11px] text-brand-700 font-medium block mt-0.5">
-                        {student.target}
-                      </span>
+                      <div className="flex items-baseline gap-1 mt-0.5">
+                        <span className="text-slate-400 font-normal shrink-0">Target:</span>
+                        <span className="text-[11px] text-brand-700 font-medium">{student.target}</span>
+                      </div>
                     )}
                   </td>
 
