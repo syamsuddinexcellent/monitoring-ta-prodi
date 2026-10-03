@@ -164,145 +164,113 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
   };
 
   const handlePrintPDF = () => {
-    const weeksReversed = [...weekColumns].reverse();
     const printWin = window.open('', '_blank');
     if (!printWin) return;
 
-    const fmtTgl = (str) => str
-      ? new Date(str + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
-      : null;
+    const reportedCount = weekColumns.filter(w => isWeekVerified(w) || mergedUpdates[w]?.reported).length;
+    const totalCount = weekColumns.length;
+    const pctVal = totalCount > 0 ? Math.round((reportedCount / totalCount) * 100) : 0;
 
-    const periodeCards = weeksReversed.map((week, idx) => {
+    const tableRows = weekColumns.map((week, idx) => {
       const update = mergedUpdates[week];
       const verified = isWeekVerified(week);
       const sessions = update ? getSessions(update) : [];
-      const num = weekColumns.length - idx;
+      const num = idx + 1;
+      const lastSession = sessions[sessions.length - 1];
 
-      const statusBadge = verified
-        ? `<span class="badge badge-verified">✓ Terverifikasi</span>`
+      const badge = verified
+        ? `<span class="badge badge-verified">&#10003; Terverifikasi</span>`
         : update?.reported
-        ? `<span class="badge badge-lapor">Sudah Lapor</span>`
-        : `<span class="badge badge-belum">⚠ Belum Lapor</span>`;
+        ? `<span class="badge badge-sudah">Sudah Lapor</span>`
+        : `<span class="badge badge-belum">Belum Lapor</span>`;
 
-      const sessionCards = sessions.length > 0 ? sessions.map(s => `
-        <div class="session-card">
-          <div class="session-meta">
-            <span class="pill pill-ke">Bimbingan ke-${s.ke}</span>
-            ${s.category ? `<span class="pill pill-cat">● ${s.category}</span>` : ''}
-          </div>
-          ${fmtTgl(s.tanggal) ? `<div class="session-date">📅 ${fmtTgl(s.tanggal)}${s.dosen?.name ? ` · ${s.dosen.name}` : ''}</div>` : ''}
-          <div class="section-block">
-            <div class="section-label">PROGRES</div>
-            <div class="section-text">${s.progress || '-'}</div>
-          </div>
-          <div class="section-block target-block">
-            <div class="section-label">TARGET BERIKUTNYA</div>
-            <div class="section-text target-text">→ ${s.next || '-'}</div>
-          </div>
-        </div>
-      `).join('') : `<p class="empty-text">Belum ada laporan bimbingan untuk periode ini.</p>`;
+      const cat = lastSession?.category ? `<div class="cat-text">${lastSession.category}</div>` : '';
+      const progres = lastSession?.progress || '<span class="text-muted">-</span>';
+      const target = lastSession?.next || '<span class="text-muted">-</span>';
 
-      const leftBorderColor = verified ? '#4ade80' : update?.reported ? '#60a5fa' : '#f87171';
-
-      return `
-        <div class="periode-card" style="border-left:4px solid ${leftBorderColor}"
-          <div class="periode-header">
-            <div>
-              <strong class="periode-num">Periode ${num}</strong>
-              <span class="periode-range">(${week})</span>
-            </div>
-            ${statusBadge}
-          </div>
-          ${sessionCards}
-        </div>
-      `;
+      return `<tr>
+        <td><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>
+        <td>${badge}${cat}</td>
+        <td>${progres}</td>
+        <td>${target}</td>
+      </tr>`;
     }).join('');
+
+    const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    const p1 = student.pembimbing1 || '-';
+    const p2 = student.pembimbing2 || '-';
 
     const html = `<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
 <title>Riwayat Bimbingan TA — ${student.nama}</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',system-ui,Arial,sans-serif;color:#1e293b;background:#f8fafc;padding:28px}
-  @media print{body{background:#fff;padding:12px}@page{margin:12mm 10mm;size:A4 portrait}}
+  body{font-family:'Segoe UI',system-ui,Arial,sans-serif;color:#1e293b;background:#fff;padding:32px 40px}
+  @media print{body{padding:0}@page{margin:12mm 10mm;size:A4 portrait}.no-print{display:none!important}}
 
-  /* Header */
-  .doc-header{background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;border-radius:14px;padding:20px 24px;margin-bottom:20px}
-  .doc-header h1{font-size:18px;font-weight:800;letter-spacing:-.01em}
-  .doc-header p{font-size:11px;opacity:.85;margin-top:3px}
+  .top-bar{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+  .doc-title h1{font-size:20px;font-weight:800;color:#0f172a}
+  .doc-title p{font-size:12px;color:#64748b;margin-top:3px}
+  .print-btn{background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
 
-  /* Profile card */
-  .profile-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px 20px;margin-bottom:20px;display:grid;grid-template-columns:1fr 1fr;gap:8px 24px}
-  .profile-field{}
+  .profile-card{border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;margin-bottom:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px 24px}
   .profile-label{font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
   .profile-value{font-size:13px;font-weight:600;color:#1e293b}
-  .profile-value.mono{font-family:monospace;font-size:12px}
+  .profile-value.mono{font-family:monospace}
 
-  /* Section title */
-  .section-title{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-  .section-title::after{content:'';flex:1;height:1px;background:#e2e8f0}
+  .progress-info{display:inline-flex;align-items:center;gap:8px;background:#dcfce7;color:#166534;font-size:12px;font-weight:700;padding:5px 14px;border-radius:999px;margin-bottom:16px}
+  .progress-pct{background:#16a34a;color:#fff;border-radius:999px;padding:1px 9px;font-size:11px;font-weight:700}
 
-  /* Periode card */
-  .periode-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:12px;page-break-inside:avoid}
-  .periode-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-  .periode-num{font-size:14px;font-weight:700;color:#1e293b}
-  .periode-range{font-size:12px;color:#64748b;margin-left:6px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead th{font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;padding:8px 12px;text-align:left;border-bottom:2px solid #e2e8f0;background:#f8fafc}
+  tbody tr{border-bottom:1px solid #f1f5f9}
+  tbody tr:last-child{border-bottom:none}
+  tbody td{padding:12px;vertical-align:top;line-height:1.6}
+  th:first-child,td:first-child{width:130px}
+  th:nth-child(2),td:nth-child(2){width:140px}
 
-  /* Session card */
-  .session-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;margin-top:8px}
-  .session-meta{display:flex;align-items:center;gap:6px;margin-bottom:6px}
-  .session-date{font-size:11px;color:#64748b;margin-bottom:8px}
-  .pill{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid}
-  .pill-ke{background:#ede9fe;color:#5b21b6;border-color:#ddd6fe}
-  .pill-cat{background:#f1f5f9;color:#475569;border-color:#e2e8f0}
+  .p-label{font-size:15px;font-weight:800;color:#0f172a}
+  .p-range{font-size:11px;color:#94a3b8;margin-top:2px}
 
-  /* Progres / Target */
-  .section-block{margin-bottom:6px}
-  .section-label{font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
-  .section-text{font-size:13px;color:#1e293b;line-height:1.5}
-  .target-block{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px}
-  .target-text{color:#4f46e5;font-weight:500}
+  .badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;display:inline-block}
+  .badge-verified{background:#dcfce7;color:#166534}
+  .badge-sudah{background:#d1fae5;color:#065f46}
+  .badge-belum{background:#fee2e2;color:#991b1b}
+  .cat-text{font-size:11px;color:#64748b;margin-top:5px}
+  .text-muted{color:#94a3b8}
 
-  /* Badges */
-  .badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid;white-space:nowrap}
-  .badge-verified{background:#dcfce7;color:#166534;border-color:#bbf7d0}
-  .badge-lapor{background:#dbeafe;color:#1e40af;border-color:#bfdbfe}
-  .badge-belum{background:#fee2e2;color:#991b1b;border-color:#fecaca}
-  .empty-text{color:#94a3b8;font-style:italic;font-size:13px;margin-top:4px}
-
-  /* Footer */
-  .doc-footer{margin-top:20px;padding-top:10px;border-top:1px solid #e2e8f0;text-align:right;font-size:11px;color:#94a3b8}
+  .doc-footer{margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;text-align:right;font-size:11px;color:#94a3b8}
 </style></head><body>
 
-<div class="doc-header">
-  <h1>Riwayat Bimbingan Tugas Akhir</h1>
-  <p>Program Studi Sains Data · Institut Teknologi Sumatera · Semester Ganjil 2026/2027</p>
+<div class="top-bar">
+  <div class="doc-title">
+    <h1>Riwayat Bimbingan Tugas Akhir</h1>
+    <p>Program Studi Sains Data &middot; Semester Ganjil 2026/2027</p>
+  </div>
+  <button class="print-btn no-print" onclick="window.print()">Cetak / Simpan PDF</button>
 </div>
 
 <div class="profile-card">
-  <div class="profile-field">
-    <div class="profile-label">Nama</div>
-    <div class="profile-value">${student.nama}</div>
-  </div>
-  <div class="profile-field">
-    <div class="profile-label">Angkatan</div>
-    <div class="profile-value">${student.angkatan}</div>
-  </div>
-  <div class="profile-field">
-    <div class="profile-label">NIM</div>
-    <div class="profile-value mono">${student.nim}</div>
-  </div>
-  <div class="profile-field">
-    <div class="profile-label">Status TA</div>
-    <div class="profile-value">${student.statusTA || '-'}</div>
-  </div>
-  ${student.pembimbing1 ? `<div class="profile-field"><div class="profile-label">Pembimbing 1</div><div class="profile-value">${student.pembimbing1}</div></div>` : ''}
-  ${student.pembimbing2 ? `<div class="profile-field"><div class="profile-label">Pembimbing 2</div><div class="profile-value">${student.pembimbing2}</div></div>` : ''}
+  <div><div class="profile-label">Nama</div><div class="profile-value">${student.nama}</div></div>
+  <div><div class="profile-label">NIM</div><div class="profile-value mono">${student.nim}</div></div>
+  <div><div class="profile-label">Angkatan</div><div class="profile-value">${student.angkatan}</div></div>
+  <div><div class="profile-label">Pembimbing 1</div><div class="profile-value">${p1}</div></div>
+  <div><div class="profile-label">Pembimbing 2</div><div class="profile-value">${p2}</div></div>
+  <div><div class="profile-label">Status TA</div><div class="profile-value">${student.statusTA || '-'}</div></div>
 </div>
 
-<div class="section-title">Riwayat Bimbingan</div>
-${periodeCards}
+<div class="progress-info">
+  ${reportedCount} dari ${totalCount} periode terlaporkan
+  <span class="progress-pct">${pctVal}%</span>
+</div>
 
-<div class="doc-footer">Dicetak dari Sistem Monitoring TA Prodi Sains Data · ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+<table>
+  <thead><tr>
+    <th>Periode</th><th>Status</th><th>Progres</th><th>Target Berikutnya</th>
+  </tr></thead>
+  <tbody>${tableRows}</tbody>
+</table>
+
+<div class="doc-footer">Dicetak dari Sistem Monitoring TA Prodi Sains Data &middot; ${todayStr}</div>
 <script>window.onload=function(){window.print()}</script>
 </body></html>`;
 
