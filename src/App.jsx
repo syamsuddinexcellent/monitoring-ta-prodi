@@ -283,6 +283,25 @@ export default function App() {
     });
   };
 
+  // Realtime sync: re-apply student_overrides whenever admin changes them
+  useEffect(() => {
+    if (!supabase) return;
+    const channel = supabase
+      .channel('student-overrides-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'student_overrides' }, async () => {
+        setData(prev => {
+          if (!prev?.students) return prev;
+          // Re-apply overrides asynchronously then update state
+          applyStudentOverrides(prev.students).then(updated => {
+            setData(p => p ? { ...p, students: updated } : p);
+          });
+          return prev;
+        });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
   const fetchData = async () => {
     try {
       const result = await loadMonitoringData();
