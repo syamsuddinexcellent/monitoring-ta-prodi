@@ -174,6 +174,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
     const tableRows = weekColumns.map((week, idx) => {
       const update = mergedUpdates[week];
       const verified = isWeekVerified(week);
+      if (!verified) return '';
       const sessions = update ? getSessions(update) : [];
       const num = idx + 1;
       const lastSession = sessions[sessions.length - 1];
