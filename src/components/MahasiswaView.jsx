@@ -661,8 +661,13 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
                                 <ShieldCheck className="w-3.5 h-3.5" />
                                 Sudah diverifikasi · tidak dapat diedit
                               </span>
+                            ) : isLocked ? (
+                              <span className="flex items-center gap-1 text-[11px] font-semibold text-slate-500">
+                                <Lock className="w-3.5 h-3.5" />
+                                Dikunci · tidak dapat diedit
+                              </span>
                             ) : null}
-                            {isFromApp && !weekVerified ? (
+                            {isFromApp && !weekVerified && !isLocked ? (
                               <>
                                 {sessions.length <= 1 && (
                                   <button
