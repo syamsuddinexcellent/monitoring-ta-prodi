@@ -209,10 +209,10 @@ export default function StudentCard({
               </span>
             </div>
           )}
-          {(student.target || isDosen) && (
+          {(student.target || (isDosen && student.pembimbing1 === dosenName)) && (
             <div className="flex items-center justify-between gap-1 pt-0.5">
               <span className="text-slate-400 shrink-0">Target:</span>
-              {isDosen && onUpdateTarget ? (
+              {isDosen && onUpdateTarget && student.pembimbing1 === dosenName ? (
                 editingTarget ? (
                   <div className="flex items-center gap-1 flex-1 justify-end">
                     <input
