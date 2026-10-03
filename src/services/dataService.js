@@ -462,14 +462,20 @@ export async function mergeSupabaseReports(students) {
           const rawSessions = r.dosen_hadir?.sessions;
           const sessionVerified = !inVerifikasi && Array.isArray(rawSessions) && rawSessions.some(s => s.verified_at);
           if (!byNim[r.nim]) byNim[r.nim] = {};
+          const sessions = rawSessions || [];
+          const dosenHadir = Array.isArray(r.dosen_hadir)
+            ? r.dosen_hadir
+            : sessions.length > 0
+              ? sessions.map(s => s.dosen).filter(Boolean)
+              : (r.dosen_hadir?.list || []);
           byNim[r.nim][r.week] = {
             reported: true,
             category: r.category,
             progress: r.progress,
             next: r.next_target,
-            dosenHadir: Array.isArray(r.dosen_hadir) ? r.dosen_hadir : (r.dosen_hadir?.list || []),
-            sessions: rawSessions || [],
-            tanggalBimbingan: Array.isArray(r.dosen_hadir) ? null : (r.dosen_hadir?.tanggal || null),
+            dosenHadir,
+            sessions,
+            tanggalBimbingan: Array.isArray(r.dosen_hadir) ? null : (r.dosen_hadir?.tanggal || sessions[0]?.tanggal || null),
             submittedAt: r.submitted_at,
             sessionVerified,
           };

@@ -211,22 +211,49 @@ export default function StudentDetailModal({
                             </div>
                           </div>
                         )}
-                        {update.tanggalBimbingan && (
-                          <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
-                            <CalendarDays className="w-3.5 h-3.5 text-slate-400" />
-                            <span>Tanggal bimbingan: <span className="font-semibold text-slate-700">{new Date(update.tanggalBimbingan + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></span>
-                          </div>
-                        )}
-                        {update.dosenHadir?.length > 0 && (
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <UserCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                            <span className="text-[11px] text-slate-500">Bimbingan dengan:</span>
-                            {update.dosenHadir.map(d => (
-                              <span key={d.label} className="text-[11px] bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
-                                {d.label} · {d.name.split(',')[0]}
-                              </span>
+                        {update.sessions?.length > 0 ? (
+                          <div className="space-y-1.5 mt-1">
+                            {update.sessions.map((s, si) => (
+                              <div key={si} className="flex items-center gap-2 flex-wrap">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">
+                                  Bimbingan ke-{s.ke ?? si + 1}
+                                </span>
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  {s.dosen && (
+                                    <span className="text-[11px] bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
+                                      {s.dosen.label} · {s.dosen.name.split(',')[0]}
+                                    </span>
+                                  )}
+                                  {s.tanggal && (
+                                    <span className="text-[11px] text-slate-500 flex items-center gap-1">
+                                      <CalendarDays className="w-3 h-3 text-slate-400" />
+                                      {new Date(s.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
                             ))}
                           </div>
+                        ) : (
+                          <>
+                            {update.tanggalBimbingan && (
+                              <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                                <CalendarDays className="w-3.5 h-3.5 text-slate-400" />
+                                <span>Tanggal bimbingan: <span className="font-semibold text-slate-700">{new Date(update.tanggalBimbingan + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></span>
+                              </div>
+                            )}
+                            {update.dosenHadir?.length > 0 && (
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <UserCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                <span className="text-[11px] text-slate-500">Bimbingan dengan:</span>
+                                {update.dosenHadir.map(d => (
+                                  <span key={d.label} className="text-[11px] bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
+                                    {d.label} · {d.name.split(',')[0]}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </>
                         )}
                       </div>
                     ) : (
