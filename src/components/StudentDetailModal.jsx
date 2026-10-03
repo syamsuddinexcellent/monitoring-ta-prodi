@@ -189,50 +189,79 @@ export default function StudentDetailModal({
                     {/* Progress Detail */}
                     {reported ? (
                       <div className="space-y-2 mt-2 text-xs">
-                        <div className="bg-white p-2.5 rounded-lg border border-slate-100">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">
-                            Progres:
-                          </span>
-                          <p className="text-slate-800 font-medium leading-relaxed">
-                            {update.progress}
-                          </p>
-                        </div>
-
-                        {update.next && (
-                          <div className="bg-brand-50/50 p-2.5 rounded-lg border border-brand-100 flex items-start gap-1.5">
-                            <ArrowRight className="w-3.5 h-3.5 text-brand-600 shrink-0 mt-0.5" />
-                            <div>
-                              <span className="text-[10px] font-bold text-brand-700 uppercase tracking-wider block">
-                                Target Berikutnya:
+                        {/* Single session: shared progress/next shown at top */}
+                        {(!update.sessions || update.sessions.length <= 1) && (
+                          <>
+                            <div className="bg-white p-2.5 rounded-lg border border-slate-100">
+                              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">
+                                Progres:
                               </span>
-                              <p className="text-slate-900 font-semibold">
-                                {update.next}
+                              <p className="text-slate-800 font-medium leading-relaxed">
+                                {update.progress}
                               </p>
                             </div>
-                          </div>
-                        )}
-                        {update.sessions?.length > 0 ? (
-                          <div className="space-y-1.5 mt-2">
-                            {update.sessions.map((s, si) => (
-                              <div key={si} className="flex items-center gap-2 bg-white border border-slate-100 rounded-lg pl-2.5 pr-3 py-1.5 border-l-[3px] border-l-indigo-300">
-                                <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider shrink-0 min-w-[56px]">
-                                  ke-{s.ke ?? si + 1}
-                                </span>
-                                <div className="flex items-center gap-1.5 flex-wrap flex-1">
-                                  {s.dosen && (
-                                    <span className="text-[11px] bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
-                                      {s.dosen.label} · {s.dosen.name.split(',')[0]}
-                                    </span>
-                                  )}
-                                  {s.tanggal && (
-                                    <span className="text-[11px] text-slate-500 flex items-center gap-1">
-                                      <CalendarDays className="w-3 h-3 text-slate-400" />
-                                      {new Date(s.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                    </span>
-                                  )}
+                            {update.next && (
+                              <div className="bg-brand-50/50 p-2.5 rounded-lg border border-brand-100 flex items-start gap-1.5">
+                                <ArrowRight className="w-3.5 h-3.5 text-brand-600 shrink-0 mt-0.5" />
+                                <div>
+                                  <span className="text-[10px] font-bold text-brand-700 uppercase tracking-wider block">
+                                    Target Berikutnya:
+                                  </span>
+                                  <p className="text-slate-900 font-semibold">{update.next}</p>
                                 </div>
                               </div>
-                            ))}
+                            )}
+                          </>
+                        )}
+
+                        {update.sessions?.length > 0 ? (
+                          <div className="space-y-2 mt-1">
+                            {update.sessions.map((s, si) => {
+                              const isMulti = update.sessions.length > 1;
+                              return (
+                                <div key={si} className="bg-white border border-slate-100 rounded-lg border-l-[3px] border-l-indigo-300 overflow-hidden">
+                                  {/* Header: ke + dosen + tanggal */}
+                                  <div className="flex items-center gap-2 pl-2.5 pr-3 py-1.5 flex-wrap">
+                                    <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider shrink-0 min-w-[56px]">
+                                      ke-{s.ke ?? si + 1}
+                                    </span>
+                                    <div className="flex items-center gap-1.5 flex-wrap flex-1">
+                                      {s.dosen && (
+                                        <span className="text-[11px] bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
+                                          {s.dosen.label} · {s.dosen.name.split(',')[0]}
+                                        </span>
+                                      )}
+                                      {s.tanggal && (
+                                        <span className="text-[11px] text-slate-500 flex items-center gap-1">
+                                          <CalendarDays className="w-3 h-3 text-slate-400" />
+                                          {new Date(s.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  {/* Per-session progress + next (only when multi-session) */}
+                                  {isMulti && (s.progress || s.next) && (
+                                    <div className="border-t border-slate-100 px-3 pb-2 pt-1.5 ml-2 space-y-1">
+                                      {s.progress && (
+                                        <p className="text-[11px] text-slate-700 leading-relaxed">
+                                          <span className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Progres: </span>
+                                          {s.progress}
+                                        </p>
+                                      )}
+                                      {s.next && (
+                                        <div className="flex items-start gap-1">
+                                          <ArrowRight className="w-3 h-3 text-brand-500 shrink-0 mt-0.5" />
+                                          <p className="text-[11px] text-slate-800 font-semibold leading-relaxed">
+                                            <span className="font-bold text-brand-600 uppercase tracking-wider text-[10px]">Target: </span>
+                                            {s.next}
+                                          </p>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
                           </div>
                         ) : (
                           <>
