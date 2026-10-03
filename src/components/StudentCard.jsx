@@ -409,7 +409,7 @@ export default function StudentCard({
 
         <div className="flex items-center gap-1.5">
           {/* Quick Auto Send Button */}
-          {isGatewayConnected && hasPhone && (
+          {isGatewayConnected && hasPhone && !update.reported && (
             <button
               onClick={handleQuickAutoSend}
               disabled={autoSending}
@@ -438,7 +438,7 @@ export default function StudentCard({
           )}
 
           {/* WA Reminder Button — dosen only */}
-          {isDosen && hasPhone && (() => {
+          {isDosen && hasPhone && !update.reported && (() => {
             const role = dosenName
               ? student.pembimbing1 === dosenName ? 'Pembimbing 1 (P1)'
               : student.pembimbing2 === dosenName ? 'Pembimbing 2 (P2)'
