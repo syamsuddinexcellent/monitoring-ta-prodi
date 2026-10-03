@@ -1761,6 +1761,8 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                       const verif = verifData[l.nim]?.[l.week];
                       const penolakan = penolakanData[l.nim]?.[l.week];
                       const submittedDate = l.submitted_at ? new Date(l.submitted_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: '2-digit' }) : '-';
+                      const mhsData = mergedStudents.find(s => s.nim === l.nim);
+                      const pembimbing = [mhsData?.pembimbing1, mhsData?.pembimbing2].filter(Boolean).map(p => p.split(',')[0]).join(' & ');
                       return (
                         <div key={`${l.nim}|${l.week}`} className="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 transition-colors">
                           <div className="flex-1 min-w-0">
@@ -1774,6 +1776,9 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                               {l.category && <span className="text-[9px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">{l.category}</span>}
                               <span className="text-[9px] text-slate-400">{submittedDate}</span>
                             </div>
+                            {status === 'menunggu' && pembimbing && (
+                              <p className="text-[9px] text-amber-700 mt-0.5">Menunggu verifikasi: {pembimbing}</p>
+                            )}
                             {status === 'ditolak' && penolakan?.alasan && (
                               <p className="text-[9px] text-rose-600 mt-0.5 italic">Alasan: {penolakan.alasan}</p>
                             )}
