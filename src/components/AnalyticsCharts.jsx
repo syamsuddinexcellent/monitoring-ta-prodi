@@ -111,7 +111,7 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
                 const waMsg = encodeURIComponent(
                   `Halo ${s.nama}, mohon segera mengisi laporan progres bimbingan TA untuk periode ini. Terima kasih 🙏`
                 );
-                const waUrl = !lapor && phone ? `https://wa.me/${phone}?text=${waMsg}` : null;
+                const waUrl = !lapor && phone && s.pembimbing1 === dosenName ? `https://wa.me/${phone}?text=${waMsg}` : null;
                 return (
                   <div key={s.nim || i} className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border ${lapor ? 'bg-emerald-50/60 border-emerald-100' : 'bg-rose-50/40 border-rose-100'}`}>
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${lapor ? 'bg-emerald-100' : 'bg-rose-100'}`}>
@@ -255,7 +255,7 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
                     ? `Halo ${s.nama}, mohon segera melakukan bimbingan dengan saya selaku ${roleLabel} terkait progres Tugas Akhir periode ini. Jika sudah melakukan bimbingan selain dengan saya selaku ${roleLabel}, maka hiraukan pesan ini. Terima kasih 🙏`
                     : `Halo ${s.nama}, mohon segera melakukan bimbingan dengan dosen pembimbing Anda terkait progres Tugas Akhir periode ini. Terima kasih 🙏`
                 );
-                const waUrl = phone ? `https://wa.me/${phone}?text=${waMsg}` : null;
+                const waUrl = phone && s.pembimbing1 === dosenName ? `https://wa.me/${phone}?text=${waMsg}` : null;
                 return (
                   <div key={s.nim || i} className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-rose-100 bg-rose-50/40">
                     <div className="w-6 h-6 rounded-full bg-rose-100 flex items-center justify-center shrink-0">

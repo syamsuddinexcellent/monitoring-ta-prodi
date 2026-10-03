@@ -385,8 +385,8 @@ export default function App() {
   const trendData = useMemo(() => {
     if (!data || activePeriods.length === 0) return [];
     const students = isDosen && dosenStudents.length > 0 ? dosenStudents : data.students;
-    return getAllWeeksTrend(students, activePeriods);
-  }, [data, isDosen, dosenStudents, activePeriods]);
+    return getAllWeeksTrend(students, activePeriods, verifData);
+  }, [data, isDosen, dosenStudents, activePeriods, verifData]);
 
   // Distinct angkatan
   const availableAngkatan = useMemo(() => {
@@ -667,6 +667,7 @@ export default function App() {
           isDosen={isDosen}
           dosenStudents={dosenStudents}
           dosenName={loggedInUser?.lecturerName || ''}
+          verifData={verifData}
         />
 
         {/* Content Area Based on View Mode */}
@@ -802,6 +803,14 @@ export default function App() {
                 onOpenGatewayModal={() => setIsGatewayModalOpen(true)}
                 isAdmin={isAdmin}
                 isDosen={isDosen}
+                dosenName={loggedInUser?.lecturerName || ''}
+                onUpdateTarget={async (nim, newTarget) => {
+                  await upsertStudentOverride(nim, { target: newTarget });
+                  setData(prev => {
+                    if (!prev?.students) return prev;
+                    return { ...prev, students: prev.students.map(s => s.nim === nim ? { ...s, target: newTarget } : s) };
+                  });
+                }}
               />
             )}
           </div>

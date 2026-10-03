@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   CheckCircle2,
   AlertCircle,
@@ -7,7 +7,8 @@ import {
   ArrowRight,
   Phone,
   Zap,
-  RefreshCw
+  RefreshCw,
+  Pencil
 } from 'lucide-react';
 import {
   getCategoryBadgeStyle,
@@ -27,9 +28,15 @@ export default function StudentTable({
   onOpenGatewayModal,
   isAdmin = false,
   isDosen = false,
+  dosenName = '',
+  onUpdateTarget = null,
 }) {
   const [sendingNim, setSendingNim] = useState(null);
   const [sentNim, setSentNim] = useState(null);
+  const [editingTargetNim, setEditingTargetNim] = useState(null);
+  const [targetValue, setTargetValue] = useState('');
+  const [savingTarget, setSavingTarget] = useState(false);
+  const targetInputRef = useRef(null);
 
   const isGatewayConnected = gatewayStatus?.isConnected;
 
@@ -163,10 +170,58 @@ export default function StudentTable({
                       <span className="text-slate-400 font-normal shrink-0">Status:</span>
                       <span className="font-medium text-slate-700">{student.statusTA || '-'}</span>
                     </div>
-                    {student.target && (
+                    {(student.target || (isDosen && onUpdateTarget && student.pembimbing1 === dosenName)) && (
                       <div className="flex items-baseline gap-1 mt-0.5">
                         <span className="text-slate-400 font-normal shrink-0">Target:</span>
-                        <span className="text-[11px] text-brand-700 font-medium">{student.target}</span>
+                        {isDosen && onUpdateTarget && student.pembimbing1 === dosenName ? (
+                          editingTargetNim === student.nim ? (
+                            <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                              <input
+                                ref={targetInputRef}
+                                value={targetValue}
+                                onChange={e => setTargetValue(e.target.value)}
+                                onKeyDown={async e => {
+                                  if (e.key === 'Enter') {
+                                    setSavingTarget(true);
+                                    await onUpdateTarget(student.nim, targetValue);
+                                    setSavingTarget(false);
+                                    setEditingTargetNim(null);
+                                  } else if (e.key === 'Escape') {
+                                    setEditingTargetNim(null);
+                                  }
+                                }}
+                                className="text-[11px] border border-brand-300 rounded px-1.5 py-0.5 w-32 focus:outline-none focus:ring-1 focus:ring-brand-400"
+                                autoFocus
+                                placeholder="Isi target..."
+                              />
+                              <button
+                                disabled={savingTarget}
+                                onClick={async e => {
+                                  e.stopPropagation();
+                                  setSavingTarget(true);
+                                  await onUpdateTarget(student.nim, targetValue);
+                                  setSavingTarget(false);
+                                  setEditingTargetNim(null);
+                                }}
+                                className="text-[10px] px-1.5 py-0.5 bg-brand-600 text-white rounded hover:bg-brand-700"
+                              >
+                                {savingTarget ? '...' : 'Simpan'}
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              className="group flex items-center gap-1 text-left hover:text-brand-700"
+                              onClick={e => { e.stopPropagation(); setTargetValue(student.target || ''); setEditingTargetNim(student.nim); }}
+                            >
+                              <span className="text-[11px] text-brand-700 font-medium">
+                                {student.target || <span className="text-slate-400 italic">— atur target</span>}
+                              </span>
+                              <Pencil className="w-3 h-3 opacity-0 group-hover:opacity-60 shrink-0" />
+                            </button>
+                          )
+                        ) : (
+                          student.target && <span className="text-[11px] text-brand-700 font-medium">{student.target}</span>
+                        )}
                       </div>
                     )}
                   </td>
