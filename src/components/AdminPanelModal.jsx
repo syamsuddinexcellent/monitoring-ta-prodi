@@ -298,12 +298,12 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
         const ov = studentOverrides[s.nim] || {};
         return {
           ...s,
-          pembimbing1: ov.pembimbing1 ?? s.pembimbing1,
-          pembimbing2: ov.pembimbing2 ?? s.pembimbing2,
-          penguji1:    ov.penguji1    ?? s.penguji1,
-          penguji2:    ov.penguji2    ?? s.penguji2,
-          phone:       ov.phone       ?? s.phone,
-          statusTA:    ov.status_ta   ?? s.statusTA,
+          pembimbing1: ov.pembimbing1 !== undefined ? ov.pembimbing1 : s.pembimbing1,
+          pembimbing2: ov.pembimbing2 !== undefined ? ov.pembimbing2 : s.pembimbing2,
+          penguji1:    ov.penguji1    !== undefined ? ov.penguji1    : s.penguji1,
+          penguji2:    ov.penguji2    !== undefined ? ov.penguji2    : s.penguji2,
+          phone:       ov.phone       !== undefined ? ov.phone       : s.phone,
+          statusTA:    ov.status_ta   !== undefined ? ov.status_ta   : s.statusTA,
         };
       });
     const customStudents = Object.values(studentOverrides)
