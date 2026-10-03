@@ -170,7 +170,7 @@ export default function StudentTable({
 
                   {/* WhatsApp */}
                   <td className="py-3.5 px-4">
-                    {student.phone ? (
+                    {student.phone && !update.reported ? (
                       <button
                         onClick={handleDirectWA}
                         className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-mono font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors"
@@ -180,7 +180,7 @@ export default function StudentTable({
                         <span>{phoneDisplay}</span>
                       </button>
                     ) : (
-                      <span className="text-slate-400 text-xs italic">-</span>
+                      <span className="text-slate-400 text-xs italic">{student.phone ? phoneDisplay : '-'}</span>
                     )}
                   </td>
 
@@ -247,7 +247,7 @@ export default function StudentTable({
                       </button>
 
                       {/* Quick Auto Send — admin only */}
-                      {isAdmin && isGatewayConnected && student.phone && (
+                      {isAdmin && isGatewayConnected && student.phone && !update.reported && (
                         <button
                           onClick={() => handleQuickAutoSend(student, update)}
                           disabled={isSendingThis}
