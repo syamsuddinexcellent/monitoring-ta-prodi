@@ -113,12 +113,18 @@ function getDosenLaporanSummary() {
   } catch { return []; }
 }
 
+function getDosenFromDH(dh) {
+  if (!dh) return [];
+  if (Array.isArray(dh?.sessions)) return dh.sessions.map(s => s.dosen).filter(Boolean);
+  if (Array.isArray(dh?.list)) return dh.list;
+  if (Array.isArray(dh)) return dh;
+  return [];
+}
+
 function getDosenSummaryFromLaporan(laporan) {
   const map = {};
   laporan.forEach(l => {
-    const dh = l.dosen_hadir;
-    const list = dh?.list || (Array.isArray(dh) ? dh : []);
-    list.forEach(d => {
+    getDosenFromDH(l.dosen_hadir).forEach(d => {
       if (!d?.name) return;
       if (!map[d.name]) map[d.name] = { dosen: d.name, total: 0 };
       map[d.name].total++;
@@ -1873,10 +1879,9 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
                     <p className="px-4 py-3 text-xs text-slate-400 italic">Inbox dosen kosong.</p>
                   ) : (
                     dosenSummary.map(({ dosen, total }) => {
-                      const dosenLaporan = allLaporan.filter(l => {
-                        const list = l.dosen_hadir?.list || (Array.isArray(l.dosen_hadir) ? l.dosen_hadir : []);
-                        return list.some(d => d.name === dosen);
-                      });
+                      const dosenLaporan = allLaporan.filter(l =>
+                        getDosenFromDH(l.dosen_hadir).some(d => d.name === dosen)
+                      );
                       const nVerif = dosenLaporan.filter(l => {
                         const s = getInboxStatus(l.nim, l.week);
                         return s === 'diverifikasi' || s === 'masuk_database';
