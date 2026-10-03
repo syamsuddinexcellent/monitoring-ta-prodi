@@ -187,12 +187,14 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
       const cat = lastSession?.category ? `<div class="cat-text">${lastSession.category}</div>` : '';
       const progres = lastSession?.progress || '<span class="text-muted">-</span>';
       const target = lastSession?.next || '<span class="text-muted">-</span>';
+      const dosenName = lastSession?.dosen?.name || (verified ? '-' : '<span class="text-muted">-</span>');
 
       return `<tr>
         <td><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>
         <td>${badge}${cat}</td>
         <td>${progres}</td>
         <td>${target}</td>
+        <td class="col-ttd"><div class="ttd-space"></div><div class="ttd-name">${dosenName}</div></td>
       </tr>`;
     }).join('');
 
@@ -225,8 +227,11 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
   tbody tr{border-bottom:1px solid #f1f5f9}
   tbody tr:last-child{border-bottom:none}
   tbody td{padding:12px;vertical-align:top;line-height:1.6}
-  th:first-child,td:first-child{width:130px}
-  th:nth-child(2),td:nth-child(2){width:140px}
+  th:first-child,td:first-child{width:120px}
+  th:nth-child(2),td:nth-child(2){width:130px}
+  .col-ttd{width:140px;text-align:center}
+  .ttd-space{height:48px;border-bottom:1px solid #cbd5e1;margin-bottom:6px}
+  .ttd-name{font-size:11px;color:#475569;text-align:center}
 
   .p-label{font-size:15px;font-weight:800;color:#0f172a}
   .p-range{font-size:11px;color:#94a3b8;margin-top:2px}
@@ -265,7 +270,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
 
 <table>
   <thead><tr>
-    <th>Periode</th><th>Status</th><th>Progres</th><th>Target Berikutnya</th>
+    <th>Periode</th><th>Status</th><th>Progres</th><th>Target Berikutnya</th><th class="col-ttd">Tanda Tangan</th>
   </tr></thead>
   <tbody>${tableRows}</tbody>
 </table>
