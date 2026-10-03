@@ -15,6 +15,7 @@ import MahasiswaView from './components/MahasiswaView';
 import LaporanMasukModal from './components/LaporanMasukModal';
 import AdminPanelModal from './components/AdminPanelModal';
 import { getDosenLaporan } from './components/LaporanModal';
+import { registerPush } from './services/pushService';
 import {
   loadMonitoringData,
   getWeeklyMetrics,
@@ -130,13 +131,28 @@ export default function App() {
     }
   }, [loggedInUser]);
 
+  // Supabase Realtime: refresh laporan count instantly on new/updated submissions
   useEffect(() => {
-    refreshLaporanCount();
-    if (loggedInUser?.role === 'dosen') {
-      const timer = setInterval(refreshLaporanCount, 30000);
-      return () => clearInterval(timer);
+    if (!supabase || loggedInUser?.role !== 'dosen') {
+      refreshLaporanCount();
+      return;
     }
+    refreshLaporanCount();
+    const channel = supabase
+      .channel('laporan-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'laporan_bimbingan' }, () => {
+        refreshLaporanCount();
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, [refreshLaporanCount]);
+
+  // Register Web Push for dosen after login
+  useEffect(() => {
+    if (loggedInUser?.role === 'dosen' && loggedInUser?.lecturerName) {
+      registerPush(loggedInUser.lecturerName).catch(() => {});
+    }
+  }, [loggedInUser?.role, loggedInUser?.lecturerName]);
 
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
 

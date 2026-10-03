@@ -124,6 +124,18 @@ async function saveReport(nim, week, data, mahasiswaName, editMode = false) {
 
     if (!error) {
       trackReadLocally(nim, week, data.selectedDosen, mahasiswaName, submittedAt);
+      // Notify dosen via Web Push
+      if (data.selectedDosen?.name) {
+        fetch('/api/send-push', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            dosen_name: data.selectedDosen.name,
+            title: 'Laporan Bimbingan Masuk',
+            body: `${mahasiswaName || nim} telah mengisi laporan bimbingan.`,
+          }),
+        }).catch(() => {});
+      }
       return true;
     }
   }
