@@ -8,6 +8,8 @@ export default function MatrixView({
   onOpenDetail
 }) {
   const [selectedCell, setSelectedCell] = useState(null);
+  // Tampilkan periode terbaru di kiri
+  const reversedWeekColumns = [...weekColumns].reverse();
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
@@ -42,7 +44,8 @@ export default function MatrixView({
               <th className="py-3 px-4 min-w-[200px] sticky left-10 bg-slate-50 z-10 border-r border-slate-200 shadow-xs">
                 Mahasiswa & Pembimbing
               </th>
-              {weekColumns.map((week, idx) => {
+              {reversedWeekColumns.map((week) => {
+                const originalIdx = weekColumns.indexOf(week);
                 let count = 0;
                 students.forEach(s => {
                   if (s.weeklyUpdates[week]?.reported) count++;
@@ -51,7 +54,7 @@ export default function MatrixView({
                 return (
                   <th key={week} className="py-3 px-3 min-w-[200px] border-r border-slate-100">
                     <div className="flex flex-col">
-                      <span className="text-slate-800 font-bold">Periode {idx + 1}</span>
+                      <span className="text-slate-800 font-bold">Periode {originalIdx + 1}</span>
                       <span className="text-[10px] text-slate-400 font-normal">{week}</span>
                       <span className="text-[10px] text-emerald-600 font-semibold mt-0.5">
                         {count}/{students.length} Lapor
@@ -97,7 +100,7 @@ export default function MatrixView({
                 </td>
 
                 {/* Week Cells */}
-                {weekColumns.map(week => {
+                {reversedWeekColumns.map(week => {
                   const update = student.weeklyUpdates[week];
                   const reported = update?.reported;
                   const badgeStyle = getCategoryBadgeStyle(update?.category);
