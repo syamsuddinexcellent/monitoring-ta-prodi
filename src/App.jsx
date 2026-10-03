@@ -22,7 +22,7 @@ import {
   getAllWeeksTrend,
   mergeSupabaseReports
 } from './services/dataService';
-import { getCustomPeriods, getLockedPeriods, BUILTIN_SEMESTERS, getLocalSemesters, getStudentOverrides, getVerifikasi } from './utils/exportUtils';
+import { getCustomPeriods, getLockedPeriods, BUILTIN_SEMESTERS, getLocalSemesters, getStudentOverrides, upsertStudentOverride, getVerifikasi } from './utils/exportUtils';
 import {
   checkGatewayStatus,
   logoutGateway
@@ -279,6 +279,7 @@ export default function App() {
         penguji2:    ov.penguji2    ?? s.penguji2,
         phone:       ov.phone       ?? s.phone,
         statusTA:    ov.status_ta   ?? s.statusTA,
+        target:      ov.target      ?? s.target,
       };
     });
   };
@@ -775,6 +776,18 @@ export default function App() {
                     isDosen={isDosen}
                     dosenName={loggedInUser?.lecturerName || ''}
                     highlightLecturer={lecturerFilter !== 'all' ? lecturerFilter : ''}
+                    onUpdateTarget={async (nim, newTarget) => {
+                      await upsertStudentOverride(nim, { target: newTarget });
+                      setData(prev => {
+                        if (!prev?.students) return prev;
+                        return {
+                          ...prev,
+                          students: prev.students.map(s =>
+                            s.nim === nim ? { ...s, target: newTarget } : s
+                          ),
+                        };
+                      });
+                    }}
                   />
                 ))}
               </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   CheckCircle2,
   AlertCircle,
@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   UserCheck,
   CalendarDays,
+  Pencil,
 } from 'lucide-react';
 import {
   getCategoryBadgeStyle,
@@ -35,10 +36,15 @@ export default function StudentCard({
   isDosen = false,
   dosenName = '',
   highlightLecturer = '',
+  onUpdateTarget = null,
 }) {
   const [copiedPhone, setCopiedPhone] = useState(false);
   const [autoSending, setAutoSending] = useState(false);
   const [autoSentSuccess, setAutoSentSuccess] = useState(false);
+  const [editingTarget, setEditingTarget] = useState(false);
+  const [targetValue, setTargetValue] = useState('');
+  const [savingTarget, setSavingTarget] = useState(false);
+  const targetInputRef = useRef(null);
 
   const update = student.weeklyUpdates[selectedWeek] || {
     reported: false,
@@ -195,12 +201,67 @@ export default function StudentCard({
               </div>
             );
           })}
-          {(student.statusTA || student.target) && (
+          {student.statusTA && (
             <div className="flex items-center justify-between gap-1 pt-1 border-t border-slate-200/50">
-              <span className="text-slate-400">Target/Status:</span>
+              <span className="text-slate-400 shrink-0">Status:</span>
               <span className="font-medium text-brand-700 truncate text-right">
-                {[student.statusTA, student.target].filter(Boolean).join(' • ')}
+                {student.statusTA}
               </span>
+            </div>
+          )}
+          {(student.target || isDosen) && (
+            <div className="flex items-center justify-between gap-1 pt-0.5">
+              <span className="text-slate-400 shrink-0">Target:</span>
+              {isDosen && onUpdateTarget ? (
+                editingTarget ? (
+                  <div className="flex items-center gap-1 flex-1 justify-end">
+                    <input
+                      ref={targetInputRef}
+                      value={targetValue}
+                      onChange={e => setTargetValue(e.target.value)}
+                      onKeyDown={async e => {
+                        if (e.key === 'Enter') {
+                          setSavingTarget(true);
+                          await onUpdateTarget(student.nim, targetValue.trim());
+                          setSavingTarget(false);
+                          setEditingTarget(false);
+                        } else if (e.key === 'Escape') {
+                          setEditingTarget(false);
+                        }
+                      }}
+                      className="text-xs border border-brand-300 rounded px-1.5 py-0.5 w-full max-w-[140px] focus:outline-none focus:ring-1 focus:ring-brand-400"
+                      placeholder="Target TA..."
+                      autoFocus
+                      disabled={savingTarget}
+                    />
+                    <button
+                      onClick={async () => {
+                        setSavingTarget(true);
+                        await onUpdateTarget(student.nim, targetValue.trim());
+                        setSavingTarget(false);
+                        setEditingTarget(false);
+                      }}
+                      disabled={savingTarget}
+                      className="shrink-0 text-[10px] bg-brand-600 text-white rounded px-1.5 py-0.5 hover:bg-brand-700"
+                    >
+                      {savingTarget ? '...' : 'Simpan'}
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => { setTargetValue(student.target || ''); setEditingTarget(true); }}
+                    className="flex items-center gap-1 text-right font-medium text-brand-700 hover:text-brand-900 group truncate max-w-[160px]"
+                    title="Klik untuk edit target"
+                  >
+                    <span className="truncate">{student.target || <span className="text-slate-400 italic">— atur target</span>}</span>
+                    <Pencil className="w-3 h-3 shrink-0 opacity-0 group-hover:opacity-60 transition-opacity" />
+                  </button>
+                )
+              ) : (
+                <span className="font-medium text-brand-700 truncate text-right">
+                  {student.target || '-'}
+                </span>
+              )}
             </div>
           )}
         </div>
