@@ -187,14 +187,14 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
       const cat = lastSession?.category ? `<div class="cat-text">${lastSession.category}</div>` : '';
       const progres = lastSession?.progress || '<span class="text-muted">-</span>';
       const target = lastSession?.next || '<span class="text-muted">-</span>';
-      const dosenName = lastSession?.dosen?.name || (verified ? '-' : '<span class="text-muted">-</span>');
+      const dosenName = verified ? (lastSession?.dosen?.name || '') : '';
 
       return `<tr>
         <td><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>
         <td>${badge}${cat}</td>
         <td>${progres}</td>
         <td>${target}</td>
-        <td class="col-ttd"><div class="ttd-space"></div><div class="ttd-name">${dosenName}</div></td>
+        <td class="col-ttd">${verified ? `<div class="ttd-space"></div><div class="ttd-name">${dosenName}</div>` : ''}</td>
       </tr>`;
     }).join('');
 
