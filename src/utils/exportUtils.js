@@ -247,28 +247,50 @@ export function printStudentHistory(student, weekColumns, verifData = {}) {
   const totalCount = weekColumns.length;
   const pctVal = totalCount > 0 ? Math.round((reportedCount / totalCount) * 100) : 0;
 
-  const tableRows = weekColumns.map((week, idx) => {
+  const tableRows = weekColumns.flatMap((week, idx) => {
     const upd = student.weeklyUpdates?.[week] || {};
     const verif = verifNim[week];
     const isSessionVerif = !verif?.verified && upd.sessionVerified;
-    if (!verif?.verified && !isSessionVerif) return '';
+    if (!verif?.verified && !isSessionVerif) return [];
 
     const num = idx + 1;
-    const progres = upd.progress || '<span class="text-muted">-</span>';
-    const target = upd.next || '<span class="text-muted">-</span>';
-    const category = upd.category || '';
-    const sessionDosenName = isSessionVerif
-      ? (upd.sessions?.find(s => s.verified_at)?.dosen?.name || '')
-      : '';
-    const dosenName = verif?.dosenName ? verif.dosenName.split(',')[0] : sessionDosenName;
+    const allSessions = upd.sessions || [];
+    const verifiedSessions = verif?.verified
+      ? allSessions
+      : allSessions.filter(s => s.verified_at);
 
-    return `<tr>
-      <td><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>
-      <td><span class="badge badge-verified">&#10003; Terverifikasi</span>${category ? `<div class="cat-text">${category}</div>` : ''}</td>
-      <td>${progres}</td>
-      <td>${target}</td>
-      <td class="col-ttd"><div class="ttd-space"></div><div class="ttd-name">${dosenName}</div></td>
-    </tr>`;
+    if (verifiedSessions.length === 0) {
+      const progres = upd.progress || '<span class="text-muted">-</span>';
+      const target = upd.next || '<span class="text-muted">-</span>';
+      const category = upd.category || '';
+      const dosenName = verif?.dosenName?.split(',')[0] || '';
+      return [`<tr>
+        <td><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>
+        <td><span class="badge badge-verified">&#10003; Terverifikasi</span>${category ? `<div class="cat-text">${category}</div>` : ''}</td>
+        <td>${progres}</td>
+        <td>${target}</td>
+        <td class="col-ttd"><div class="ttd-space"></div><div class="ttd-name">${dosenName}</div></td>
+      </tr>`];
+    }
+
+    const rowCount = verifiedSessions.length;
+    return verifiedSessions.map((s, si) => {
+      const progres = s.progress || '<span class="text-muted">-</span>';
+      const target = s.next || '<span class="text-muted">-</span>';
+      const category = s.category || '';
+      const dosenName = s.dosen?.name?.split(',')[0] || verif?.dosenName?.split(',')[0] || '';
+      const keBadge = rowCount > 1 ? `<div class="ke-text">Bimbingan ke-${s.ke ?? si + 1}</div>` : '';
+      const periodCell = si === 0
+        ? `<td rowspan="${rowCount}" style="vertical-align:top"><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>`
+        : '';
+      return `<tr>
+        ${periodCell}
+        <td><span class="badge badge-verified">&#10003; Terverifikasi</span>${category ? `<div class="cat-text">${category}</div>` : ''}${keBadge}</td>
+        <td>${progres}</td>
+        <td>${target}</td>
+        <td class="col-ttd"><div class="ttd-space"></div><div class="ttd-name">${dosenName}</div></td>
+      </tr>`;
+    });
   }).join('');
 
   const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -309,6 +331,7 @@ export function printStudentHistory(student, weekColumns, verifData = {}) {
   .badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;display:inline-block}
   .badge-verified{background:#dcfce7;color:#166534}
   .cat-text{font-size:11px;color:#64748b;margin-top:5px}
+  .ke-text{font-size:10px;font-weight:700;color:#4f46e5;text-transform:uppercase;letter-spacing:.04em;margin-top:4px}
   .text-muted{color:#94a3b8}
 
   .doc-footer{margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;text-align:right;font-size:11px;color:#94a3b8}

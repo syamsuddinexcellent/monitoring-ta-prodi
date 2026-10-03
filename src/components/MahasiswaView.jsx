@@ -171,32 +171,53 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
     const totalCount = weekColumns.length;
     const pctVal = totalCount > 0 ? Math.round((reportedCount / totalCount) * 100) : 0;
 
-    const tableRows = weekColumns.map((week, idx) => {
+    const tableRows = weekColumns.flatMap((week, idx) => {
       const update = mergedUpdates[week];
       const verified = isWeekVerified(week);
-      if (!verified) return '';
-      const sessions = update ? getSessions(update) : [];
+      if (!verified) return [];
+      const allSessions = update ? getSessions(update) : [];
       const num = idx + 1;
-      const lastSession = sessions[sessions.length - 1];
+      const adminVerif = verifData[week]?.verified;
 
-      const badge = verified
-        ? `<span class="badge badge-verified">&#10003; Terverifikasi</span>`
-        : update?.reported
-        ? `<span class="badge badge-sudah">Sudah Lapor</span>`
-        : `<span class="badge badge-belum">Belum Lapor</span>`;
+      const verifiedSessions = adminVerif
+        ? allSessions
+        : allSessions.filter(s => s.verified_at);
 
-      const cat = lastSession?.category ? `<div class="cat-text">${lastSession.category}</div>` : '';
-      const progres = lastSession?.progress || '<span class="text-muted">-</span>';
-      const target = lastSession?.next || '<span class="text-muted">-</span>';
-      const dosenName = verified ? (verifData[week]?.dosenName?.split(',')[0] || lastSession?.dosen?.name || '') : '';
+      if (verifiedSessions.length === 0) {
+        const lastSession = allSessions[allSessions.length - 1];
+        const badge = `<span class="badge badge-verified">&#10003; Terverifikasi</span>`;
+        const cat = lastSession?.category ? `<div class="cat-text">${lastSession.category}</div>` : '';
+        const progres = lastSession?.progress || '<span class="text-muted">-</span>';
+        const target = lastSession?.next || '<span class="text-muted">-</span>';
+        const dosenName = verifData[week]?.dosenName?.split(',')[0] || lastSession?.dosen?.name || '';
+        return [`<tr>
+          <td><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>
+          <td>${badge}${cat}</td>
+          <td>${progres}</td>
+          <td>${target}</td>
+          <td class="col-ttd"><div class="ttd-space"></div><div class="ttd-name">${dosenName}</div></td>
+        </tr>`];
+      }
 
-      return `<tr>
-        <td><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>
-        <td>${badge}${cat}</td>
-        <td>${progres}</td>
-        <td>${target}</td>
-        <td class="col-ttd">${verified ? `<div class="ttd-space"></div><div class="ttd-name">${dosenName}</div>` : ''}</td>
-      </tr>`;
+      const rowCount = verifiedSessions.length;
+      return verifiedSessions.map((s, si) => {
+        const badge = `<span class="badge badge-verified">&#10003; Terverifikasi</span>`;
+        const cat = s.category ? `<div class="cat-text">${s.category}</div>` : '';
+        const keBadge = rowCount > 1 ? `<div class="ke-text">Bimbingan ke-${s.ke ?? si + 1}</div>` : '';
+        const progres = s.progress || '<span class="text-muted">-</span>';
+        const target = s.next || '<span class="text-muted">-</span>';
+        const dosenName = s.dosen?.name?.split(',')[0] || verifData[week]?.dosenName?.split(',')[0] || '';
+        const periodCell = si === 0
+          ? `<td rowspan="${rowCount}" style="vertical-align:top"><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>`
+          : '';
+        return `<tr>
+          ${periodCell}
+          <td>${badge}${cat}${keBadge}</td>
+          <td>${progres}</td>
+          <td>${target}</td>
+          <td class="col-ttd"><div class="ttd-space"></div><div class="ttd-name">${dosenName}</div></td>
+        </tr>`;
+      });
     }).join('');
 
     const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -242,6 +263,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
   .badge-sudah{background:#d1fae5;color:#065f46}
   .badge-belum{background:#fee2e2;color:#991b1b}
   .cat-text{font-size:11px;color:#64748b;margin-top:5px}
+  .ke-text{font-size:10px;font-weight:700;color:#4f46e5;text-transform:uppercase;letter-spacing:.04em;margin-top:4px}
   .text-muted{color:#94a3b8}
 
   .doc-footer{margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;text-align:right;font-size:11px;color:#94a3b8}
