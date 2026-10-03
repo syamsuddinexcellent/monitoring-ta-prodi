@@ -7,6 +7,7 @@ import {
   Eye, EyeOff, KeyRound, Lock, Unlock
 } from 'lucide-react';
 import { getStoredUsersList, getStoredUsersWithPasswords, deleteStoredUser, resetPassword, registerUser } from './AuthModal';
+import { supabase } from '../lib/supabase';
 import {
   exportExcelAll, exportExcelPeriode, exportExcelSemester,
   printRekapPeriode, printRekapAll, printRekapSemester,
@@ -226,6 +227,31 @@ export default function AdminPanelModal({ isOpen, onClose, sheetsData, onSemeste
   useEffect(() => {
     if (isOpen) { refresh(); setConfirmDelete(null); setFlash(''); }
     else { setAkunUnlocked(false); setAkunPasswordInput(''); setAkunError(false); }
+  }, [isOpen]);
+
+  // Realtime: refresh inbox laporan ketika ada laporan baru/diupdate
+  useEffect(() => {
+    if (!isOpen || !supabase) return;
+    const refreshLaporan = async () => {
+      const [laporan, verif, penolakan, masukDb] = await Promise.all([
+        getAllLaporanBimbingan(),
+        getVerifikasi(),
+        getPenolakan(),
+        getLaporanMasukDatabase(),
+      ]);
+      setAllLaporan(laporan);
+      setVerifData(verif);
+      setPenolakanData(penolakan);
+      setMasukDbList(masukDb);
+      const fromSupabase = getDosenSummaryFromLaporan(laporan);
+      setDosenSummary(fromSupabase.length > 0 ? fromSupabase : getDosenLaporanSummary());
+    };
+    const channel = supabase
+      .channel('admin-laporan-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'laporan_bimbingan' }, refreshLaporan)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'verifikasi_laporan' }, refreshLaporan)
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, [isOpen]);
 
   const allSemesters = useMemo(() => [...BUILTIN_SEMESTERS, ...localSemesters], [localSemesters]);
