@@ -8,6 +8,7 @@ import {
   XAxis,
   YAxis,
   Tooltip,
+  Legend,
   ResponsiveContainer,
   LineChart,
   Line,
@@ -26,7 +27,7 @@ import {
 } from 'lucide-react';
 import { getCategoryBadgeStyle } from '../utils/helpers';
 
-export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDosen = false, dosenStudents = [], dosenName = '' }) {
+export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDosen = false, dosenStudents = [], dosenName = '', verifData = {} }) {
   const { total, reported, notReported, categoryChartData, lecturerChartData } = metrics;
   const [activeTab, setActiveTab] = useState('stages');
 
@@ -301,23 +302,27 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
             <span className="text-xs text-slate-400 font-medium">Lintas Periode</span>
           </div>
 
-          <div className="h-52 w-full">
+          <div className="h-60 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={trendData} margin={{ top: 15, right: 20, left: -20, bottom: 5 }}>
+              <LineChart data={trendData} margin={{ top: 10, right: 20, left: -20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                 <XAxis dataKey="shortName" tick={{ fontSize: 10, fill: '#64748b' }} />
                 <YAxis domain={[0, total]} allowDecimals={false} tick={{ fontSize: 10, fill: '#64748b' }} />
                 <Tooltip
-                  formatter={(val, name) => [`${val} Mahasiswa`, name === 'reported' ? 'Sudah Melapor' : name]}
+                  formatter={(val, name) => [`${val} Mahasiswa`, name]}
                   labelFormatter={(label, payload) => payload?.[0]?.payload?.weekName || label}
+                  contentStyle={{ fontSize: 11, borderRadius: 8, border: '1px solid #e2e8f0' }}
                 />
-                <Line type="monotone" dataKey="reported" name="Sudah Melapor" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 4, fill: '#6366f1' }} activeDot={{ r: 6 }} />
+                <Legend wrapperStyle={{ fontSize: 11, paddingTop: 4 }} />
+                <Line type="monotone" dataKey="notReported" name="Belum Melapor" stroke="#f43f5e" strokeWidth={2} dot={{ r: 3, fill: '#f43f5e' }} activeDot={{ r: 5 }} />
+                <Line type="monotone" dataKey="reported"    name="Sudah Melapor" stroke="#6366f1" strokeWidth={2} dot={{ r: 3, fill: '#6366f1' }} activeDot={{ r: 5 }} />
+                <Line type="monotone" dataKey="verified"    name="Terverifikasi"  stroke="#10b981" strokeWidth={2} dot={{ r: 3, fill: '#10b981' }} activeDot={{ r: 5 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
 
           <p className="text-[11px] text-slate-500 text-center border-t border-slate-100 pt-3">
-            Perbandingan jumlah mahasiswa yang aktif berkonsultasi per periode
+            Perbandingan jumlah mahasiswa per status pelaporan di setiap periode
           </p>
         </div>
       )}
