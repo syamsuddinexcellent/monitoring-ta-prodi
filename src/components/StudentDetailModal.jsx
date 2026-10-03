@@ -212,13 +212,13 @@ export default function StudentDetailModal({
                           </div>
                         )}
                         {update.sessions?.length > 0 ? (
-                          <div className="space-y-1.5 mt-1">
+                          <div className="space-y-1.5 mt-2">
                             {update.sessions.map((s, si) => (
-                              <div key={si} className="flex items-center gap-2 flex-wrap">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">
-                                  Bimbingan ke-{s.ke ?? si + 1}
+                              <div key={si} className="flex items-center gap-2 bg-white border border-slate-100 rounded-lg pl-2.5 pr-3 py-1.5 border-l-[3px] border-l-indigo-300">
+                                <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider shrink-0 min-w-[56px]">
+                                  ke-{s.ke ?? si + 1}
                                 </span>
-                                <div className="flex items-center gap-1.5 flex-wrap">
+                                <div className="flex items-center gap-1.5 flex-wrap flex-1">
                                   {s.dosen && (
                                     <span className="text-[11px] bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
                                       {s.dosen.label} · {s.dosen.name.split(',')[0]}
