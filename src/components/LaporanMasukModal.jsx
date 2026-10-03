@@ -23,16 +23,16 @@ function SessionCard({ sess, nim, week, dosenName, isVerifiedPeriod, onVerifChan
   const [alasan, setAlasan] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const sessVerified = !!sess.verified_at;
+  const sessVerified = !!sess.verified_at || isVerifiedPeriod;
   const badge = getCategoryBadgeStyle(sess.category);
 
   const handleVerify = async () => {
     setLoading(true);
-    if (sessVerified) {
+    if (sess.verified_at || isVerifiedPeriod) {
       await cancelVerifikasiSession(nim, week, sess.ke);
+      await cancelVerifikasi(nim, week);
     } else {
       await saveVerifikasiSession(nim, week, sess.ke, dosenName);
-      // Also write to verifikasi_laporan (period-level) for backward compat
       await saveVerifikasi(nim, week, dosenName);
     }
     setLoading(false);

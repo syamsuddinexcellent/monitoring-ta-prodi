@@ -196,10 +196,24 @@ export async function getDosenLaporan(dosenName) {
         .map(r => {
           const sessions = getSessions(r.dosen_hadir);
           const dosenSessions = sessions.length > 0
-            ? sessions.filter(s => s.dosen && dosenNames.includes(s.dosen.name))
+            ? sessions
+                .filter(s => s.dosen && dosenNames.includes(s.dosen.name))
+                .map(s => ({
+                  ...s,
+                  category: s.category || r.category,
+                  progress: s.progress || r.progress,
+                  next: s.next || r.next_target,
+                }))
             : normalizeDosenHadir(r.dosen_hadir).list
                 .filter(d => dosenNames.includes(d.name))
-                .map(d => ({ ke: 1, dosen: d, tanggal: normalizeDosenHadir(r.dosen_hadir).tanggal }));
+                .map(d => ({
+                  ke: 1,
+                  dosen: d,
+                  tanggal: normalizeDosenHadir(r.dosen_hadir).tanggal,
+                  category: r.category,
+                  progress: r.progress,
+                  next: r.next_target,
+                }));
           return {
             nim: r.nim, nama: r.nama, week: r.week,
             category: r.category, progress: r.progress,

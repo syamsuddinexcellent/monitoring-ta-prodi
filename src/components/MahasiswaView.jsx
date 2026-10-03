@@ -147,6 +147,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
   // Check if a period can have more sessions added
   const canAddSession = (week) => {
     if (lockedPeriods.includes(week)) return false;
+    if (isWeekVerified(week)) return false;
     const cnt = getSessionCount(mergedUpdates[week]);
     if (cnt >= MAX_SESSIONS) return false;
     const range = parseWeekRange(week);
@@ -512,7 +513,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
                                 Sudah diverifikasi · tidak dapat diedit
                               </span>
                             ) : null}
-                            {isFromApp ? (
+                            {isFromApp && !weekVerified ? (
                               <>
                                 {sessions.length <= 1 && (
                                   <button

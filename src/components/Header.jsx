@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Database,
   Zap,
@@ -7,8 +7,20 @@ import {
   ShieldCheck,
   User,
   Inbox,
+  GraduationCap,
+  BookOpen,
+  UserCog,
 } from 'lucide-react';
 import { formatPhoneDisplay } from '../utils/helpers';
+
+const ROLE_LABEL = { admin: 'Admin', dosen: 'Dosen', mahasiswa: 'Mahasiswa', guest: 'Pengunjung' };
+const ROLE_COLOR = {
+  admin:     'bg-brand-100 text-brand-700 border-brand-200',
+  dosen:     'bg-indigo-100 text-indigo-700 border-indigo-200',
+  mahasiswa: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  guest:     'bg-slate-100 text-slate-500 border-slate-200',
+};
+const ROLE_ICON = { admin: UserCog, dosen: BookOpen, mahasiswa: GraduationCap, guest: User };
 
 export default function Header({
   lastUpdated,
@@ -25,7 +37,22 @@ export default function Header({
   onOpenAdminPanel,
   bottomRow,
   onlineCount = 1,
+  onlineUsers = [],
 }) {
+  const [showOnlineList, setShowOnlineList] = useState(false);
+  const onlineRef = useRef(null);
+
+  useEffect(() => {
+    if (!showOnlineList) return;
+    const handleClick = (e) => {
+      if (onlineRef.current && !onlineRef.current.contains(e.target)) {
+        setShowOnlineList(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [showOnlineList]);
+
   const formatTime = (date) => {
     if (!date) return '-';
     return new Intl.DateTimeFormat('id-ID', {
@@ -104,10 +131,54 @@ export default function Header({
             </div>}
 
             {/* Online visitors badge */}
-            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-700 select-none" title="Jumlah pengguna yang sedang membuka halaman ini">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-              <span className="font-semibold tabular-nums">{onlineCount}</span>
-              <span className="text-emerald-600">online</span>
+            <div className="hidden sm:block relative" ref={onlineRef}>
+              {isAdmin ? (
+                <button
+                  onClick={() => setShowOnlineList(v => !v)}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-xs text-emerald-700 transition-colors cursor-pointer"
+                  title="Klik untuk melihat siapa saja yang sedang online"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                  <span className="font-semibold tabular-nums">{onlineCount}</span>
+                  <span className="text-emerald-600">online</span>
+                </button>
+              ) : (
+                <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-700 select-none" title="Jumlah pengguna yang sedang membuka halaman ini">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                  <span className="font-semibold tabular-nums">{onlineCount}</span>
+                  <span className="text-emerald-600">online</span>
+                </div>
+              )}
+              {isAdmin && showOnlineList && (
+                <div className="absolute right-0 top-full mt-1.5 w-64 bg-white border border-slate-200 rounded-xl shadow-lg z-50 overflow-hidden">
+                  <div className="px-3 py-2 bg-slate-50 border-b border-slate-100">
+                    <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Sedang Online ({onlineUsers.length})</p>
+                  </div>
+                  <ul className="max-h-60 overflow-y-auto divide-y divide-slate-100">
+                    {onlineUsers.length === 0 ? (
+                      <li className="px-3 py-3 text-xs text-slate-400 text-center">Tidak ada data</li>
+                    ) : (
+                      onlineUsers.map((u, i) => {
+                        const role = u.role || 'guest';
+                        const RoleIcon = ROLE_ICON[role] || User;
+                        const colorClass = ROLE_COLOR[role] || ROLE_COLOR.guest;
+                        return (
+                          <li key={i} className="flex items-center gap-2.5 px-3 py-2.5">
+                            <RoleIcon className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-medium text-slate-800 truncate">{u.name || 'Pengunjung'}</p>
+                              {u.nim && <p className="text-[10px] text-slate-400 truncate">{u.nim}</p>}
+                            </div>
+                            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${colorClass}`}>
+                              {ROLE_LABEL[role] || role}
+                            </span>
+                          </li>
+                        );
+                      })
+                    )}
+                  </ul>
+                </div>
+              )}
             </div>
 
             {/* Auth: Login / User badge / Logout */}

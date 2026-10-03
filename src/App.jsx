@@ -21,7 +21,7 @@ import {
   getAllWeeksTrend,
   mergeSupabaseReports
 } from './services/dataService';
-import { getCustomPeriods, getLockedPeriods, BUILTIN_SEMESTERS, getLocalSemesters } from './utils/exportUtils';
+import { getCustomPeriods, getLockedPeriods, BUILTIN_SEMESTERS, getLocalSemesters, getStudentOverrides } from './utils/exportUtils';
 import {
   checkGatewayStatus,
   logoutGateway
@@ -138,22 +138,46 @@ export default function App() {
 
   // Online visitors count via Supabase Realtime Presence
   const [onlineCount, setOnlineCount] = useState(1);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const presenceChannelRef = useRef(null);
+
   useEffect(() => {
     if (!supabase) return;
     const channel = supabase.channel('online-visitors', {
       config: { presence: { key: crypto.randomUUID() } },
     });
+    presenceChannelRef.current = channel;
     channel
       .on('presence', { event: 'sync' }, () => {
-        setOnlineCount(Object.keys(channel.presenceState()).length);
+        const state = channel.presenceState();
+        const users = Object.values(state).flat();
+        setOnlineCount(users.length);
+        setOnlineUsers(users);
       })
       .subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
-          await channel.track({ at: Date.now() });
+          await channel.track({
+            at: Date.now(),
+            name: loggedInUser?.name || 'Pengunjung',
+            role: loggedInUser?.role || 'guest',
+            nim: loggedInUser?.nim || '',
+          });
         }
       });
     return () => { supabase.removeChannel(channel); };
   }, []);
+
+  // Re-track when user logs in/out so name/role updates
+  useEffect(() => {
+    const ch = presenceChannelRef.current;
+    if (!ch) return;
+    ch.track({
+      at: Date.now(),
+      name: loggedInUser?.name || 'Pengunjung',
+      role: loggedInUser?.role || 'guest',
+      nim: loggedInUser?.nim || '',
+    }).catch(() => {});
+  }, [loggedInUser]);
 
   // Modals
   const [detailStudent, setDetailStudent] = useState(null);
@@ -216,10 +240,29 @@ export default function App() {
     };
   }, []);
 
+  const applyStudentOverrides = async (students) => {
+    const overrides = await getStudentOverrides();
+    if (!Object.keys(overrides).length) return students;
+    return students.map(s => {
+      const ov = overrides[s.nim];
+      if (!ov) return s;
+      return {
+        ...s,
+        pembimbing1: ov.pembimbing1 ?? s.pembimbing1,
+        pembimbing2: ov.pembimbing2 ?? s.pembimbing2,
+        penguji1:    ov.penguji1    ?? s.penguji1,
+        penguji2:    ov.penguji2    ?? s.penguji2,
+        phone:       ov.phone       ?? s.phone,
+        statusTA:    ov.status_ta   ?? s.statusTA,
+      };
+    });
+  };
+
   const fetchData = async () => {
     try {
       const result = await loadMonitoringData();
       result.students = await mergeSupabaseReports(result.students);
+      result.students = await applyStudentOverrides(result.students);
 
       // Save raw Sheets periods before merging custom
       result.sheetsWeekColumns = [...result.weekColumns];
@@ -476,6 +519,7 @@ export default function App() {
             setLoggedInUser(null);
           }}
           onlineCount={onlineCount}
+          onlineUsers={onlineUsers}
         />
         <main className="flex-1">
           <MahasiswaView
@@ -517,6 +561,7 @@ export default function App() {
         onOpenLaporanMasuk={() => setIsLaporanMasukOpen(true)}
         onOpenAdminPanel={() => setIsAdminPanelOpen(true)}
         onlineCount={onlineCount}
+        onlineUsers={onlineUsers}
         bottomRow={
           <WeekSelector
             weekColumns={activePeriods}
@@ -754,14 +799,27 @@ export default function App() {
       {/* Laporan Masuk Modal (dosen) */}
       <LaporanMasukModal
         isOpen={isLaporanMasukOpen}
-        onClose={() => { setIsLaporanMasukOpen(false); refreshLaporanCount(); }}
+        onClose={async () => {
+          setIsLaporanMasukOpen(false);
+          refreshLaporanCount();
+          if (data?.students) {
+            const updated = await mergeSupabaseReports(data.students);
+            setData(prev => ({ ...prev, students: updated }));
+          }
+        }}
         dosenName={loggedInUser?.lecturerName || ''}
       />
 
       {/* Admin Panel Modal */}
       <AdminPanelModal
         isOpen={isAdminPanelOpen}
-        onClose={() => setIsAdminPanelOpen(false)}
+        onClose={async () => {
+          setIsAdminPanelOpen(false);
+          if (data?.students) {
+            const updated = await applyStudentOverrides(data.students);
+            setData(prev => ({ ...prev, students: updated }));
+          }
+        }}
         sheetsData={data}
         onSemestersChange={setLocalSemesters}
         onLockedPeriodsChange={setLockedPeriods}
