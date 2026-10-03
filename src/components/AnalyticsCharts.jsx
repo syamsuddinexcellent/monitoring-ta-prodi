@@ -316,7 +316,6 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
                 <Legend wrapperStyle={{ fontSize: 11, paddingTop: 4 }} />
                 <Line type="monotone" dataKey="notReported" name="Belum Melapor" stroke="#f43f5e" strokeWidth={2} dot={{ r: 3, fill: '#f43f5e' }} activeDot={{ r: 5 }} />
                 <Line type="monotone" dataKey="reported"    name="Sudah Melapor" stroke="#6366f1" strokeWidth={2} dot={{ r: 3, fill: '#6366f1' }} activeDot={{ r: 5 }} />
-                <Line type="monotone" dataKey="verified"    name="Terverifikasi"  stroke="#10b981" strokeWidth={2} dot={{ r: 3, fill: '#10b981' }} activeDot={{ r: 5 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
