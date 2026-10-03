@@ -66,7 +66,7 @@ export default function WeekSelector({
               const pNum = weekColumns.indexOf(week) + 1;
               const lapor = laporMap[week] ?? 0;
               const verif = verifMap[week] ?? 0;
-              const label = `P${pNum} · ${week}  (${verif} verif / ${lapor} lapor / ${total} total)`;
+              const label = `P${pNum} · ${week}  (${verif} / ${lapor} / ${total})`;
               return (
                 <option key={week} value={week}>{label}</option>
               );
