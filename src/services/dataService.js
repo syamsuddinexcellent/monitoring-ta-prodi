@@ -460,7 +460,7 @@ export async function mergeSupabaseReports(students) {
         allReports.forEach(r => {
           const inVerifikasi = verifiedSet.has(`${r.nim}:${r.week}`);
           const rawSessions = r.dosen_hadir?.sessions;
-          const sessionVerified = !inVerifikasi && Array.isArray(rawSessions) && rawSessions.some(s => s.verified_at);
+          const sessionVerified = !inVerifikasi && Array.isArray(rawSessions) && rawSessions.length > 0 && rawSessions.every(s => s.verified_at);
           if (!byNim[r.nim]) byNim[r.nim] = {};
           const sessions = rawSessions || [];
           const dosenHadir = Array.isArray(r.dosen_hadir)
