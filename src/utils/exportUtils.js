@@ -243,90 +243,111 @@ export function printStudentHistory(student, weekColumns, verifData = {}) {
   const nim = student.nim;
   const verifNim = verifData[nim] || {};
 
-  const periodeRows = weekColumns.map((week, idx) => {
+  const reportedCount = weekColumns.filter(w => student.weeklyUpdates?.[w]?.reported).length;
+  const totalCount = weekColumns.length;
+  const pctVal = totalCount > 0 ? Math.round((reportedCount / totalCount) * 100) : 0;
+
+  const tableRows = weekColumns.map((week, idx) => {
     const upd = student.weeklyUpdates?.[week] || {};
     const verif = verifNim[week];
-    const statusColor = upd.reported ? '#065f46' : '#991b1b';
-    const statusBg = upd.reported ? '#d1fae5' : '#fee2e2';
-    const statusLabel = upd.reported ? 'Sudah Lapor' : 'Belum Lapor';
-    const verifBadge = verif?.verified
-      ? `<span style="background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe;padding:1px 6px;border-radius:9999px;font-size:10px;font-weight:700;">✓ Diverifikasi oleh ${verif.dosenName?.split(',')[0] || 'Dosen'}</span>`
-      : '';
+    if (!verif?.verified) return '';
 
-    return `
-      <tr>
-        <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;font-weight:600;white-space:nowrap;color:#475569;">
-          P${idx + 1}<br><span style="font-size:10px;font-weight:400;color:#94a3b8;">${week}</span>
-        </td>
-        <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">
-          <span style="background:${statusBg};color:${statusColor};padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:700;">${statusLabel}</span>
-          ${upd.category && upd.reported ? `<span style="margin-left:6px;font-size:11px;color:#64748b;">${upd.category}</span>` : ''}
-          <div style="margin-top:4px;">${verifBadge}</div>
-        </td>
-        <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;color:#1e293b;font-size:12px;">${upd.progress || '<span style="color:#94a3b8;font-style:italic;">-</span>'}</td>
-        <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;color:#64748b;font-size:12px;">${upd.next || '-'}</td>
-      </tr>`;
+    const num = idx + 1;
+    const progres = upd.progress || '<span class="text-muted">-</span>';
+    const target = upd.next || '<span class="text-muted">-</span>';
+    const category = upd.category || '';
+    const dosenName = verif.dosenName ? verif.dosenName.split(',')[0] : '';
+
+    return `<tr>
+      <td><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>
+      <td><span class="badge badge-verified">&#10003; Terverifikasi</span>${category ? `<div class="cat-text">${category}</div>` : ''}</td>
+      <td>${progres}</td>
+      <td>${target}</td>
+      <td class="col-ttd"><div class="ttd-space"></div><div class="ttd-name">${dosenName}</div></td>
+    </tr>`;
   }).join('');
 
-  const total = weekColumns.filter(w => student.weeklyUpdates?.[w]?.reported).length;
-  const rate = Math.round((total / (weekColumns.length || 1)) * 100);
+  const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  const html = `<!DOCTYPE html>
-<html><head>
-<meta charset="utf-8"/>
-<title>Riwayat Bimbingan – ${student.nama}</title>
+  const html = `<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
+<title>Riwayat Bimbingan TA — ${student.nama}</title>
 <style>
-  body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 24px; color: #1e293b; }
-  h1 { font-size: 18px; margin: 0 0 4px; }
-  .subtitle { color: #64748b; font-size: 12px; margin-bottom: 20px; }
-  .info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px solid #e2e8f0; }
-  .info-label { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
-  .info-val { font-size: 13px; font-weight: 600; color: #1e293b; }
-  table { width: 100%; border-collapse: collapse; }
-  thead tr { background: #f1f5f9; }
-  th { padding: 8px 10px; text-align: left; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid #e2e8f0; }
-  .stat { display: inline-flex; align-items: center; gap: 8px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 8px 16px; margin-bottom: 16px; }
-  @media print { body { padding: 12px; } button { display: none; } }
-</style>
-</head><body>
-<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
-  <div>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,Arial,sans-serif;color:#1e293b;background:#fff;padding:32px 40px}
+  @media print{body{padding:0}@page{margin:12mm 10mm;size:A4 portrait}.no-print{display:none!important}}
+
+  .top-bar{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+  .doc-title h1{font-size:20px;font-weight:800;color:#0f172a}
+  .doc-title p{font-size:12px;color:#64748b;margin-top:3px}
+  .print-btn{background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+
+  .profile-card{border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;margin-bottom:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px 24px}
+  .profile-label{font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+  .profile-value{font-size:13px;font-weight:600;color:#1e293b}
+  .profile-value.mono{font-family:monospace}
+
+  .progress-info{display:inline-flex;align-items:center;gap:8px;background:#dcfce7;color:#166534;font-size:12px;font-weight:700;padding:5px 14px;border-radius:999px;margin-bottom:16px}
+  .progress-pct{background:#16a34a;color:#fff;border-radius:999px;padding:1px 9px;font-size:11px;font-weight:700}
+
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead th{font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;padding:8px 12px;text-align:left;border-bottom:2px solid #e2e8f0;background:#f8fafc}
+  tbody tr{border-bottom:1px solid #f1f5f9}
+  tbody tr:last-child{border-bottom:none}
+  tbody td{padding:12px;vertical-align:top;line-height:1.6}
+  th:first-child,td:first-child{width:120px}
+  th:nth-child(2),td:nth-child(2){width:130px}
+  .col-ttd{width:140px;text-align:center}
+  .ttd-space{height:48px;border-bottom:1px solid #cbd5e1;margin-bottom:6px}
+  .ttd-name{font-size:11px;color:#475569;text-align:center}
+
+  .p-label{font-size:15px;font-weight:800;color:#0f172a}
+  .p-range{font-size:11px;color:#94a3b8;margin-top:2px}
+  .badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;display:inline-block}
+  .badge-verified{background:#dcfce7;color:#166534}
+  .cat-text{font-size:11px;color:#64748b;margin-top:5px}
+  .text-muted{color:#94a3b8}
+
+  .doc-footer{margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;text-align:right;font-size:11px;color:#94a3b8}
+</style></head><body>
+
+<div class="top-bar">
+  <div class="doc-title">
     <h1>Riwayat Bimbingan Tugas Akhir</h1>
-    <div class="subtitle">Program Studi Sains Data · Semester Ganjil 2026/2027</div>
+    <p>Program Studi Sains Data &middot; Semester Ganjil 2026/2027</p>
   </div>
-  <button onclick="window.print()" style="padding:8px 18px;background:#4f46e5;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">Cetak / Simpan PDF</button>
+  <button class="print-btn no-print" onclick="window.print()">Cetak / Simpan PDF</button>
 </div>
-<div class="info-grid">
-  <div><div class="info-label">Nama</div><div class="info-val">${student.nama}</div></div>
-  <div><div class="info-label">NIM</div><div class="info-val" style="font-family:monospace;">${student.nim}</div></div>
-  <div><div class="info-label">Angkatan</div><div class="info-val">${student.angkatan}</div></div>
-  <div><div class="info-label">Pembimbing 1</div><div class="info-val">${student.pembimbing1 || '-'}</div></div>
-  <div><div class="info-label">Pembimbing 2</div><div class="info-val">${student.pembimbing2 || '-'}</div></div>
-  <div><div class="info-label">Status TA</div><div class="info-val">${student.statusTA || '-'}</div></div>
+
+<div class="profile-card">
+  <div><div class="profile-label">Nama</div><div class="profile-value">${student.nama}</div></div>
+  <div><div class="profile-label">NIM</div><div class="profile-value mono">${student.nim}</div></div>
+  <div><div class="profile-label">Angkatan</div><div class="profile-value">${student.angkatan}</div></div>
+  <div><div class="profile-label">Pembimbing 1</div><div class="profile-value">${student.pembimbing1 || '-'}</div></div>
+  <div><div class="profile-label">Pembimbing 2</div><div class="profile-value">${student.pembimbing2 || '-'}</div></div>
+  <div><div class="profile-label">Status TA</div><div class="profile-value">${student.statusTA || '-'}</div></div>
 </div>
-<div class="stat">
-  <span style="font-weight:700;font-size:18px;color:#059669;">${total}</span>
-  <span style="font-size:12px;color:#64748b;">dari ${weekColumns.length} periode terlaporkan</span>
-  <span style="background:#059669;color:white;border-radius:9999px;padding:2px 10px;font-size:12px;font-weight:700;">${rate}%</span>
+
+<div class="progress-info">
+  ${reportedCount} dari ${totalCount} periode terlaporkan
+  <span class="progress-pct">${pctVal}%</span>
 </div>
+
 <table>
   <thead><tr>
-    <th style="width:140px;">Periode</th>
-    <th style="width:160px;">Status</th>
-    <th>Progres</th>
-    <th style="width:200px;">Target Berikutnya</th>
+    <th>Periode</th><th>Status</th><th>Progres</th><th>Target Berikutnya</th><th class="col-ttd">Tanda Tangan</th>
   </tr></thead>
-  <tbody>${periodeRows}</tbody>
+  <tbody>${tableRows}</tbody>
 </table>
-<div style="margin-top:20px;font-size:10px;color:#94a3b8;text-align:right;">
-  Dicetak dari Sistem Monitoring TA Prodi Sains Data · ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-</div>
+
+<div class="doc-footer">Dicetak dari Sistem Monitoring TA Prodi Sains Data &middot; ${todayStr}</div>
+<script>window.onload=function(){window.print()}</script>
 </body></html>`;
 
   const win = window.open('', '_blank');
   win.document.write(html);
   win.document.close();
 }
+
 
 export function printRekapPeriode(students, week, weekColumns) {
   const idx = weekColumns.indexOf(week);
