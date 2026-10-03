@@ -27,6 +27,23 @@ import Papa from 'papaparse';
 import { parseProgressCell, getAngkatan, cleanPhoneNumber } from '../utils/helpers.js';
 import { lookupStudentNIM, lookupStudentPhone } from '../utils/studentDatabase.js';
 
+const TARGET_NORMALIZE = {
+  'Belum Sempro': 'Proposal',
+  'Masih Kuliah': 'Proposal',
+  'Aktif': 'Proposal',
+  'Sudah Sempro': 'Seminar Hasil',
+  'Semhas Mei': 'Seminar Hasil',
+  'Belum Semhas': 'Seminar Hasil',
+  'baru Sempro': 'Seminar Hasil',
+  'Baru Sempro': 'Seminar Hasil',
+  'Baru Sempro Desember 2024': 'Seminar Hasil',
+  'Mau Semhas Mei': 'Sidang',
+};
+function normalizeTarget(val) {
+  const trimmed = (val || '').trim();
+  return TARGET_NORMALIZE[trimmed] ?? trimmed;
+}
+
 export const GOOGLE_SPREADSHEET_ID = '1pj3negFYVU9nHrTVvnXW8an8soJrp2Kyfs3BVXG-eq0';
 export const GOOGLE_SHEETS_VIEW_URL = `https://docs.google.com/spreadsheets/d/${GOOGLE_SPREADSHEET_ID}/edit?usp=sharing`;
 
@@ -254,7 +271,7 @@ function processFallbackJson(json, source = 'fallback_json') {
       penguji1: s.penguji1 || '',
       penguji2: s.penguji2 || '',
       statusTA: s.statusTA || '',
-      target: s.target || '',
+      target: normalizeTarget(s.target),
       keterangan: s.keterangan || '',
       weeklyUpdates
     };
@@ -327,7 +344,7 @@ function processCombinedCSV(csvText, source = 'local_csv') {
       penguji1: row['Penguji 1'] || '',
       penguji2: row['Penguji 2'] || '',
       statusTA: row['Status TA'] || '',
-      target: row['Target'] || '',
+      target: normalizeTarget(row['Target']),
       keterangan: '',
       weeklyUpdates
     };
