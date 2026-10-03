@@ -172,6 +172,7 @@ export default function FilterBar({
           className="shrink-0 px-3 py-2 text-xs bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20"
         >
           <option value="all">Status Lapor</option>
+          <option value="verified">Terverifikasi</option>
           <option value="reported">Sudah Lapor</option>
           <option value="unreported">Belum Lapor</option>
         </select>

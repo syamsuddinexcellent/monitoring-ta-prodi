@@ -21,7 +21,7 @@ import {
   getAllWeeksTrend,
   mergeSupabaseReports
 } from './services/dataService';
-import { getCustomPeriods, getLockedPeriods, BUILTIN_SEMESTERS, getLocalSemesters, getStudentOverrides } from './utils/exportUtils';
+import { getCustomPeriods, getLockedPeriods, BUILTIN_SEMESTERS, getLocalSemesters, getStudentOverrides, getVerifikasi } from './utils/exportUtils';
 import {
   checkGatewayStatus,
   logoutGateway
@@ -110,6 +110,10 @@ export default function App() {
   const [angkatanFilter, setAngkatanFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [lecturerFilter, setLecturerFilter] = useState('all');
+
+  // Verification data for filter
+  const [verifData, setVerifData] = useState({});
+  useEffect(() => { getVerifikasi().then(setVerifData); }, []);
 
   // Laporan masuk for dosen
   const [isLaporanMasukOpen, setIsLaporanMasukOpen] = useState(false);
@@ -391,7 +395,9 @@ export default function App() {
       }
 
       // Status
-      if (statusFilter === 'reported' && !update.reported) return false;
+      const isVerified = verifData[student.nim]?.[selectedWeek]?.verified || update.sessionVerified;
+      if (statusFilter === 'verified' && !isVerified) return false;
+      if (statusFilter === 'reported' && (!update.reported || isVerified)) return false;
       if (statusFilter === 'unreported' && update.reported) return false;
 
       // Angkatan
@@ -412,7 +418,7 @@ export default function App() {
 
       return true;
     });
-  }, [data, selectedWeek, searchQuery, statusFilter, angkatanFilter, categoryFilter, lecturerFilter]);
+  }, [data, selectedWeek, searchQuery, statusFilter, angkatanFilter, categoryFilter, lecturerFilter, verifData]);
 
   // Unreported students for selected week
   const unreportedStudents = useMemo(() => {
@@ -609,7 +615,7 @@ export default function App() {
         )}
 
         {/* KPI Cards */}
-        <MetricCards metrics={activeMetrics} selectedWeek={selectedWeek} isDosen={isDosen} isAdmin={isAdmin} students={isDosen ? dosenStudents : (data?.students || [])} dosenName={loggedInUser?.lecturerName || ''} />
+        <MetricCards metrics={activeMetrics} selectedWeek={selectedWeek} isDosen={isDosen} isAdmin={isAdmin} students={isDosen ? dosenStudents : (data?.students || [])} dosenName={loggedInUser?.lecturerName || ''} verifData={verifData} />
 
         {/* Analytics Charts */}
         <AnalyticsCharts

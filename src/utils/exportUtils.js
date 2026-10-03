@@ -250,13 +250,17 @@ export function printStudentHistory(student, weekColumns, verifData = {}) {
   const tableRows = weekColumns.map((week, idx) => {
     const upd = student.weeklyUpdates?.[week] || {};
     const verif = verifNim[week];
-    if (!verif?.verified) return '';
+    const isSessionVerif = !verif?.verified && upd.sessionVerified;
+    if (!verif?.verified && !isSessionVerif) return '';
 
     const num = idx + 1;
     const progres = upd.progress || '<span class="text-muted">-</span>';
     const target = upd.next || '<span class="text-muted">-</span>';
     const category = upd.category || '';
-    const dosenName = verif.dosenName ? verif.dosenName.split(',')[0] : '';
+    const sessionDosenName = isSessionVerif
+      ? (upd.sessions?.find(s => s.verified_at)?.dosen?.name || '')
+      : '';
+    const dosenName = verif?.dosenName ? verif.dosenName.split(',')[0] : sessionDosenName;
 
     return `<tr>
       <td><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>

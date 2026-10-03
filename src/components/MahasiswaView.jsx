@@ -188,7 +188,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
       const cat = lastSession?.category ? `<div class="cat-text">${lastSession.category}</div>` : '';
       const progres = lastSession?.progress || '<span class="text-muted">-</span>';
       const target = lastSession?.next || '<span class="text-muted">-</span>';
-      const dosenName = verified ? (lastSession?.dosen?.name || '') : '';
+      const dosenName = verified ? (verifData[week]?.dosenName?.split(',')[0] || lastSession?.dosen?.name || '') : '';
 
       return `<tr>
         <td><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>
@@ -387,6 +387,10 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
               <div className="flex justify-between items-center text-sm">
                 <span className="text-slate-600">Total periode monitoring</span>
                 <span className="font-bold text-slate-900">{weekColumns.length}</span>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-slate-600">Terverifikasi</span>
+                <span className="font-bold text-indigo-600">{weekColumns.filter(w => isWeekVerified(w)).length} periode</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-slate-600">Sudah lapor</span>

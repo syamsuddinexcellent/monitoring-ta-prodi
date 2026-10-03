@@ -457,7 +457,10 @@ export async function mergeSupabaseReports(students) {
         const verifiedSet = new Set(allVerif.map(v => `${v.nim}:${v.week}`));
         const byNim = {};
         allReports.forEach(r => {
-          if (!verifiedSet.has(`${r.nim}:${r.week}`)) return;
+          const inVerifikasi = verifiedSet.has(`${r.nim}:${r.week}`);
+          const rawSessions = r.dosen_hadir?.sessions;
+          const sessionVerified = !inVerifikasi && Array.isArray(rawSessions) && rawSessions.some(s => s.verified_at);
+          if (!inVerifikasi && !sessionVerified) return;
           if (!byNim[r.nim]) byNim[r.nim] = {};
           byNim[r.nim][r.week] = {
             reported: true,
@@ -465,8 +468,10 @@ export async function mergeSupabaseReports(students) {
             progress: r.progress,
             next: r.next_target,
             dosenHadir: Array.isArray(r.dosen_hadir) ? r.dosen_hadir : (r.dosen_hadir?.list || []),
+            sessions: rawSessions || [],
             tanggalBimbingan: Array.isArray(r.dosen_hadir) ? null : (r.dosen_hadir?.tanggal || null),
             submittedAt: r.submitted_at,
+            sessionVerified,
           };
         });
         return students.map(student => {
