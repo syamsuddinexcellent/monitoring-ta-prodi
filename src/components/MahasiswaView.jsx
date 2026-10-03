@@ -168,38 +168,53 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
     const printWin = window.open('', '_blank');
     if (!printWin) return;
 
-    const periodeRows = weeksReversed.map((week, idx) => {
+    const fmtTgl = (str) => str
+      ? new Date(str + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+      : null;
+
+    const periodeCards = weeksReversed.map((week, idx) => {
       const update = mergedUpdates[week];
       const verified = isWeekVerified(week);
       const sessions = update ? getSessions(update) : [];
       const num = weekColumns.length - idx;
 
       const statusBadge = verified
-        ? `<span style="background:#dcfce7;color:#166534;border:1px solid #bbf7d0;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;">✓ Terverifikasi</span>`
+        ? `<span class="badge badge-verified">✓ Terverifikasi</span>`
         : update?.reported
-        ? `<span style="background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;">Sudah Lapor</span>`
-        : `<span style="background:#fee2e2;color:#991b1b;border:1px solid #fecaca;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;">Belum Lapor</span>`;
+        ? `<span class="badge badge-lapor">Sudah Lapor</span>`
+        : `<span class="badge badge-belum">⚠ Belum Lapor</span>`;
 
-      const sessionHtml = sessions.length > 0 ? sessions.map(s => `
-        <div style="margin:8px 0 0;padding:10px 12px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
-          <div style="font-size:11px;color:#64748b;margin-bottom:6px;">
-            <strong>Bimbingan ke-${s.ke}</strong>
-            ${s.tanggal ? ` · ${new Date(s.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}` : ''}
-            ${s.dosen?.name ? ` · ${s.dosen.name}` : ''}
-            ${s.category ? ` <span style="background:#ede9fe;color:#5b21b6;padding:1px 6px;border-radius:4px;font-size:10px;">${s.category}</span>` : ''}
+      const sessionCards = sessions.length > 0 ? sessions.map(s => `
+        <div class="session-card">
+          <div class="session-meta">
+            <span class="pill pill-ke">Bimbingan ke-${s.ke}</span>
+            ${s.category ? `<span class="pill pill-cat">● ${s.category}</span>` : ''}
           </div>
-          <div style="font-size:13px;color:#1e293b;margin-bottom:4px;"><span style="color:#64748b;font-size:11px;font-weight:600;">PROGRES</span><br/>${s.progress || '-'}</div>
-          <div style="font-size:13px;color:#4f46e5;"><span style="color:#64748b;font-size:11px;font-weight:600;">TARGET BERIKUTNYA</span><br/>${s.next || '-'}</div>
+          ${fmtTgl(s.tanggal) ? `<div class="session-date">📅 ${fmtTgl(s.tanggal)}${s.dosen?.name ? ` · ${s.dosen.name}` : ''}</div>` : ''}
+          <div class="section-block">
+            <div class="section-label">PROGRES</div>
+            <div class="section-text">${s.progress || '-'}</div>
+          </div>
+          <div class="section-block target-block">
+            <div class="section-label">TARGET BERIKUTNYA</div>
+            <div class="section-text target-text">→ ${s.next || '-'}</div>
+          </div>
         </div>
-      `).join('') : `<p style="color:#94a3b8;font-style:italic;margin:8px 0 0;font-size:13px;">Belum ada laporan bimbingan untuk periode ini.</p>`;
+      `).join('') : `<p class="empty-text">Belum ada laporan bimbingan untuk periode ini.</p>`;
+
+      const cardBorder = verified ? '#bbf7d0' : update?.reported ? '#bfdbfe' : '#fecaca';
+      const cardBg = verified ? '#f0fdf4' : update?.reported ? '#eff6ff' : '#fff5f5';
 
       return `
-        <div style="margin-bottom:16px;padding:14px 16px;border:1px solid #e2e8f0;border-radius:12px;background:#fff;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-            <div><strong style="font-size:14px;">Periode ${num}</strong> <span style="color:#64748b;font-size:13px;">(${week})</span></div>
+        <div class="periode-card" style="border-color:${cardBorder};background:${cardBg}">
+          <div class="periode-header">
+            <div>
+              <strong class="periode-num">Periode ${num}</strong>
+              <span class="periode-range">(${week})</span>
+            </div>
             ${statusBadge}
           </div>
-          ${sessionHtml}
+          ${sessionCards}
         </div>
       `;
     }).join('');
@@ -207,31 +222,89 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
     const html = `<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
 <title>Riwayat Bimbingan TA — ${student.nama}</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; padding: 32px; background: #fff; }
-  @media print {
-    body { padding: 16px; }
-    @page { margin: 16mm 12mm; size: A4 portrait; }
-  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,Arial,sans-serif;color:#1e293b;background:#f8fafc;padding:28px}
+  @media print{body{background:#fff;padding:12px}@page{margin:12mm 10mm;size:A4 portrait}}
+
+  /* Header */
+  .doc-header{background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;border-radius:14px;padding:20px 24px;margin-bottom:20px}
+  .doc-header h1{font-size:18px;font-weight:800;letter-spacing:-.01em}
+  .doc-header p{font-size:11px;opacity:.85;margin-top:3px}
+
+  /* Profile card */
+  .profile-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px 20px;margin-bottom:20px;display:grid;grid-template-columns:1fr 1fr;gap:8px 24px}
+  .profile-field{}
+  .profile-label{font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+  .profile-value{font-size:13px;font-weight:600;color:#1e293b}
+  .profile-value.mono{font-family:monospace;font-size:12px}
+
+  /* Section title */
+  .section-title{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .section-title::after{content:'';flex:1;height:1px;background:#e2e8f0}
+
+  /* Periode card */
+  .periode-card{border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:12px;page-break-inside:avoid}
+  .periode-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .periode-num{font-size:14px;font-weight:700;color:#1e293b}
+  .periode-range{font-size:12px;color:#64748b;margin-left:6px}
+
+  /* Session card */
+  .session-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;margin-top:8px}
+  .session-meta{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+  .session-date{font-size:11px;color:#64748b;margin-bottom:8px}
+  .pill{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid}
+  .pill-ke{background:#ede9fe;color:#5b21b6;border-color:#ddd6fe}
+  .pill-cat{background:#f1f5f9;color:#475569;border-color:#e2e8f0}
+
+  /* Progres / Target */
+  .section-block{margin-bottom:6px}
+  .section-label{font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+  .section-text{font-size:13px;color:#1e293b;line-height:1.5}
+  .target-block{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px}
+  .target-text{color:#4f46e5;font-weight:500}
+
+  /* Badges */
+  .badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid;white-space:nowrap}
+  .badge-verified{background:#dcfce7;color:#166534;border-color:#bbf7d0}
+  .badge-lapor{background:#dbeafe;color:#1e40af;border-color:#bfdbfe}
+  .badge-belum{background:#fee2e2;color:#991b1b;border-color:#fecaca}
+  .empty-text{color:#94a3b8;font-style:italic;font-size:13px;margin-top:4px}
+
+  /* Footer */
+  .doc-footer{margin-top:20px;padding-top:10px;border-top:1px solid #e2e8f0;text-align:right;font-size:11px;color:#94a3b8}
 </style></head><body>
-<div style="text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #4f46e5;">
-  <div style="font-size:12px;color:#64748b;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;">Program Studi Sains Data · Institut Teknologi Sumatera</div>
-  <div style="font-size:20px;font-weight:800;color:#1e293b;">Riwayat Bimbingan Tugas Akhir</div>
+
+<div class="doc-header">
+  <h1>Riwayat Bimbingan Tugas Akhir</h1>
+  <p>Program Studi Sains Data · Institut Teknologi Sumatera · Semester Ganjil 2026/2027</p>
 </div>
-<table style="width:100%;border-collapse:collapse;margin-bottom:24px;font-size:13px;">
-  <tr><td style="padding:4px 8px;width:140px;color:#64748b;font-weight:600;">Nama</td><td style="padding:4px 8px;font-weight:700;">${student.nama}</td>
-      <td style="padding:4px 8px;width:140px;color:#64748b;font-weight:600;">Angkatan</td><td style="padding:4px 8px;">${student.angkatan}</td></tr>
-  <tr><td style="padding:4px 8px;color:#64748b;font-weight:600;">NIM</td><td style="padding:4px 8px;font-family:monospace;">${student.nim}</td>
-      <td style="padding:4px 8px;color:#64748b;font-weight:600;">Status TA</td><td style="padding:4px 8px;">${student.statusTA || '-'}</td></tr>
-  ${student.pembimbing1 ? `<tr><td style="padding:4px 8px;color:#64748b;font-weight:600;">Pembimbing 1</td><td style="padding:4px 8px;" colspan="3">${student.pembimbing1}</td></tr>` : ''}
-  ${student.pembimbing2 ? `<tr><td style="padding:4px 8px;color:#64748b;font-weight:600;">Pembimbing 2</td><td style="padding:4px 8px;" colspan="3">${student.pembimbing2}</td></tr>` : ''}
-</table>
-<div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Riwayat Bimbingan</div>
-${periodeRows}
-<div style="margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;text-align:right;font-size:11px;color:#94a3b8;">
-  Dicetak: ${new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+
+<div class="profile-card">
+  <div class="profile-field">
+    <div class="profile-label">Nama</div>
+    <div class="profile-value">${student.nama}</div>
+  </div>
+  <div class="profile-field">
+    <div class="profile-label">Angkatan</div>
+    <div class="profile-value">${student.angkatan}</div>
+  </div>
+  <div class="profile-field">
+    <div class="profile-label">NIM</div>
+    <div class="profile-value mono">${student.nim}</div>
+  </div>
+  <div class="profile-field">
+    <div class="profile-label">Status TA</div>
+    <div class="profile-value">${student.statusTA || '-'}</div>
+  </div>
+  ${student.pembimbing1 ? `<div class="profile-field"><div class="profile-label">Pembimbing 1</div><div class="profile-value">${student.pembimbing1}</div></div>` : ''}
+  ${student.pembimbing2 ? `<div class="profile-field"><div class="profile-label">Pembimbing 2</div><div class="profile-value">${student.pembimbing2}</div></div>` : ''}
 </div>
-<script>window.onload = function(){ window.print(); }</script>
+
+<div class="section-title">Riwayat Bimbingan</div>
+${periodeCards}
+
+<div class="doc-footer">Dicetak dari Sistem Monitoring TA Prodi Sains Data · ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+<script>window.onload=function(){window.print()}</script>
 </body></html>`;
 
     printWin.document.write(html);
