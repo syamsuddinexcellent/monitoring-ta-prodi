@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import {
   GraduationCap, BookOpen, CheckCircle2, AlertCircle,
   ArrowRight, UserCheck, Calendar, TrendingUp, Clock,
-  PlusCircle, ShieldCheck, PencilLine, Trash2, XCircle, RefreshCw, CalendarDays, Lock, Plus
+  PlusCircle, ShieldCheck, PencilLine, Trash2, XCircle, RefreshCw, CalendarDays, Lock, Plus, Printer
 } from 'lucide-react';
 import { getCategoryBadgeStyle } from '../utils/helpers';
 import LaporanModal, { getLocalReportsForNim, parseWeekRange, getSubmitDeadline, deleteReport, deleteSession, getSessions, getSessionCount, MAX_SESSIONS } from './LaporanModal';
@@ -163,6 +163,81 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
     return true;
   };
 
+  const handlePrintPDF = () => {
+    const weeksReversed = [...weekColumns].reverse();
+    const printWin = window.open('', '_blank');
+    if (!printWin) return;
+
+    const periodeRows = weeksReversed.map((week, idx) => {
+      const update = mergedUpdates[week];
+      const verified = isWeekVerified(week);
+      const sessions = update ? getSessions(update) : [];
+      const num = weekColumns.length - idx;
+
+      const statusBadge = verified
+        ? `<span style="background:#dcfce7;color:#166534;border:1px solid #bbf7d0;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;">✓ Terverifikasi</span>`
+        : update?.reported
+        ? `<span style="background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;">Sudah Lapor</span>`
+        : `<span style="background:#fee2e2;color:#991b1b;border:1px solid #fecaca;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;">Belum Lapor</span>`;
+
+      const sessionHtml = sessions.length > 0 ? sessions.map(s => `
+        <div style="margin:8px 0 0;padding:10px 12px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+          <div style="font-size:11px;color:#64748b;margin-bottom:6px;">
+            <strong>Bimbingan ke-${s.ke}</strong>
+            ${s.tanggal ? ` · ${new Date(s.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}` : ''}
+            ${s.dosen?.name ? ` · ${s.dosen.name}` : ''}
+            ${s.category ? ` <span style="background:#ede9fe;color:#5b21b6;padding:1px 6px;border-radius:4px;font-size:10px;">${s.category}</span>` : ''}
+          </div>
+          <div style="font-size:13px;color:#1e293b;margin-bottom:4px;"><span style="color:#64748b;font-size:11px;font-weight:600;">PROGRES</span><br/>${s.progress || '-'}</div>
+          <div style="font-size:13px;color:#4f46e5;"><span style="color:#64748b;font-size:11px;font-weight:600;">TARGET BERIKUTNYA</span><br/>${s.next || '-'}</div>
+        </div>
+      `).join('') : `<p style="color:#94a3b8;font-style:italic;margin:8px 0 0;font-size:13px;">Belum ada laporan bimbingan untuk periode ini.</p>`;
+
+      return `
+        <div style="margin-bottom:16px;padding:14px 16px;border:1px solid #e2e8f0;border-radius:12px;background:#fff;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <div><strong style="font-size:14px;">Periode ${num}</strong> <span style="color:#64748b;font-size:13px;">(${week})</span></div>
+            ${statusBadge}
+          </div>
+          ${sessionHtml}
+        </div>
+      `;
+    }).join('');
+
+    const html = `<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
+<title>Riwayat Bimbingan TA — ${student.nama}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; padding: 32px; background: #fff; }
+  @media print {
+    body { padding: 16px; }
+    @page { margin: 16mm 12mm; size: A4 portrait; }
+  }
+</style></head><body>
+<div style="text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #4f46e5;">
+  <div style="font-size:12px;color:#64748b;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;">Program Studi Sains Data · Institut Teknologi Sumatera</div>
+  <div style="font-size:20px;font-weight:800;color:#1e293b;">Riwayat Bimbingan Tugas Akhir</div>
+</div>
+<table style="width:100%;border-collapse:collapse;margin-bottom:24px;font-size:13px;">
+  <tr><td style="padding:4px 8px;width:140px;color:#64748b;font-weight:600;">Nama</td><td style="padding:4px 8px;font-weight:700;">${student.nama}</td>
+      <td style="padding:4px 8px;width:140px;color:#64748b;font-weight:600;">Angkatan</td><td style="padding:4px 8px;">${student.angkatan}</td></tr>
+  <tr><td style="padding:4px 8px;color:#64748b;font-weight:600;">NIM</td><td style="padding:4px 8px;font-family:monospace;">${student.nim}</td>
+      <td style="padding:4px 8px;color:#64748b;font-weight:600;">Status TA</td><td style="padding:4px 8px;">${student.statusTA || '-'}</td></tr>
+  ${student.pembimbing1 ? `<tr><td style="padding:4px 8px;color:#64748b;font-weight:600;">Pembimbing 1</td><td style="padding:4px 8px;" colspan="3">${student.pembimbing1}</td></tr>` : ''}
+  ${student.pembimbing2 ? `<tr><td style="padding:4px 8px;color:#64748b;font-weight:600;">Pembimbing 2</td><td style="padding:4px 8px;" colspan="3">${student.pembimbing2}</td></tr>` : ''}
+</table>
+<div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Riwayat Bimbingan</div>
+${periodeRows}
+<div style="margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;text-align:right;font-size:11px;color:#94a3b8;">
+  Dicetak: ${new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+</div>
+<script>window.onload = function(){ window.print(); }</script>
+</body></html>`;
+
+    printWin.document.write(html);
+    printWin.document.close();
+  };
+
   return (
     <>
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
@@ -189,23 +264,43 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
                   </span>
                 )}
               </div>
-              <button
-                onClick={() => openAddSession()}
-                className="mt-3 flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow transition-all sm:hidden"
-              >
-                <PlusCircle className="w-4 h-4" />
-                Laporkan Progres
-              </button>
+              <div className="mt-3 flex items-center gap-2 sm:hidden">
+                <button
+                  onClick={handlePrintPDF}
+                  className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-xl shadow-xs transition-all"
+                  title="Cetak / Simpan PDF Riwayat Bimbingan"
+                >
+                  <Printer className="w-4 h-4" />
+                  Cetak PDF
+                </button>
+                <button
+                  onClick={() => openAddSession()}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow transition-all"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  Laporkan Progres
+                </button>
+              </div>
             </div>
             <div className="flex flex-col items-center gap-3 shrink-0">
               <ProgressRing pct={pct} />
-              <button
-                onClick={() => openAddSession()}
-                className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow transition-all"
-              >
-                <PlusCircle className="w-4 h-4" />
-                Laporkan Progres
-              </button>
+              <div className="hidden sm:flex items-center gap-2">
+                <button
+                  onClick={handlePrintPDF}
+                  className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-xl shadow-xs transition-all"
+                  title="Cetak / Simpan PDF Riwayat Bimbingan"
+                >
+                  <Printer className="w-4 h-4" />
+                  Cetak PDF
+                </button>
+                <button
+                  onClick={() => openAddSession()}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow transition-all"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  Laporkan Progres
+                </button>
+              </div>
             </div>
           </div>
         </div>
