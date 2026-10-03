@@ -852,6 +852,7 @@ export default function App() {
         onSemestersChange={setLocalSemesters}
         onLockedPeriodsChange={setLockedPeriods}
         onCustomPeriodsChange={setCustomPeriodsData}
+        isAdmin={isAdmin}
       />
     </div>
   );
