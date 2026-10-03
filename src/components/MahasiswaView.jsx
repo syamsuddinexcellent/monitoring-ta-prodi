@@ -202,11 +202,10 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
         </div>
       `).join('') : `<p class="empty-text">Belum ada laporan bimbingan untuk periode ini.</p>`;
 
-      const cardBorder = verified ? '#bbf7d0' : update?.reported ? '#bfdbfe' : '#fecaca';
-      const cardBg = verified ? '#f0fdf4' : update?.reported ? '#eff6ff' : '#fff5f5';
+      const leftBorderColor = verified ? '#4ade80' : update?.reported ? '#60a5fa' : '#f87171';
 
       return `
-        <div class="periode-card" style="border-color:${cardBorder};background:${cardBg}">
+        <div class="periode-card" style="border-left:4px solid ${leftBorderColor}"
           <div class="periode-header">
             <div>
               <strong class="periode-num">Periode ${num}</strong>
@@ -243,7 +242,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
   .section-title::after{content:'';flex:1;height:1px;background:#e2e8f0}
 
   /* Periode card */
-  .periode-card{border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:12px;page-break-inside:avoid}
+  .periode-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:12px;page-break-inside:avoid}
   .periode-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
   .periode-num{font-size:14px;font-weight:700;color:#1e293b}
   .periode-range{font-size:12px;color:#64748b;margin-left:6px}
