@@ -600,6 +600,7 @@ export default function App() {
             selectedSemester={selectedSemester}
             onSelectSemester={setSelectedSemester}
             availableSemesters={availableSemesters}
+            verifData={verifData}
           />
         }
       />

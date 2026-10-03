@@ -11,10 +11,18 @@ export default function WeekSelector({
   selectedSemester,
   onSelectSemester,
   availableSemesters = [],
+  verifData = {},
 }) {
-  const countMap = {};
+  const total = students.length;
+  const laporMap = {};
+  const verifMap = {};
   weekColumns.forEach(w => {
-    countMap[w] = students.filter(s => s.weeklyUpdates[w]?.reported).length;
+    laporMap[w] = students.filter(s => s.weeklyUpdates[w]?.reported).length;
+    verifMap[w] = students.filter(s => {
+      const upd = s.weeklyUpdates[w];
+      if (!upd?.reported) return false;
+      return verifData[s.nim]?.[w]?.verified || upd?.sessionVerified;
+    }).length;
   });
 
   const reversedWeeks = [...weekColumns].reverse();
@@ -54,9 +62,11 @@ export default function WeekSelector({
             {viewMode === 'matrix' && (
               <option value="">— Semua Periode —</option>
             )}
-            {reversedWeeks.map((week, i) => {
-              const count = countMap[week] ?? 0;
-              const label = `${week}  (${count}/${students.length})`;
+            {reversedWeeks.map((week) => {
+              const pNum = weekColumns.indexOf(week) + 1;
+              const lapor = laporMap[week] ?? 0;
+              const verif = verifMap[week] ?? 0;
+              const label = `P${pNum} · ${week}  (${verif} verif / ${lapor} lapor / ${total} total)`;
               return (
                 <option key={week} value={week}>{label}</option>
               );
