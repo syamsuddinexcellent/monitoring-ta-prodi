@@ -7,3 +7,4 @@ public/qr.png
 .DS_Store
 *.log
 .vercel
+.env*
