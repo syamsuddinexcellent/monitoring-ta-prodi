@@ -139,13 +139,13 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
                         <MessageCircle className="w-3 h-3" />
                         <span>WA</span>
                       </a>
-                    ) : lapor ? (
+                    ) : s.pembimbing1 === dosenName && lapor ? (
                       <span className="text-[10px] font-bold shrink-0 text-emerald-600">✓ Lapor</span>
-                    ) : !phone ? (
+                    ) : s.pembimbing1 === dosenName && !phone ? (
                       <span className="text-[10px] font-bold shrink-0 text-rose-400">No WA</span>
-                    ) : (
+                    ) : s.pembimbing1 === dosenName ? (
                       <span className="text-[10px] font-mono shrink-0 text-slate-500">{s.phone}</span>
-                    )}
+                    ) : null}
                   </div>
                 );
               })
@@ -278,11 +278,11 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
                         <MessageCircle className="w-3 h-3" />
                         <span>WA</span>
                       </a>
-                    ) : !phone ? (
+                    ) : s.pembimbing1 === dosenName && !phone ? (
                       <span className="text-[10px] text-slate-400 shrink-0">No WA</span>
-                    ) : (
+                    ) : s.pembimbing1 === dosenName ? (
                       <span className="text-[10px] font-mono shrink-0 text-slate-500">{s.phone}</span>
-                    )}
+                    ) : null}
                   </div>
                 );
               })
