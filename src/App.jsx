@@ -101,6 +101,11 @@ export default function App() {
     } catch { return null; }
   });
   const isAdmin = loggedInUser?.role === 'admin';
+  // For shared dosen luar account: the name selected after login
+  const [activeDosenName, setActiveDosenName] = useState(() => {
+    try { return sessionStorage.getItem('active_dosen_name') || ''; } catch { return ''; }
+  });
+  const dosenName = activeDosenName || loggedInUser?.lecturerName || '';
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [resetToken, setResetToken] = useState(null);
   const [resetEmail, setResetEmail] = useState(null);
@@ -363,12 +368,14 @@ export default function App() {
     return getWeeklyMetrics(data.students, selectedWeek);
   }, [data, selectedWeek]);
 
-  // Dosen's own students (P1 or P2) — handles pipe-separated lecturerName for shared accounts
+  // Dosen's own students (P1 or P2) — uses selected name for shared dosen luar accounts
   const dosenStudents = useMemo(() => {
     if (!data || loggedInUser?.role !== 'dosen' || !loggedInUser?.lecturerName) return [];
-    const names = new Set(loggedInUser.lecturerName.split('|').map(n => n.trim()).filter(Boolean));
+    const names = activeDosenName
+      ? new Set([activeDosenName])
+      : new Set(loggedInUser.lecturerName.split('|').map(n => n.trim()).filter(Boolean));
     return data.students.filter(s => names.has(s.pembimbing1) || names.has(s.pembimbing2));
-  }, [data, loggedInUser]);
+  }, [data, loggedInUser, activeDosenName]);
 
   // Dosen-scoped metrics
   const dosenMetrics = useMemo(() => {
@@ -562,8 +569,9 @@ export default function App() {
           loggedInUser={loggedInUser}
           onLoginClick={() => setIsLoginModalOpen(true)}
           onLogout={() => {
-            try { sessionStorage.removeItem('auth_session'); } catch {}
+            try { sessionStorage.removeItem('auth_session'); sessionStorage.removeItem('active_dosen_name'); } catch {}
             setLoggedInUser(null);
+            setActiveDosenName('');
           }}
           onlineCount={onlineCount}
           onlineUsers={onlineUsers}
@@ -600,8 +608,9 @@ export default function App() {
         loggedInUser={loggedInUser}
         onLoginClick={() => setIsLoginModalOpen(true)}
         onLogout={() => {
-          try { sessionStorage.removeItem('auth_session'); } catch {}
+          try { sessionStorage.removeItem('auth_session'); sessionStorage.removeItem('active_dosen_name'); } catch {}
           setLoggedInUser(null);
+          setActiveDosenName('');
           setLecturerFilter('all');
         }}
         laporanMasukCount={laporanMasukCount}
@@ -634,7 +643,7 @@ export default function App() {
             <div className="bg-gradient-to-r from-brand-600 to-indigo-600 rounded-2xl px-5 py-4 flex items-center justify-between gap-4 shadow-sm">
               <div>
                 <p className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-0.5">Dashboard Bimbingan</p>
-                <h2 className="text-base font-bold text-white leading-tight">{loggedInUser.lecturerName}</h2>
+                <h2 className="text-base font-bold text-white leading-tight">{dosenName}</h2>
                 <p className="text-xs text-white/70 mt-0.5">
                   {dosenStudents.length} mahasiswa bimbingan
                   {selectedWeek && ` · Periode ${selectedWeek}`}
@@ -657,7 +666,7 @@ export default function App() {
         )}
 
         {/* KPI Cards */}
-        <MetricCards metrics={activeMetrics} selectedWeek={selectedWeek} isDosen={isDosen} isAdmin={isAdmin} students={isDosen ? dosenStudents : (data?.students || [])} dosenName={loggedInUser?.lecturerName || ''} verifData={verifData} />
+        <MetricCards metrics={activeMetrics} selectedWeek={selectedWeek} isDosen={isDosen} isAdmin={isAdmin} students={isDosen ? dosenStudents : (data?.students || [])} dosenName={dosenName} verifData={verifData} />
 
         {/* Analytics Charts */}
         <AnalyticsCharts
@@ -666,7 +675,7 @@ export default function App() {
           selectedWeek={selectedWeek}
           isDosen={isDosen}
           dosenStudents={dosenStudents}
-          dosenName={loggedInUser?.lecturerName || ''}
+          dosenName={dosenName}
           verifData={verifData}
         />
 
@@ -775,7 +784,7 @@ export default function App() {
                     onOpenGatewayModal={() => setIsGatewayModalOpen(true)}
                     isAdmin={isAdmin}
                     isDosen={isDosen}
-                    dosenName={loggedInUser?.lecturerName || ''}
+                    dosenName={dosenName}
                     highlightLecturer={lecturerFilter !== 'all' ? lecturerFilter : ''}
                     onUpdateTarget={async (nim, newTarget) => {
                       await upsertStudentOverride(nim, { target: newTarget });
@@ -803,7 +812,7 @@ export default function App() {
                 onOpenGatewayModal={() => setIsGatewayModalOpen(true)}
                 isAdmin={isAdmin}
                 isDosen={isDosen}
-                dosenName={loggedInUser?.lecturerName || ''}
+                dosenName={dosenName}
                 onUpdateTarget={async (nim, newTarget) => {
                   await upsertStudentOverride(nim, { target: newTarget });
                   setData(prev => {
@@ -857,14 +866,41 @@ export default function App() {
         isOpen={isLoginModalOpen}
         onClose={() => { setIsLoginModalOpen(false); setResetToken(null); setResetEmail(null); }}
         onSuccess={(user) => {
+          setActiveDosenName('');
+          try { sessionStorage.removeItem('active_dosen_name'); } catch {}
           setLoggedInUser(user);
-          if (user.role === 'dosen' && user.lecturerName) {
+          if (user.role === 'dosen' && user.lecturerName && !user.lecturerName.includes('|')) {
             setLecturerFilter(user.lecturerName);
           }
         }}
         resetToken={resetToken}
         resetEmail={resetEmail}
       />
+
+      {/* Dosen Luar Name Picker — shown when shared account has multiple names */}
+      {isDosen && loggedInUser?.lecturerName?.includes('|') && !activeDosenName && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full">
+            <h2 className="text-base font-bold text-slate-800 mb-1">Pilih Nama Anda</h2>
+            <p className="text-xs text-slate-500 mb-4">Pilih nama Anda dari daftar dosen luar berikut untuk melanjutkan.</p>
+            <div className="space-y-2">
+              {loggedInUser.lecturerName.split('|').map(n => n.trim()).filter(Boolean).map(name => (
+                <button
+                  key={name}
+                  onClick={() => {
+                    setActiveDosenName(name);
+                    try { sessionStorage.setItem('active_dosen_name', name); } catch {}
+                    setLecturerFilter(name);
+                  }}
+                  className="w-full text-left px-4 py-3 rounded-xl border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 text-sm font-medium text-slate-700 transition-colors"
+                >
+                  {name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Laporan Masuk Modal (dosen) */}
       <LaporanMasukModal
@@ -877,7 +913,7 @@ export default function App() {
             setData(prev => ({ ...prev, students: updated }));
           }
         }}
-        dosenName={loggedInUser?.lecturerName || ''}
+        dosenName={dosenName}
       />
 
       {/* Admin Panel Modal */}

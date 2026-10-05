@@ -17,6 +17,7 @@ const LECTURER_EMAIL_MAP = {
   'dewi.setiawan@sd.itera.ac.id':          'Dewi Indra Setiawan, S.Si., M.Si.',
   'dimas.randa@sd.itera.ac.id':            'Dimas Dwi Randa, S.Kom., M.Kom.',
   'koordinator.ta@itera.ac.id':            'Dr. Koordinator TA',
+  'dosenluar@sd.itera.ac.id':             'Budi Santoso, S.T., M.T.|Dr. Esa Prakasa, S.T., M.T.|Lita Lianti, S.T., M.Sc.|Rumadi, S.T., M.T.|Triyana Muliawati, S.Si., M.Si.',
   'fajri.farid@sd.itera.ac.id':            'Fajri Farid, S.Si., M.Sc.',
   'febri.dwi@sd.itera.ac.id':              'Febri Dwi Irawati, S.Si., M.Si.',
   'fitri.nurjanah@sd.itera.ac.id':         'Fitri Nurjanah, S.Si., M.Mat.',
