@@ -17,7 +17,6 @@ const LECTURER_EMAIL_MAP = {
   'dewi.setiawan@sd.itera.ac.id':          'Dewi Indra Setiawan, S.Si., M.Si.',
   'dimas.randa@sd.itera.ac.id':            'Dimas Dwi Randa, S.Kom., M.Kom.',
   'koordinator.ta@itera.ac.id':            'Dr. Koordinator TA',
-  'dosenluar@itera.ac.id':                 'Budi Santoso, S.T., M.T.|Dr. Esa Prakasa, S.T., M.T.|Lita Lianti, S.T., M.Sc.|Rumadi, S.T., M.T.|Triyana Muliawati, S.Si., M.Si.',
   'fajri.farid@sd.itera.ac.id':            'Fajri Farid, S.Si., M.Sc.',
   'febri.dwi@sd.itera.ac.id':              'Febri Dwi Irawati, S.Si., M.Si.',
   'fitri.nurjanah@sd.itera.ac.id':         'Fitri Nurjanah, S.Si., M.Mat.',
@@ -108,20 +107,24 @@ export async function loginWithCredentials(identifier, password) {
   return null;
 }
 
-export async function registerUser(email, password, overrideName = null, overrideRole = null, overrideNim = null) {
+export async function registerUser(email, password, overrideName = null, overrideRole = null, overrideNim = null, overrideLecturerName = null) {
   if (!email.trim() || !password) return { error: 'Semua field wajib diisi.' };
   const emailLower = email.trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailLower)) return { error: 'Format email tidak valid.' };
   const role = overrideRole || classifyEmail(emailLower);
-  if (!role) return { error: 'Hanya email ITERA yang diizinkan (@sd.itera.ac.id, @student.itera.ac.id, dll.).' };
+  // When admin explicitly sets role (overrideRole provided), skip domain validation
+  if (!overrideRole) {
+    if (!role) return { error: 'Hanya email ITERA yang diizinkan (@sd.itera.ac.id, @student.itera.ac.id, dll.).' };
+    if (password.length < 6) return { error: 'Password minimal 6 karakter.' };
+    if (role === 'dosen' && !DOSEN_DOMAINS.includes(emailLower.split('@')[1])) {
+      return { error: 'Akun dosen hanya dapat didaftarkan dengan email ITERA dosen (@sd.itera.ac.id, @itera.ac.id, dll.).' };
+    }
+    if (role === 'mahasiswa' && emailLower.split('@')[1] !== 'student.itera.ac.id') {
+      return { error: 'Akun mahasiswa hanya dapat didaftarkan dengan email @student.itera.ac.id.' };
+    }
+  }
   if (password.length < 6) return { error: 'Password minimal 6 karakter.' };
-  if (role === 'dosen' && !DOSEN_DOMAINS.includes(emailLower.split('@')[1])) {
-    return { error: 'Akun dosen hanya dapat didaftarkan dengan email ITERA dosen (@sd.itera.ac.id, @itera.ac.id, dll.).' };
-  }
-  if (role === 'mahasiswa' && emailLower.split('@')[1] !== 'student.itera.ac.id') {
-    return { error: 'Akun mahasiswa hanya dapat didaftarkan dengan email @student.itera.ac.id.' };
-  }
-  const lecturerName = LECTURER_EMAIL_MAP[emailLower] || '';
+  const lecturerName = overrideLecturerName || LECTURER_EMAIL_MAP[emailLower] || '';
   const name = overrideName || emailLower.split('@')[0];
   if (supabase) {
     const { data: existing } = await supabase.from('app_users').select('email').eq('email', emailLower).maybeSingle();
