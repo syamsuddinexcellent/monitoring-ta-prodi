@@ -170,7 +170,7 @@ export default function StudentTable({
                       <span className="text-slate-400 font-normal shrink-0">Status:</span>
                       <span className="font-medium text-slate-700">{student.statusTA || '-'}</span>
                     </div>
-                    {(student.target || (isDosen && onUpdateTarget && student.pembimbing1 === dosenName)) && (
+                    {(student.target || (isDosen && student.pembimbing1 === dosenName)) && (
                       <div className="flex items-baseline gap-1 mt-0.5">
                         <span className="text-slate-400 font-normal shrink-0">Target:</span>
                         {isDosen && onUpdateTarget && student.pembimbing1 === dosenName ? (

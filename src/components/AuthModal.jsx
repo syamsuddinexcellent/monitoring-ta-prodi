@@ -473,7 +473,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, resetToken = nul
     const overrideNim  = regRole === 'mahasiswa' ? regNim.trim() : null;
     setRegLoading(true);
     try {
-      const result = await registerUser(regEmail, regPassword, overrideName, regRole, overrideNim);
+      const result = await registerUser(regEmail, regPassword, overrideName, null, overrideNim);
       if (result.error) { setRegError(result.error); }
       else {
         setRegSuccess('Akun berhasil dibuat! Silakan login.');
