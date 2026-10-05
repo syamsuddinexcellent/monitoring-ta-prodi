@@ -422,13 +422,14 @@ export function getWeeklyMetrics(students, selectedWeek) {
 /**
  * Calculate trend metrics across all weeks
  */
-export function getAllWeeksTrend(students, weekColumns) {
+export function getAllWeeksTrend(students, weekColumns, verifData = {}) {
   return weekColumns.map((week, idx) => {
     let reported = 0;
+    let verified = 0;
     students.forEach(s => {
-      if (s.weeklyUpdates[week]?.reported) {
-        reported++;
-      }
+      const update = s.weeklyUpdates[week];
+      if (update?.reported) reported++;
+      if (verifData[s.nim]?.[week]?.verified || update?.sessionVerified) verified++;
     });
 
     return {
@@ -436,6 +437,7 @@ export function getAllWeeksTrend(students, weekColumns) {
       shortName: `Periode ${idx + 1}`,
       reported,
       notReported: students.length - reported,
+      verified,
       total: students.length,
       percentage: students.length > 0 ? Math.round((reported / (students.length || 1)) * 100) : 0
     };

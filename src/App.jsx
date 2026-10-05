@@ -587,7 +587,7 @@ export default function App() {
         <AuthModal
           isOpen={isLoginModalOpen}
           onClose={() => { setIsLoginModalOpen(false); setResetToken(null); setResetEmail(null); }}
-          onSuccess={(user) => { setLoggedInUser(user); try { sessionStorage.setItem('auth_session', JSON.stringify(user)); } catch {} }}
+          onSuccess={(user) => { setActiveDosenName(''); try { sessionStorage.removeItem('active_dosen_name'); sessionStorage.setItem('auth_session', JSON.stringify(user)); } catch {} setLoggedInUser(user); }}
           resetToken={resetToken}
           resetEmail={resetEmail}
         />
