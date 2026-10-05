@@ -238,8 +238,10 @@ export default function StudentTable({
                           <Phone className="w-3 h-3 text-emerald-600" />
                           <span>{phoneDisplay}</span>
                         </button>
+                      ) : update.reported && student.phone ? (
+                        <span className="text-slate-400 text-xs italic">{phoneDisplay}</span>
                       ) : (
-                        <span className="text-slate-400 text-xs italic">{student.phone ? phoneDisplay : '-'}</span>
+                        <span className="text-slate-400 text-xs italic">-</span>
                       )}
                     </td>
                   )}

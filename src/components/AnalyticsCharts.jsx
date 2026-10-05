@@ -277,7 +277,7 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
                         <span>WA</span>
                       </a>
                     ) : (
-                      <span className="text-[10px] text-slate-400 shrink-0">No WA</span>
+                      <span className="text-[10px] text-slate-400 shrink-0">{!phone ? 'No WA' : '—'}</span>
                     )}
                   </div>
                 );

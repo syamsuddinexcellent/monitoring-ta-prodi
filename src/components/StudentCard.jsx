@@ -201,14 +201,12 @@ export default function StudentCard({
               </div>
             );
           })}
-          {student.statusTA && (
-            <div className="flex items-center justify-between gap-1 pt-1 border-t border-slate-200/50">
-              <span className="text-slate-400 shrink-0">Status:</span>
-              <span className="font-medium text-brand-700 truncate text-right">
-                {student.statusTA}
-              </span>
-            </div>
-          )}
+          <div className="flex items-center justify-between gap-1 pt-1 border-t border-slate-200/50">
+            <span className="text-slate-400 shrink-0">Status:</span>
+            <span className="font-medium text-brand-700 truncate text-right">
+              {student.statusTA || '-'}
+            </span>
+          </div>
           {(student.target || (isDosen && student.pembimbing1 === dosenName)) && (
             <div className="flex items-center justify-between gap-1 pt-0.5">
               <span className="text-slate-400 shrink-0">Target:</span>
@@ -276,38 +274,36 @@ export default function StudentCard({
             <span>{update.category}</span>
           </span>
 
-          {/* WhatsApp Direct Badge — admin & dosen, klikable hanya P1 & Belum Lapor */}
-          {(isAdmin || isDosen) && (
-            (isAdmin || student.pembimbing1 === dosenName) && hasPhone && !update.reported ? (
-              <div className="inline-flex items-center gap-1 text-xs bg-emerald-50/80 border border-emerald-200/80 text-emerald-800 rounded-md px-2 py-0.5 font-medium">
-                <Phone className="w-3 h-3 text-emerald-600" />
-                <button
-                  onClick={handleDirectWA}
-                  className="hover:underline font-mono text-[11px] font-semibold"
-                  title="Klik untuk buka chat di WhatsApp Web"
-                >
-                  {phoneDisplay}
-                </button>
-                <button
-                  onClick={handleCopyPhone}
-                  className="p-0.5 hover:text-emerald-950 text-emerald-600"
-                  title="Salin nomor WhatsApp"
-                >
-                  {copiedPhone ? (
-                    <Check className="w-3 h-3 text-emerald-700" />
-                  ) : (
-                    <Copy className="w-3 h-3" />
-                  )}
-                </button>
-              </div>
-            ) : hasPhone ? (
-              <span className="font-mono text-[11px] text-slate-500">{phoneDisplay}</span>
-            ) : (
-              <span className="text-[11px] text-slate-400 italic">
-                Nomor WA belum ada
-              </span>
-            )
-          )}
+          {/* WhatsApp Direct Badge — admin & dosen P1 only, hanya Belum Lapor */}
+          {(isAdmin || (isDosen && student.pembimbing1 === dosenName)) && (hasPhone && !update.reported ? (
+            <div className="inline-flex items-center gap-1 text-xs bg-emerald-50/80 border border-emerald-200/80 text-emerald-800 rounded-md px-2 py-0.5 font-medium">
+              <Phone className="w-3 h-3 text-emerald-600" />
+              <button
+                onClick={handleDirectWA}
+                className="hover:underline font-mono text-[11px] font-semibold"
+                title="Klik untuk buka chat di WhatsApp Web"
+              >
+                {phoneDisplay}
+              </button>
+              <button
+                onClick={handleCopyPhone}
+                className="p-0.5 hover:text-emerald-950 text-emerald-600"
+                title="Salin nomor WhatsApp"
+              >
+                {copiedPhone ? (
+                  <Check className="w-3 h-3 text-emerald-700" />
+                ) : (
+                  <Copy className="w-3 h-3" />
+                )}
+              </button>
+            </div>
+          ) : hasPhone ? (
+            <span className="font-mono text-[11px] text-slate-500">{phoneDisplay}</span>
+          ) : (
+            <span className="text-[11px] text-slate-400 italic">
+              Nomor WA belum ada
+            </span>
+          ))}
         </div>
 
         {/* Progress Content */}
