@@ -325,11 +325,9 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
                 <span className="text-xs font-semibold text-brand-700 bg-brand-50 border border-brand-200 px-2 py-0.5 rounded-full">
                   Angkatan {student.angkatan}
                 </span>
-                {student.statusTA && (
-                  <span className="text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full">
-                    {student.statusTA}
-                  </span>
-                )}
+                <span className="text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full">
+                  {student.statusTA || '-'}
+                </span>
               </div>
               <div className="mt-3 flex items-center gap-2 sm:hidden">
                 <button

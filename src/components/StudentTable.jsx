@@ -238,7 +238,9 @@ export default function StudentTable({
                           <Phone className="w-3 h-3 text-emerald-600" />
                           <span>{phoneDisplay}</span>
                         </button>
-                      ) : update.reported && student.phone ? (
+                      ) : student.phone && !update.reported ? (
+                        <span className="text-slate-400 text-xs italic">{phoneDisplay}</span>
+                      ) : (isAdmin || student.pembimbing1 === dosenName) && student.phone ? (
                         <span className="text-slate-400 text-xs italic">{phoneDisplay}</span>
                       ) : (
                         <span className="text-slate-400 text-xs italic">-</span>
