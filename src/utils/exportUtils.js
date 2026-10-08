@@ -252,9 +252,11 @@ export function printStudentHistory(student, weekColumns, verifData = {}) {
     if (!upd.reported) return [];
 
     const verif = verifNim[week];
-    const isPeriodVerified = !!(verif?.verified || upd.sessionVerified);
     const num = idx + 1;
     const allSessions = upd.sessions || [];
+    const isPeriodVerified = allSessions.length > 0
+      ? allSessions.every(s => s.verified_at)
+      : !!(verif?.verified || upd.sessionVerified);
 
     if (allSessions.length === 0) {
       const progres = upd.progress || '<span class="text-muted">-</span>';
