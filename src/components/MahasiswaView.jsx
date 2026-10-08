@@ -75,7 +75,7 @@ export default function MahasiswaView({ student, weekColumns, loggedInUser, lock
     if (verifData[week]?.verified) return true;
     // Check inline session verification
     const sessions = mergedUpdates[week]?.sessions || [];
-    return sessions.some(s => s.verified_at);
+    return sessions.length > 0 && sessions.every(s => s.verified_at);
   };
 
   const [confirmDelete, setConfirmDelete] = useState(null); // { type: 'week'|'session', week, ke }
