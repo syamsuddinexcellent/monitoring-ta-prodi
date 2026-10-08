@@ -145,6 +145,8 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
                       <span className="text-[10px] font-bold shrink-0 text-rose-400">No WA</span>
                     ) : s.pembimbing1 === dosenName ? (
                       <span className="text-[10px] font-mono shrink-0 text-slate-500">{s.phone}</span>
+                    ) : !lapor && phone ? (
+                      <span className="text-[10px] font-mono shrink-0 text-slate-500">{s.phone}</span>
                     ) : null}
                   </div>
                 );
@@ -281,6 +283,8 @@ export default function AnalyticsCharts({ metrics, trendData, selectedWeek, isDo
                     ) : s.pembimbing1 === dosenName && !phone ? (
                       <span className="text-[10px] text-slate-400 shrink-0">No WA</span>
                     ) : s.pembimbing1 === dosenName ? (
+                      <span className="text-[10px] font-mono shrink-0 text-slate-500">{s.phone}</span>
+                    ) : phone ? (
                       <span className="text-[10px] font-mono shrink-0 text-slate-500">{s.phone}</span>
                     ) : null}
                   </div>

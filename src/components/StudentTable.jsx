@@ -238,13 +238,13 @@ export default function StudentTable({
                           <Phone className="w-3 h-3 text-emerald-600" />
                           <span>{phoneDisplay}</span>
                         </button>
-                      ) : student.phone && !update.reported ? (
+                      ) : student.phone && !update.reported && isDosen ? (
                         <span className="text-slate-400 text-xs italic">{phoneDisplay}</span>
                       ) : (isAdmin || student.pembimbing1 === dosenName) && student.phone ? (
                         <span className="text-slate-400 text-xs italic">{phoneDisplay}</span>
-                      ) : (
+                      ) : isAdmin ? (
                         <span className="text-slate-400 text-xs italic">-</span>
-                      )}
+                      ) : null}
                     </td>
                   )}
 
