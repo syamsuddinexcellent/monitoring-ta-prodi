@@ -249,47 +249,56 @@ export function printStudentHistory(student, weekColumns, verifData = {}) {
 
   const tableRows = weekColumns.flatMap((week, idx) => {
     const upd = student.weeklyUpdates?.[week] || {};
-    const verif = verifNim[week];
-    const isSessionVerif = !verif?.verified && upd.sessionVerified;
-    if (!verif?.verified && !isSessionVerif) return [];
+    if (!upd.reported) return [];
 
+    const verif = verifNim[week];
+    const isPeriodVerified = !!(verif?.verified || upd.sessionVerified);
     const num = idx + 1;
     const allSessions = upd.sessions || [];
-    const hasSessionVerif = allSessions.some(s => s.verified_at);
-    const verifiedSessions = hasSessionVerif
-      ? allSessions.filter(s => s.verified_at)
-      : verif?.verified ? allSessions : [];
 
-    if (verifiedSessions.length === 0) {
+    if (allSessions.length === 0) {
       const progres = upd.progress || '<span class="text-muted">-</span>';
       const target = upd.next || '<span class="text-muted">-</span>';
       const category = upd.category || '';
       const dosenName = verif?.dosenName || upd.sessions?.[0]?.verified_by || '';
+      const badgeHtml = isPeriodVerified
+        ? `<span class="badge badge-verified">&#10003; Terverifikasi</span>`
+        : `<span class="badge badge-pending">Belum Diverifikasi</span>`;
+      const ttdHtml = isPeriodVerified
+        ? `<div class="ttd-space"></div><div class="ttd-name">${dosenName}</div>`
+        : `<div class="ttd-space" style="border-bottom-style:dashed"></div>`;
       return [`<tr>
         <td><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>
-        <td><span class="badge badge-verified">&#10003; Terverifikasi</span>${category ? `<div class="cat-text">${category}</div>` : ''}</td>
+        <td>${badgeHtml}${category ? `<div class="cat-text">${category}</div>` : ''}</td>
         <td>${progres}</td>
         <td>${target}</td>
-        <td class="col-ttd"><div class="ttd-space"></div><div class="ttd-name">${dosenName}</div></td>
+        <td class="col-ttd">${ttdHtml}</td>
       </tr>`];
     }
 
-    const rowCount = verifiedSessions.length;
-    return verifiedSessions.map((s, si) => {
+    const rowCount = allSessions.length;
+    return allSessions.map((s, si) => {
       const progres = s.progress || '<span class="text-muted">-</span>';
       const target = s.next || '<span class="text-muted">-</span>';
       const category = s.category || '';
+      const isSessionVerified = !!(s.verified_at);
       const dosenName = s.verified_by || verif?.dosenName || s.dosen?.name || '';
       const keBadge = rowCount > 1 ? `<div class="ke-text">Bimbingan ke-${s.ke ?? si + 1}</div>` : '';
+      const badgeHtml = isSessionVerified
+        ? `<span class="badge badge-verified">&#10003; Terverifikasi</span>`
+        : `<span class="badge badge-pending">Belum Diverifikasi</span>`;
+      const ttdHtml = isSessionVerified
+        ? `<div class="ttd-space"></div><div class="ttd-name">${dosenName}</div>`
+        : `<div class="ttd-space" style="border-bottom-style:dashed"></div>`;
       const periodCell = si === 0
         ? `<td rowspan="${rowCount}" style="vertical-align:top"><div class="p-label">P${num}</div><div class="p-range">${week}</div></td>`
         : '';
       return `<tr>
         ${periodCell}
-        <td><span class="badge badge-verified">&#10003; Terverifikasi</span>${category ? `<div class="cat-text">${category}</div>` : ''}${keBadge}</td>
+        <td>${badgeHtml}${category ? `<div class="cat-text">${category}</div>` : ''}${keBadge}</td>
         <td>${progres}</td>
         <td>${target}</td>
-        <td class="col-ttd"><div class="ttd-space"></div><div class="ttd-name">${dosenName}</div></td>
+        <td class="col-ttd">${ttdHtml}</td>
       </tr>`;
     });
   }).join('');
@@ -331,6 +340,7 @@ export function printStudentHistory(student, weekColumns, verifData = {}) {
   .p-range{font-size:11px;color:#94a3b8;margin-top:2px}
   .badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;display:inline-block}
   .badge-verified{background:#dcfce7;color:#166534}
+  .badge-pending{background:#fef9c3;color:#854d0e}
   .cat-text{font-size:11px;color:#64748b;margin-top:5px}
   .ke-text{font-size:10px;font-weight:700;color:#4f46e5;text-transform:uppercase;letter-spacing:.04em;margin-top:4px}
   .text-muted{color:#94a3b8}
