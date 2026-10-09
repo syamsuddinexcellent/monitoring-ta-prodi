@@ -430,7 +430,7 @@ function getPeriodsWithRoom(weekColumns, existingData, lockedPeriods, forceWeek)
     const sessionCount = getSessionCount(existingData?.[w]);
     if (sessionCount >= MAX_SESSIONS) return false;
     const range = parseWeekRange(w);
-    if (range && new Date() > getSubmitDeadline(range.end)) return false;
+    if (range && new Date() > new Date(2026, 9, 18, 23, 59, 59, 999)) return false;
     return true;
   });
 }
